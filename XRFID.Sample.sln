@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34009.444
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XRFID.Sample.Webservice", "XRFID.Sample.Webservice\XRFID.Sample.Webservice.csproj", "{37F168AF-CE80-4B82-9478-F3389D4D62DB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XRFID.Sample.Client", "XRFID.Client.Mobile\XRFID.Sample.Client.csproj", "{EA555669-DD91-4290-8754-96FAC7F919EC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XRFID.Sample.Common", "XRFID.Sample.Common\XRFID.Sample.Common.csproj", "{A7039A16-5042-4486-9457-31C86A66F67D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{37F168AF-CE80-4B82-9478-F3389D4D62DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37F168AF-CE80-4B82-9478-F3389D4D62DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37F168AF-CE80-4B82-9478-F3389D4D62DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37F168AF-CE80-4B82-9478-F3389D4D62DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA555669-DD91-4290-8754-96FAC7F919EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA555669-DD91-4290-8754-96FAC7F919EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA555669-DD91-4290-8754-96FAC7F919EC}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{EA555669-DD91-4290-8754-96FAC7F919EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA555669-DD91-4290-8754-96FAC7F919EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA555669-DD91-4290-8754-96FAC7F919EC}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{A7039A16-5042-4486-9457-31C86A66F67D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7039A16-5042-4486-9457-31C86A66F67D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7039A16-5042-4486-9457-31C86A66F67D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7039A16-5042-4486-9457-31C86A66F67D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5B467AC4-9FC0-4F11-9782-BA682127A0F7}
+	EndGlobalSection
+EndGlobal
