@@ -1,0 +1,144 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>;net7.0-android33.0</TargetFrameworks>
+		<OutputType>Exe</OutputType>
+		<RootNamespace>XRFID.Sample.Client.Mobile</RootNamespace>
+		<UseMaui>true</UseMaui>
+		<SingleProject>true</SingleProject>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Authors>Xerum Srl</Authors>
+		<Company>Xerum Srl</Company>
+		<Product>XRFID.Sample.Client.Mobile</Product>
+		<Copyright>Copyright © Xerum 2023</Copyright>
+
+		<!-- Display name -->
+		<ApplicationTitle>XRFID Sample Client Mobile</ApplicationTitle>
+
+		<!-- App Identifier -->
+		<ApplicationId>com.xerum.xrfid.sample.client.mobile</ApplicationId>
+		<ApplicationIdGuid>621b9872-ca74-40b1-8c83-f864255e7b9f</ApplicationIdGuid>
+
+		<!-- Versions -->
+		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+		<ApplicationVersion>1</ApplicationVersion>
+
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">28.0</SupportedOSPlatformVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-android33.0|AnyCPU'">
+	  <EmbedAssembliesIntoApk>False</EmbedAssembliesIntoApk>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- App Icon -->
+		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+
+		<!-- Splash Screen -->
+		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#e55934" BaseSize="128,128" />
+
+		<!-- Images -->
+		<MauiImage Include="Resources\Images\*" />
+		<MauiImage Update="Resources\Images\dotnet_bot.svg" BaseSize="168,208" />
+
+		<!-- Custom Fonts -->
+		<MauiFont Include="Resources\Fonts\*" />
+
+		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
+		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <AndroidResource Remove="Views\RapidRead\**" />
+	  <Compile Remove="Views\RapidRead\**" />
+	  <EmbeddedResource Remove="Views\RapidRead\**" />
+	  <MauiCss Remove="Views\RapidRead\**" />
+	  <MauiXaml Remove="Views\RapidRead\**" />
+	  <None Remove="Views\RapidRead\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Maui" Version="5.3.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1" />
+		<PackageReference Include="RestSharp" Version="110.2.0" />
+		<PackageReference Include="Symbol.XamarinEMDK" Version="8.0.0.9" />
+		<PackageReference Include="Syncfusion.Maui.Core" Version="22.2.5" />
+		<PackageReference Include="Syncfusion.Maui.DataGrid" Version="22.2.5" />
+		<PackageReference Include="Syncfusion.Maui.Gauges" Version="22.2.5" />
+		<PackageReference Include="Syncfusion.Maui.ListView" Version="22.2.5" />
+		<PackageReference Include="Syncfusion.Maui.Sliders" Version="22.2.5" />
+		<PackageReference Include="TinyMvvm.Maui" Version="4.2.1" />
+		<PackageReference Include="Xam.Plugin.DeviceInfo" Version="4.1.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\XRFID.Sample.Common\XRFID.Sample.Common.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="XamarinZebraRFID">
+	    <HintPath>..\dll\XamarinZebraRFID.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Views\FindItem\FindItemRfidView.xaml.cs">
+	    <DependentUpon>FindItemRfidView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\FindItem\FindItemView.xaml.cs">
+	    <DependentUpon>FindItemView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Inventory\InventoryView.xaml.cs">
+	    <DependentUpon>InventoryView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\PageSettings\FindSettings.xaml.cs">
+	    <DependentUpon>FindSettings.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\RapidReadView.xaml.cs">
+	    <DependentUpon>RapidReadView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\CheckItem\CheckItemView.xaml.cs">
+	    <DependentUpon>CheckItemView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\CheckItem\CheckItemRfidView.xaml.cs">
+	    <DependentUpon>CheckItemRfidView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\SettingsPage.xaml.cs">
+	    <DependentUpon>SettingsPage.xaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Update="Views\AboutView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\FindItem\FindItemRfidView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\FindItem\FindItemView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Inventory\InventoryView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\PageSettings\FindSettings.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\PageSettings\InventoryRapidReadSettings.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\RapidReadView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\CheckItem\CheckItemView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\CheckItem\CheckItemRfidView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\SettingsPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	</ItemGroup>
+
+</Project>
