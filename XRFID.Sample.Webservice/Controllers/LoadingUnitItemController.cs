@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Data;
 using Xerum.XFramework.Common;
 using XRFID.Sample.Common.Dto;
 using XRFID.Sample.Webservice.Services;
@@ -29,31 +30,29 @@ public class LoadingUnitItemController : ControllerBase
     [ProducesResponseType(typeof(XResponseData), 501)]
     public async Task<IActionResult> GetByLoadingUnitIdAsync(Guid luId)
     {
-        XResponseData errorResponse;
-        XResponseData<List<LoadingUnitItemDto>> response;
+        XResponseData response;
         try
         {
             response = _responseDataFactory.Ok<List<LoadingUnitItemDto>>(await _loadingUnitItemService.GetByLoadingUnitIdAsync(luId));
-            return Ok(response);
         }
         catch (KeyNotFoundException ex)
         {
-            errorResponse = _responseDataFactory.NotFound(ex.Message);
+            response = _responseDataFactory.NotFound(ex.Message);
         }
         catch (ArgumentException ex)
         {
-            errorResponse = _responseDataFactory.BadRequest(ex.Message);
+            response = _responseDataFactory.BadRequest(ex.Message);
         }
         catch (NotImplementedException ex)
         {
-            errorResponse = _responseDataFactory.NotImplemented(ex.Message);
+            response = _responseDataFactory.NotImplemented(ex.Message);
         }
         catch (Exception ex)
         {
-            errorResponse = _responseDataFactory.InternalError(ex.Message);
+            response = _responseDataFactory.InternalError(ex.Message);
         }
 
-        return StatusCode(errorResponse.Code, errorResponse);
+        return StatusCode(response.Code, response);
     }
 
     [HttpPost]
@@ -68,11 +67,7 @@ public class LoadingUnitItemController : ControllerBase
         {
             response = _responseDataFactory.Created<LoadingUnitItemDto>(await _loadingUnitItemService.CreateAsync(loadingUnitItemCreateDto));
         }
-        catch (KeyNotFoundException ex)
-        {
-            response = _responseDataFactory.NotFound(loadingUnitItemCreateDto, ex.Message);
-        }
-        catch (ArgumentException ex)
+        catch (Exception ex) when (ex is ArgumentException or DuplicateNameException)
         {
             response = _responseDataFactory.BadRequest(loadingUnitItemCreateDto, ex.Message);
         }

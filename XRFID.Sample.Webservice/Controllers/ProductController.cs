@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Data;
 using Xerum.XFramework.Common;
 using XRFID.Sample.Common.Dto;
 using XRFID.Sample.Webservice.Services;
@@ -29,31 +30,29 @@ public class ProductController : ControllerBase
     [ProducesResponseType(typeof(XResponseData), 501)]
     public async Task<IActionResult> GetSearchAsync(string term)
     {
-        XResponseData errorResponse;
-        XResponseData<List<ProductDto>> response;
+        XResponseData response;
         try
         {
             response = _responseDataFactory.Ok<List<ProductDto>>(await _productService.GetAsync(term));
-            return Ok(response);
         }
         catch (KeyNotFoundException ex)
         {
-            errorResponse = _responseDataFactory.NotFound(ex.Message);
+            response = _responseDataFactory.NotFound(ex.Message);
         }
         catch (ArgumentException ex)
         {
-            errorResponse = _responseDataFactory.BadRequest(ex.Message);
+            response = _responseDataFactory.BadRequest(ex.Message);
         }
         catch (NotImplementedException ex)
         {
-            errorResponse = _responseDataFactory.NotImplemented(ex.Message);
+            response = _responseDataFactory.NotImplemented(ex.Message);
         }
         catch (Exception ex)
         {
-            errorResponse = _responseDataFactory.InternalError(ex.Message);
+            response = _responseDataFactory.InternalError(ex.Message);
         }
 
-        return StatusCode(errorResponse.Code, errorResponse);
+        return StatusCode(response.Code, response);
     }
 
     [HttpGet("ByEpc")]
@@ -64,31 +63,29 @@ public class ProductController : ControllerBase
     [ProducesResponseType(typeof(XResponseData), 501)]
     public async Task<IActionResult> GetByEpcAsync(string epc)
     {
-        XResponseData errorResponse;
-        XResponseData<ProductDto?> response;
+        XResponseData response;
         try
         {
             response = _responseDataFactory.Ok<ProductDto?>(await _productService.GetByEpcAsync(epc));
-            return Ok(response);
         }
         catch (KeyNotFoundException ex)
         {
-            errorResponse = _responseDataFactory.NotFound(ex.Message);
+            response = _responseDataFactory.NotFound(ex.Message);
         }
         catch (ArgumentException ex)
         {
-            errorResponse = _responseDataFactory.BadRequest(ex.Message);
+            response = _responseDataFactory.BadRequest(ex.Message);
         }
         catch (NotImplementedException ex)
         {
-            errorResponse = _responseDataFactory.NotImplemented(ex.Message);
+            response = _responseDataFactory.NotImplemented(ex.Message);
         }
         catch (Exception ex)
         {
-            errorResponse = _responseDataFactory.InternalError(ex.Message);
+            response = _responseDataFactory.InternalError(ex.Message);
         }
 
-        return StatusCode(errorResponse.Code, errorResponse);
+        return StatusCode(response.Code, response);
     }
 
     [HttpPost]
@@ -103,11 +100,7 @@ public class ProductController : ControllerBase
         {
             response = _responseDataFactory.Created<ProductDto>(await _productService.CreateAsync(productCreateDto));
         }
-        catch (KeyNotFoundException ex)
-        {
-            response = _responseDataFactory.NotFound(productCreateDto, ex.Message);
-        }
-        catch (ArgumentException ex)
+        catch (Exception ex) when (ex is ArgumentException or DuplicateNameException)
         {
             response = _responseDataFactory.BadRequest(productCreateDto, ex.Message);
         }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Data;
 using Xerum.XFramework.Common;
 using XRFID.Sample.Common.Dto;
 using XRFID.Sample.Webservice.Services;
@@ -32,11 +33,7 @@ public class MovementController : ControllerBase
         {
             response = _responseDataFactory.Created<MovementDto>(await _movementService.CreateAsync(movementCreateDto));
         }
-        catch (KeyNotFoundException ex)
-        {
-            response = _responseDataFactory.NotFound(movementCreateDto, ex.Message);
-        }
-        catch (ArgumentException ex)
+        catch (Exception ex) when (ex is ArgumentException or DuplicateNameException)
         {
             response = _responseDataFactory.BadRequest(movementCreateDto, ex.Message);
         }

@@ -25,7 +25,7 @@ public class ProductService
         List<Product> result = await repository.GetAsync(q => (q.Name != null && q.Name.Contains(term)) || (q.Code != null && q.Code.Contains(term)));
         if (result.IsNullOrEmpty())
         {
-            throw new KeyNotFoundException();
+            throw new KeyNotFoundException("Resource not found");
         }
         return mapper.Map<List<ProductDto>>(result);
     }
@@ -35,10 +35,10 @@ public class ProductService
         List<Product> resultList = await repository.GetAsync(q => q.Epc == epc);
         if (resultList.IsNullOrEmpty())
         {
-            throw new KeyNotFoundException();
+            throw new KeyNotFoundException("Resource not found");
         }
 
-        Product? result = resultList.FirstOrDefault() ?? throw new KeyNotFoundException();
+        Product? result = resultList.FirstOrDefault() ?? throw new KeyNotFoundException("Resource not found");
         return mapper.Map<ProductDto>(result);
     }
 

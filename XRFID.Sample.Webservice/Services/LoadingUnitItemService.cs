@@ -25,7 +25,7 @@ public class LoadingUnitItemService
         List<LoadingUnitItem> result = await repository.GetAsync(q => q.LoadingUnitId == luId);
         if (result.IsNullOrEmpty())
         {
-            throw new KeyNotFoundException();
+            throw new KeyNotFoundException("Resource not found");
         }
         return mapper.Map<List<LoadingUnitItemDto>>(result);
     }

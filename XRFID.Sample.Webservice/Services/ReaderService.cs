@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.IdentityModel.Tokens;
 using XRFID.Sample.Common.Dto;
+using XRFID.Sample.Common.Dto.Create;
 using XRFID.Sample.Webservice.Database;
 using XRFID.Sample.Webservice.Entities;
 using XRFID.Sample.Webservice.Repositories;
@@ -25,19 +26,26 @@ public class ReaderService
         List<Reader> resultList = await repository.GetAsync(q => q.Name == name);
         if (resultList.IsNullOrEmpty())
         {
-            throw new KeyNotFoundException();
+            throw new KeyNotFoundException("Resource not found");
         }
 
-        Reader? result = resultList.FirstOrDefault() ?? throw new KeyNotFoundException();
+        Reader? result = resultList.FirstOrDefault() ?? throw new KeyNotFoundException("Resource not found");
         return mapper.Map<ReaderDto>(result);
     }
 
-    public async Task<ReaderDto> CreateAsync(ReaderDto loadingUnitDto)
+    public async Task<ReaderDto> CreateAsync(ReaderDto readerDto)
     {
-        Reader result = await repository.CreateAsync(mapper.Map<Reader>(loadingUnitDto));
+        Reader result = await repository.CreateAsync(mapper.Map<Reader>(readerDto));
 
         await uowk.SaveAsync();
 
+        return mapper.Map<ReaderDto>(result);
+    }
+
+    public async Task<ReaderDto> CreateAsync(MinimalReaderCreateDto readerDto)
+    {
+        Reader result = await repository.CreateAsync(new Reader { Id = readerDto.Id, Name = readerDto.Name });
+        await uowk.SaveAsync();
         return mapper.Map<ReaderDto>(result);
     }
 }

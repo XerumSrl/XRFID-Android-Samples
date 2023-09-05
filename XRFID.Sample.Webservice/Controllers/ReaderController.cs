@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Data;
 using Xerum.XFramework.Common;
 using XRFID.Sample.Common.Dto;
+using XRFID.Sample.Common.Dto.Create;
 using XRFID.Sample.Webservice.Services;
 
 namespace XRFID.Sample.Webservice.Controllers;
@@ -29,31 +31,29 @@ public class ReaderController : ControllerBase
     [ProducesResponseType(typeof(XResponseData), 501)]
     public async Task<IActionResult> GetBynameAsync(string name)
     {
-        XResponseData errorResponse;
-        XResponseData<ReaderDto> response;
+        XResponseData response;
         try
         {
             response = _responseDataFactory.Ok<ReaderDto>(await _readerService.GetByNameAsync(name));
-            return Ok(response);
         }
         catch (KeyNotFoundException ex)
         {
-            errorResponse = _responseDataFactory.NotFound(ex.Message);
+            response = _responseDataFactory.NotFound(ex.Message);
         }
         catch (ArgumentException ex)
         {
-            errorResponse = _responseDataFactory.BadRequest(ex.Message);
+            response = _responseDataFactory.BadRequest(ex.Message);
         }
         catch (NotImplementedException ex)
         {
-            errorResponse = _responseDataFactory.NotImplemented(ex.Message);
+            response = _responseDataFactory.NotImplemented(ex.Message);
         }
         catch (Exception ex)
         {
-            errorResponse = _responseDataFactory.InternalError(ex.Message);
+            response = _responseDataFactory.InternalError(ex.Message);
         }
 
-        return StatusCode(errorResponse.Code, errorResponse);
+        return StatusCode(response.Code, response);
     }
 
     [HttpPost]
@@ -68,11 +68,7 @@ public class ReaderController : ControllerBase
         {
             response = _responseDataFactory.Created<ReaderDto>(await _readerService.CreateAsync(readerCreateDto));
         }
-        catch (KeyNotFoundException ex)
-        {
-            response = _responseDataFactory.NotFound(readerCreateDto, ex.Message);
-        }
-        catch (ArgumentException ex)
+        catch (Exception ex) when (ex is ArgumentException or DuplicateNameException)
         {
             response = _responseDataFactory.BadRequest(readerCreateDto, ex.Message);
         }
@@ -83,6 +79,34 @@ public class ReaderController : ControllerBase
         catch (Exception ex)
         {
             response = _responseDataFactory.InternalError(readerCreateDto, ex.Message);
+        }
+
+        return StatusCode(response.Code, response);
+    }
+
+    [HttpPost("Minimal")]
+    [ProducesResponseType(typeof(XResponseData<ReaderDto>), 201)]
+    [ProducesResponseType(typeof(XResponseData), 400)]
+    [ProducesResponseType(typeof(XResponseData), 500)]
+    [ProducesResponseType(typeof(XResponseData), 501)]
+    public async Task<IActionResult> PostMinimalAsync(MinimalReaderCreateDto minimalReaderCreateDto)
+    {
+        XResponseData response;
+        try
+        {
+            response = _responseDataFactory.Created<ReaderDto>(await _readerService.CreateAsync(minimalReaderCreateDto));
+        }
+        catch (Exception ex) when (ex is ArgumentException or DuplicateNameException)
+        {
+            response = _responseDataFactory.BadRequest<MinimalReaderCreateDto>(minimalReaderCreateDto, ex.Message);
+        }
+        catch (NotImplementedException ex)
+        {
+            response = _responseDataFactory.NotImplemented<MinimalReaderCreateDto>(minimalReaderCreateDto, ex.Message);
+        }
+        catch (Exception ex)
+        {
+            response = _responseDataFactory.InternalError<MinimalReaderCreateDto>(minimalReaderCreateDto, ex.Message);
         }
 
         return StatusCode(response.Code, response);

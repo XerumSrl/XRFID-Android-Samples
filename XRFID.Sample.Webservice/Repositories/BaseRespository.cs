@@ -76,7 +76,7 @@ public abstract class BaseRepository<T> where T : AuditEntity
     {
         if (!await _table.AnyAsync(c => c.Id == entity.Id))
         {
-            throw new KeyNotFoundException();
+            throw new KeyNotFoundException("Resource not found");
         }
 
         int affectedRows = await _table.Where(c => c.Id == entity.Id).ExecuteDeleteAsync();
@@ -93,7 +93,7 @@ public abstract class BaseRepository<T> where T : AuditEntity
         T? existingEntity = await _table.FirstOrDefaultAsync(c => c.Id == entity.Id);
         if (existingEntity is null)
         {
-            throw new KeyNotFoundException();
+            throw new KeyNotFoundException("Resource not found");
         }
 
         //to do use a modified Deepcopy to procedurally update?

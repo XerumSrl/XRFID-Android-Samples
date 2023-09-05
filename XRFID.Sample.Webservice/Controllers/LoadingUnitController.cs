@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Data;
 using Xerum.XFramework.Common;
 using XRFID.Sample.Common.Dto;
 using XRFID.Sample.Webservice.Services;
@@ -29,31 +30,29 @@ public class LoadingUnitController : ControllerBase
     [ProducesResponseType(typeof(XResponseData), 501)]
     public async Task<IActionResult> GetAsync()
     {
-        XResponseData errorResponse;
-        XResponseData<List<LoadingUnitDto>> response;
+        XResponseData response;
         try
         {
             response = _responseDataFactory.Ok<List<LoadingUnitDto>>(await _loadingUnitService.GetAsync());
-            return Ok(response);
         }
         catch (KeyNotFoundException ex)
         {
-            errorResponse = _responseDataFactory.NotFound(ex.Message);
+            response = _responseDataFactory.NotFound(ex.Message);
         }
         catch (ArgumentException ex)
         {
-            errorResponse = _responseDataFactory.BadRequest(ex.Message);
+            response = _responseDataFactory.BadRequest(ex.Message);
         }
         catch (NotImplementedException ex)
         {
-            errorResponse = _responseDataFactory.NotImplemented(ex.Message);
+            response = _responseDataFactory.NotImplemented(ex.Message);
         }
         catch (Exception ex)
         {
-            errorResponse = _responseDataFactory.InternalError(ex.Message);
+            response = _responseDataFactory.InternalError(ex.Message);
         }
 
-        return StatusCode(errorResponse.Code, errorResponse);
+        return StatusCode(response.Code, response);
     }
 
     [HttpGet("ByReference")]
@@ -64,31 +63,29 @@ public class LoadingUnitController : ControllerBase
     [ProducesResponseType(typeof(XResponseData), 501)]
     public async Task<IActionResult> GetByReference(string reference)
     {
-        XResponseData errorResponse;
-        XResponseData<LoadingUnitDto> response;
+        XResponseData response;
         try
         {
             response = _responseDataFactory.Ok<LoadingUnitDto>(await _loadingUnitService.GetByReferenceAsync(reference));
-            return Ok(response);
         }
         catch (KeyNotFoundException ex)
         {
-            errorResponse = _responseDataFactory.NotFound(ex.Message);
+            response = _responseDataFactory.NotFound(ex.Message);
         }
         catch (ArgumentException ex)
         {
-            errorResponse = _responseDataFactory.BadRequest(ex.Message);
+            response = _responseDataFactory.BadRequest(ex.Message);
         }
         catch (NotImplementedException ex)
         {
-            errorResponse = _responseDataFactory.NotImplemented(ex.Message);
+            response = _responseDataFactory.NotImplemented(ex.Message);
         }
         catch (Exception ex)
         {
-            errorResponse = _responseDataFactory.InternalError(ex.Message);
+            response = _responseDataFactory.InternalError(ex.Message);
         }
 
-        return StatusCode(errorResponse.Code, errorResponse);
+        return StatusCode(response.Code, response);
     }
 
     [HttpGet("WithItems")]
@@ -99,31 +96,29 @@ public class LoadingUnitController : ControllerBase
     [ProducesResponseType(typeof(XResponseData), 501)]
     public async Task<IActionResult> GetWithItems(string reference)
     {
-        XResponseData errorResponse;
-        XResponseData<LoadingUnitDto> response;
+        XResponseData response;
         try
         {
             response = _responseDataFactory.Ok<LoadingUnitDto>(await _loadingUnitService.GetWithItemsAsync(reference));
-            return Ok(response);
         }
         catch (KeyNotFoundException ex)
         {
-            errorResponse = _responseDataFactory.NotFound(ex.Message);
+            response = _responseDataFactory.NotFound(ex.Message);
         }
         catch (ArgumentException ex)
         {
-            errorResponse = _responseDataFactory.BadRequest(ex.Message);
+            response = _responseDataFactory.BadRequest(ex.Message);
         }
         catch (NotImplementedException ex)
         {
-            errorResponse = _responseDataFactory.NotImplemented(ex.Message);
+            response = _responseDataFactory.NotImplemented(ex.Message);
         }
         catch (Exception ex)
         {
-            errorResponse = _responseDataFactory.InternalError(ex.Message);
+            response = _responseDataFactory.InternalError(ex.Message);
         }
 
-        return StatusCode(errorResponse.Code, errorResponse);
+        return StatusCode(response.Code, response);
     }
 
     [HttpPost]
@@ -138,11 +133,7 @@ public class LoadingUnitController : ControllerBase
         {
             response = _responseDataFactory.Created<LoadingUnitDto>(await _loadingUnitService.CreateAsync(movementCreateDto));
         }
-        catch (KeyNotFoundException ex)
-        {
-            response = _responseDataFactory.NotFound(movementCreateDto, ex.Message);
-        }
-        catch (ArgumentException ex)
+        catch (Exception ex) when (ex is ArgumentException or DuplicateNameException)
         {
             response = _responseDataFactory.BadRequest(movementCreateDto, ex.Message);
         }

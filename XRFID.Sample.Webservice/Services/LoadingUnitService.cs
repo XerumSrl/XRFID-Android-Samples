@@ -27,7 +27,7 @@ public class LoadingUnitService
         List<LoadingUnit> result = await repository.GetAsync();
         if (result.IsNullOrEmpty())
         {
-            throw new KeyNotFoundException();
+            throw new KeyNotFoundException("Resource not found");
         }
         return mapper.Map<List<LoadingUnitDto>>(result);
     }
@@ -37,10 +37,10 @@ public class LoadingUnitService
         List<LoadingUnit> resultList = await repository.GetAsync(q => q.OrderReference != null && q.OrderReference == reference);
         if (resultList.IsNullOrEmpty())
         {
-            throw new KeyNotFoundException();
+            throw new KeyNotFoundException("Resource not found");
         }
 
-        LoadingUnit? result = resultList.FirstOrDefault() ?? throw new KeyNotFoundException();
+        LoadingUnit? result = resultList.FirstOrDefault() ?? throw new KeyNotFoundException("Resource not found");
         return mapper.Map<LoadingUnitDto>(result);
     }
 
@@ -50,10 +50,10 @@ public class LoadingUnitService
                                                                    || (q.Reference != null && q.Reference == reference));
         if (resultList.IsNullOrEmpty())
         {
-            throw new KeyNotFoundException();
+            throw new KeyNotFoundException("Resource not found");
         }
 
-        LoadingUnit? result = resultList.FirstOrDefault() ?? throw new KeyNotFoundException();
+        LoadingUnit? result = resultList.FirstOrDefault() ?? throw new KeyNotFoundException("Resource not found");
         List<LoadingUnitItem> itemResult = await itemRepository.GetAsync(q => q.LoadingUnitId == result.Id);
 
         if (result.LoadingUnitItems is null)
