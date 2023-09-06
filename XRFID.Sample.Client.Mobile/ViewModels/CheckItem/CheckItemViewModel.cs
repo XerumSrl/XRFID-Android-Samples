@@ -85,6 +85,7 @@ public partial class CheckItemViewModel : TinyViewModel, IDisposable
         {
             try
             {
+                barcode = string.Empty;
                 Barcode = m.Value.FirstOrDefault().Data;
             }
             catch (Exception)
