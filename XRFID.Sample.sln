@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34009.444
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XRFID.Sample.Webservice", "XRFID.Sample.Webservice\XRFID.Sample.Webservice.csproj", "{37F168AF-CE80-4B82-9478-F3389D4D62DB}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XRFID.Sample.Common", "XRFID.Sample.Common\XRFID.Sample.Common.csproj", "{A7039A16-5042-4486-9457-31C86A66F67D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XRFID.Sample.Client.Mobile", "XRFID.Sample.Client.Mobile\XRFID.Sample.Client.Mobile.csproj", "{D1041C18-A1F8-44A6-B512-4458FC766521}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XRFID.Sample.Pages", "XRFID.Sample.Pages\XRFID.Sample.Pages.csproj", "{E498BECF-9713-4407-8AA3-7BC331BA4EF2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XRFID.Sample.Server", "XRFID.Sample.Server\XRFID.Sample.Server.csproj", "{0F90B1B0-A96D-496B-B4D0-464C8FF94C6E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,10 +17,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{37F168AF-CE80-4B82-9478-F3389D4D62DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{37F168AF-CE80-4B82-9478-F3389D4D62DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{37F168AF-CE80-4B82-9478-F3389D4D62DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{37F168AF-CE80-4B82-9478-F3389D4D62DB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A7039A16-5042-4486-9457-31C86A66F67D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A7039A16-5042-4486-9457-31C86A66F67D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A7039A16-5042-4486-9457-31C86A66F67D}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -29,6 +27,14 @@ Global
 		{D1041C18-A1F8-44A6-B512-4458FC766521}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D1041C18-A1F8-44A6-B512-4458FC766521}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D1041C18-A1F8-44A6-B512-4458FC766521}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{E498BECF-9713-4407-8AA3-7BC331BA4EF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E498BECF-9713-4407-8AA3-7BC331BA4EF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E498BECF-9713-4407-8AA3-7BC331BA4EF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E498BECF-9713-4407-8AA3-7BC331BA4EF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F90B1B0-A96D-496B-B4D0-464C8FF94C6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F90B1B0-A96D-496B-B4D0-464C8FF94C6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F90B1B0-A96D-496B-B4D0-464C8FF94C6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F90B1B0-A96D-496B-B4D0-464C8FF94C6E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
