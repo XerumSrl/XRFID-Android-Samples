@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
+using MQTTnet.AspNetCore;
 using Serilog;
 using Xerum.XFramework.Common;
 using Xerum.XFramework.DefaultLogging;
@@ -9,7 +10,7 @@ using XRFID.Sample.Server.Mapper;
 using XRFID.Sample.Server.Repositories;
 using XRFID.Sample.Server.Services;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 Log.Logger = LogHelper.CreateStatic(builder.Configuration);
 
@@ -22,26 +23,37 @@ try
     builder.Host.AddLogging(Log.Logger);
 
     // Add services to the container.
+    builder.Services.AddHostedMqttServer();
+    builder.Services.AddMqttConnectionHandler();
+    builder.Services.AddConnections();
+
+    #region BlazorSetup
     builder.Services.AddRazorPages();
     builder.Services.AddServerSideBlazor();
+    #endregion
 
+    #region ControllerSetup
     builder.Services.AddControllers()
-    .ConfigureApiBehaviorOptions(x => x.SuppressMapClientErrors = true)
-    .AddJsonOptions(options => options.JsonSerializerOptions.PropertyNamingPolicy = null);
+        .ConfigureApiBehaviorOptions(x => x.SuppressMapClientErrors = true)
+        .AddJsonOptions(options => options.JsonSerializerOptions.PropertyNamingPolicy = null);
 
     builder.Services.AddSingleton<XResponseDataFactory>();
+    #endregion
 
     builder.Services.AddAutoMapper(m => m.AddProfile<XRFIDSampleProfile>());
 
+    #region ServiceSetup
     builder.Services.AddTransient<ProductService>();
     builder.Services.AddTransient<LoadingUnitService>();
     builder.Services.AddTransient<ReaderService>();
     builder.Services.AddTransient<LoadingUnitItemService>();
     builder.Services.AddTransient<MovementService>();
-
-    builder.Services.AddScoped<UnitOfWork>();
+    #endregion
 
     builder.Services.AddDbContext<XRFIDSampleContext>(optionsAction: options => options.UseSqlite("Data Source = Persist/persist.db"));
+
+    #region RepositorySetup
+    builder.Services.AddScoped<UnitOfWork>();
 
     builder.Services.AddScoped<ProductRepository>();
     builder.Services.AddScoped<LoadingUnitRepository>();
@@ -49,7 +61,9 @@ try
     builder.Services.AddScoped<MovementRepository>();
     builder.Services.AddScoped<MovementItemRepository>();
     builder.Services.AddScoped<ReaderRepository>();
+    #endregion
 
+    #region SwaggerSetup
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen(c =>
     {
@@ -92,7 +106,9 @@ try
         c.IgnoreObsoleteProperties();
         c.CustomSchemaIds(type => type.FullName);
     });
+    #endregion
 
+    #region OpenIDDictSetup
     builder.Services.AddAuthorization();
     builder.Services.AddOpenIddict()
         .AddCore(options =>
@@ -122,8 +138,9 @@ try
             options.UseLocalServer();
             options.UseAspNetCore();
         });
+    #endregion
 
-    var app = builder.Build();
+    WebApplication app = builder.Build();
 
     // Configure the HTTP request pipeline.
     if (!app.Environment.IsDevelopment())
@@ -136,6 +153,29 @@ try
         }
     }
 
+    app.UseRouting();
+
+    app.UseAuthentication();
+    app.UseAuthorization();
+
+    app.UseEndpoints(endpoints =>
+    {
+        endpoints.MapConnectionHandler<MqttConnectionHandler>(
+            "/mqtt",
+            httpConnectionDispatcherOptions => httpConnectionDispatcherOptions.WebSockets.SubProtocolSelector =
+                protocolList => protocolList.FirstOrDefault() ?? string.Empty);
+    });
+
+    app.UseMqttServer(server =>
+    {
+        /*
+            * Attach event handlers etc. if required.
+            */
+
+        //server.ValidatingConnectionAsync += mqttController.ValidateConnection;
+        //server.ClientConnectedAsync += mqttController.OnClientConnected;
+    });
+
     app.UseSwagger();
     app.UseSwaggerUI();
 
@@ -144,12 +184,9 @@ try
         app.UseHttpsRedirection();
     }
 
-    app.UseAuthentication();
-    app.UseAuthorization();
-
     app.UseStaticFiles();
 
-    app.UseRouting();
+
 
     app.MapControllers();
     app.MapDefaultControllerRoute();

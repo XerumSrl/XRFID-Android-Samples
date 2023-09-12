@@ -33,7 +33,7 @@ public class MovementItem : AuditEntity
     public bool IsConsolidated { get; set; }
 
     public Guid MovementId { get; set; }
-    public Movement Movement { get; set; }
+    public Movement Movement { get; set; } = new Movement();
 
 
     public Guid? ProductId { get; set; }
