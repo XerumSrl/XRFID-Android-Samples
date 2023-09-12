@@ -46,6 +46,13 @@ public static class ServiceCollectionExtension
         services.AddTransient<IZebraMqttEventPublisher, ZebraMqttEventPublisher>();
         services.AddTransient<IZebraMqttPayloadPublisher, ZebraMqttPayloadPublisher>();
 
+        services.AddAutoMapper(cfg =>
+        {
+            //profiles
+            cfg.AddProfile<MqttAutomapperProfile>();
+
+        });
+
         return services;
     }
 }

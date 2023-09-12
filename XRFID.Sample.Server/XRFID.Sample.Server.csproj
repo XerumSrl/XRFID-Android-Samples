@@ -28,6 +28,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\XRFID.Sample.Common\XRFID.Sample.Common.csproj" />
+	  <ProjectReference Include="..\XRFID.Sample.Modules.Mqtt\XRFID.Sample.Modules.Mqtt.csproj" />
 	  <ProjectReference Include="..\XRFID.Sample.Pages\XRFID.Sample.Pages.csproj" />
 	</ItemGroup>
 

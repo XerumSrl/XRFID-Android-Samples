@@ -4,8 +4,10 @@ using Microsoft.Extensions.Logging;
 using MQTTnet;
 using MQTTnet.Extensions.ManagedClient;
 using MQTTnet.Packets;
+using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using XRFID.Sample.Modules.Mqtt.Contracts;
 using XRFID.Sample.Modules.Mqtt.Events;
@@ -114,6 +116,8 @@ public class ManagedMqttClientService : IManagedMqttClientService
 
                     ZebraMqttApplicationMessage evt = mapper.Map<ZebraMqttApplicationMessage>(arg.ApplicationMessage);
                     var settings = new JsonSerializerOptions();
+                    settings.Converters.Add(new DateTimeOffsetConverterUsingDateTimeParse());
+                    settings.Converters.Add(new DateTimeConverterUsingDateTimeParse());
 
                     switch (evt.ZebraManagementEvents?.Type)
                     {
@@ -399,5 +403,33 @@ public class ManagedMqttClientService : IManagedMqttClientService
         {
             logger.LogError(ex, "[EnqueueAsync] Unexpected Exceprion");
         }
+    }
+}
+
+public class DateTimeOffsetConverterUsingDateTimeParse : JsonConverter<DateTimeOffset>
+{
+    public override DateTimeOffset Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        Debug.Assert(typeToConvert == typeof(DateTimeOffset));
+        return DateTimeOffset.Parse(reader.GetString());
+    }
+
+    public override void Write(Utf8JsonWriter writer, DateTimeOffset value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.ToString());
+    }
+}
+
+public class DateTimeConverterUsingDateTimeParse : JsonConverter<DateTime>
+{
+    public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        Debug.Assert(typeToConvert == typeof(DateTime));
+        return DateTime.Parse(reader.GetString());
+    }
+
+    public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.ToString());
     }
 }

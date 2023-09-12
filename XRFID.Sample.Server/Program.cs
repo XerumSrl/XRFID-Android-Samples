@@ -1,10 +1,14 @@
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using MQTTnet.AspNetCore;
 using Serilog;
 using Xerum.XFramework.Common;
+using Xerum.XFramework.Common.Exceptions;
 using Xerum.XFramework.DefaultLogging;
+using XRFID.Sample.Modules.Mqtt;
+using XRFID.Sample.Modules.Mqtt.Consumers;
 using XRFID.Sample.Server.Database;
 using XRFID.Sample.Server.Mapper;
 using XRFID.Sample.Server.Repositories;
@@ -145,6 +149,49 @@ try
             options.UseLocalServer();
             options.UseAspNetCore();
         });
+    #endregion
+
+    #region MQTT & MassTransit
+
+    builder.Services.AddZebraManagedMqttClient(m =>
+    {
+        string? configValue = builder.Configuration.GetValue<string>("Mqtt:MqttClientId");
+        if (string.IsNullOrWhiteSpace(configValue))
+        {
+            configValue = Guid.NewGuid().ToString();
+            Log.ForContext<Program>().Information("Using new MqttClientId: ({guid})", configValue);
+        }
+        m.ClientId = configValue;
+
+
+        configValue = builder.Configuration.GetValue<string>("Mqtt:MqttServer");
+        if (string.IsNullOrWhiteSpace(configValue))
+        {
+            throw new NotConfiguredException(paramName: "Mqtt:MqttServer");
+        }
+        m.Server = configValue;
+
+
+        int port = builder.Configuration.GetValue("Mqtt:MqttPort", 1883);
+        if (port <= 0)
+        {
+            port = 1883;
+            Log.ForContext<Program>().Warning("Using default MQTT port ({port})", port);
+        }
+        m.Port = port;
+
+    });
+
+    builder.Services.AddSingleton(KebabCaseEndpointNameFormatter.Instance);
+
+    builder.Services.AddMassTransit(mt =>
+    {
+        mt.AddConsumer<ZebraCommandConsumer>();
+
+        mt.UsingInMemory();
+    });
+
+
     #endregion
 
     WebApplication app = builder.Build();

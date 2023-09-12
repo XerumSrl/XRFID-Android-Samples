@@ -4,12 +4,21 @@ using System.Text;
 using System.Text.Json;
 using XRFID.Sample.Modules.Mqtt.Events;
 using XRFID.Sample.Modules.Mqtt.Payloads;
+using XRFID.Sample.Modules.Mqtt.Services;
 
 namespace XRFID.Sample.Modules.Mqtt;
 
 
 public class ZebraMqttApplicationMessage
 {
+    private JsonSerializerOptions serializerOptions = new JsonSerializerOptions();
+    public ZebraMqttApplicationMessage()
+    {
+        serializerOptions = new JsonSerializerOptions();
+        serializerOptions.Converters.Add(new DateTimeOffsetConverterUsingDateTimeParse());
+        serializerOptions.Converters.Add(new DateTimeConverterUsingDateTimeParse());
+
+    }
     /// <summary>
     ///     Gets or sets the content type.
     ///     The content type must be a UTF-8 encoded string. The content type value identifies the kind of UTF-8 encoded
@@ -57,7 +66,7 @@ public class ZebraMqttApplicationMessage
     {
         get
         {
-            return JsonSerializer.Deserialize<AsyncEvents>(Encoding.UTF8.GetString(Payload));
+            return JsonSerializer.Deserialize<AsyncEvents>(Encoding.UTF8.GetString(Payload), serializerOptions);
             //return JsonConvert.DeserializeObject<AsyncEvents>(Encoding.UTF8.GetString(Payload));
         }
     }
@@ -67,7 +76,7 @@ public class ZebraMqttApplicationMessage
         //{"data":{"eventNum":303,"format":"epc","idHex":"5af1702018085b1805111043"},"timestamp":"2022-07-18T18:06:00.166+0200","type":"SIMPLE"}
         get
         {
-            return JsonSerializer.Deserialize<ZebraTagEvent>(Encoding.UTF8.GetString(Payload));
+            return JsonSerializer.Deserialize<ZebraTagEvent>(Encoding.UTF8.GetString(Payload), serializerOptions);
 
             //return JsonConvert.DeserializeObject<ZebraTagEvent>(Encoding.UTF8.GetString(Payload));
         }
@@ -77,7 +86,7 @@ public class ZebraMqttApplicationMessage
     {
         get
         {
-            return JsonSerializer.Deserialize<RAWMQTTResponses>(Encoding.UTF8.GetString(Payload));
+            return JsonSerializer.Deserialize<RAWMQTTResponses>(Encoding.UTF8.GetString(Payload), serializerOptions);
 
             //return JsonConvert.DeserializeObject<RAWMQTTResponses>(Encoding.UTF8.GetString(Payload));
         }
