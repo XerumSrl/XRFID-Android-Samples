@@ -7,8 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Settings\" />
-    <Folder Include="OperatingModes\" />
+    <Compile Remove="OperatingModes\**" />
+    <Compile Remove="Settings\**" />
+    <EmbeddedResource Remove="OperatingModes\**" />
+    <EmbeddedResource Remove="Settings\**" />
+    <None Remove="OperatingModes\**" />
+    <None Remove="Settings\**" />
   </ItemGroup>
 
   <ItemGroup>
