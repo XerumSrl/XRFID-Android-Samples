@@ -23,7 +23,14 @@ try
     builder.Host.AddLogging(Log.Logger);
 
     // Add services to the container.
-    builder.Services.AddHostedMqttServer();
+
+    builder.WebHost.ConfigureKestrel(options =>
+    {
+        //todo: port setup using appsettings.json
+        options.ListenAnyIP(1883, l => l.UseMqtt());
+    });
+
+    builder.Services.AddHostedMqttServer(mqttServer => mqttServer.WithoutDefaultEndpoint());
     builder.Services.AddMqttConnectionHandler();
     builder.Services.AddConnections();
 
