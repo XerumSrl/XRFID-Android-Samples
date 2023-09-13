@@ -246,8 +246,6 @@ try
 
     app.UseStaticFiles();
 
-
-
     app.MapControllers();
     app.MapDefaultControllerRoute();
 

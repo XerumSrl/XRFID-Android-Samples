@@ -3,20 +3,24 @@ using MQTTnet.Protocol;
 using System.Text;
 using System.Text.Json;
 using XRFID.Sample.Modules.Mqtt.Events;
+using XRFID.Sample.Modules.Mqtt.JsonConverters;
 using XRFID.Sample.Modules.Mqtt.Payloads;
-using XRFID.Sample.Modules.Mqtt.Services;
 
 namespace XRFID.Sample.Modules.Mqtt;
 
 
 public class ZebraMqttApplicationMessage
 {
+    /// <summary>
+    /// 
+    /// </summary>
     private JsonSerializerOptions serializerOptions = new JsonSerializerOptions();
+
     public ZebraMqttApplicationMessage()
     {
         serializerOptions = new JsonSerializerOptions();
-        serializerOptions.Converters.Add(new DateTimeOffsetConverterUsingDateTimeParse());
-        serializerOptions.Converters.Add(new DateTimeConverterUsingDateTimeParse());
+        serializerOptions.Converters.Add(new DateTimeOffsetConverter());
+        serializerOptions.Converters.Add(new DateTimeConverter());
 
     }
     /// <summary>

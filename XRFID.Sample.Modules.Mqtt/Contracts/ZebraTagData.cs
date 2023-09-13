@@ -172,6 +172,6 @@ public class ZebraTagData : IMqttTagData, IRequestMessage
 
     public virtual string ToJson()
     {
-        return JsonSerializer.Serialize(this);
+        return JsonSerializer.Serialize(this, this.GetType());
     }
 }

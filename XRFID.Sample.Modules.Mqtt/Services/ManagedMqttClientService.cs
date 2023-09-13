@@ -4,10 +4,8 @@ using Microsoft.Extensions.Logging;
 using MQTTnet;
 using MQTTnet.Extensions.ManagedClient;
 using MQTTnet.Packets;
-using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using XRFID.Sample.Modules.Mqtt.Contracts;
 using XRFID.Sample.Modules.Mqtt.Events;
@@ -115,18 +113,16 @@ public class ManagedMqttClientService : IManagedMqttClientService
 
 
                     ZebraMqttApplicationMessage evt = mapper.Map<ZebraMqttApplicationMessage>(arg.ApplicationMessage);
-                    var settings = new JsonSerializerOptions();
-                    settings.Converters.Add(new DateTimeOffsetConverterUsingDateTimeParse());
-                    settings.Converters.Add(new DateTimeConverterUsingDateTimeParse());
+                    JsonSerializerOptions options = new JsonSerializerOptions();
 
                     switch (evt.ZebraManagementEvents?.Type)
                     {
                         case "hello":
-                            //listener.Listen(JsonConvert.DeserializeObject<Hello>($"{evt.ZebraManagementEvents.Data}", settings), arg.ApplicationMessage.Topic);
+                            //listener.Listen(JsonConvert.DeserializeObject<Hello>($"{evt.ZebraManagementEvents.Data}", options), arg.ApplicationMessage.Topic);
                             break;
                         case "heartbeat":
 
-                            var heartbeat = JsonSerializer.Deserialize<Heartbeat>($"{evt.ZebraManagementEvents.Data}", settings);
+                            var heartbeat = JsonSerializer.Deserialize<Heartbeat>($"{evt.ZebraManagementEvents.Data}", options);
 
                             //listener.Listen(heartbeat, arg.ApplicationMessage.Topic);
 
@@ -147,7 +143,7 @@ public class ManagedMqttClientService : IManagedMqttClientService
 
                             break;
                         case "gpi":
-                            var gpi = JsonSerializer.Deserialize<ZebraGpiData>($"{evt.ZebraManagementEvents.Data}", settings);
+                            var gpi = JsonSerializer.Deserialize<ZebraGpiData>($"{evt.ZebraManagementEvents.Data}", options);
                             //listener.Listen(gpi, arg.ApplicationMessage.Topic);
                             logger.LogTrace("[Mevents] GPI: {gpi}", gpi);
 
@@ -184,16 +180,16 @@ public class ManagedMqttClientService : IManagedMqttClientService
 
                             break;
                         case "firmwareUpdateProgress":
-                            //listener.Listen(JsonConvert.DeserializeObject<FirmwareUpdateProgress>($"{evt.ZebraManagementEvents.Data}", settings), arg.ApplicationMessage.Topic);
+                            //listener.Listen(JsonConvert.DeserializeObject<FirmwareUpdateProgress>($"{evt.ZebraManagementEvents.Data}", options), arg.ApplicationMessage.Topic);
                             break;
                         case "error":
-                            //listener.Listen(JsonConvert.DeserializeObject<Error>($"{evt.ZebraManagementEvents.Data}", settings), arg.ApplicationMessage.Topic);
+                            //listener.Listen(JsonConvert.DeserializeObject<Error>($"{evt.ZebraManagementEvents.Data}", options), arg.ApplicationMessage.Topic);
                             break;
                         case "warning":
-                            //listener.Listen(JsonConvert.DeserializeObject<Warning>($"{evt.ZebraManagementEvents.Data}", settings), arg.ApplicationMessage.Topic);
+                            //listener.Listen(JsonConvert.DeserializeObject<Warning>($"{evt.ZebraManagementEvents.Data}", options), arg.ApplicationMessage.Topic);
                             break;
                         case "userapp":
-                            //listener.Listen(JsonConvert.DeserializeObject<Userapp>($"{evt.ZebraManagementEvents.Data}", settings), arg.ApplicationMessage.Topic);
+                            //listener.Listen(JsonConvert.DeserializeObject<Userapp>($"{evt.ZebraManagementEvents.Data}", options), arg.ApplicationMessage.Topic);
                             break;
                         default:
                             throw new Exception($"No event type defined for: {evt.ZebraManagementEvents.Type}");
@@ -212,7 +208,7 @@ public class ManagedMqttClientService : IManagedMqttClientService
                 try
                 {
                     ZebraMqttApplicationMessage evt = mapper.Map<ZebraMqttApplicationMessage>(arg.ApplicationMessage);
-                    var settings = new JsonSerializerOptions();
+                    var options = new JsonSerializerOptions();
 
                     string pattern = @"(/)";
                     Regex regex = new Regex(pattern);
@@ -222,7 +218,7 @@ public class ManagedMqttClientService : IManagedMqttClientService
                     {
                         case "SIMPLE":
                             //da tagevent.data diventa tagdata
-                            var tagSimple = JsonSerializer.Deserialize<ZebraTagData>($"{evt.ZebraTagEvent.Data}", settings);
+                            var tagSimple = JsonSerializer.Deserialize<ZebraTagData>($"{evt.ZebraTagEvent.Data}", options);
 
                             logger.LogTrace("[Tevents] evt.ZebraTagEvent SIMPLE: {tagSimple}", tagSimple);
 
@@ -238,7 +234,7 @@ public class ManagedMqttClientService : IManagedMqttClientService
 
                         case "PORTAL":
                             //da tagevent.data diventa tagdata
-                            var tagPortal = JsonSerializer.Deserialize<ZebraTagData>($"{evt.ZebraTagEvent.Data}", settings);
+                            var tagPortal = JsonSerializer.Deserialize<ZebraTagData>($"{evt.ZebraTagEvent.Data}", options);
 
                             logger.LogTrace("[Tevents] evt.ZebraTagEvent PORTAL: {tagPortal}", tagPortal);
 
@@ -254,7 +250,7 @@ public class ManagedMqttClientService : IManagedMqttClientService
 
                         case "CONVEYOR":
                             //da tagevent.data diventa tagdata
-                            var tagConveyor = JsonSerializer.Deserialize<ZebraTagData>($"{evt.ZebraTagEvent.Data}", settings);
+                            var tagConveyor = JsonSerializer.Deserialize<ZebraTagData>($"{evt.ZebraTagEvent.Data}", options);
 
                             logger.LogTrace("[Tevents] evt.ZebraTagEvent CONVEYOR: {tagConveyor}", tagConveyor);
 
@@ -270,7 +266,7 @@ public class ManagedMqttClientService : IManagedMqttClientService
 
                         case "CUSTOM":
                             //da tagevent.data diventa tagdata
-                            var tagCustom = JsonSerializer.Deserialize<ZebraTagData>($"{evt.ZebraTagEvent.Data}", settings);
+                            var tagCustom = JsonSerializer.Deserialize<ZebraTagData>($"{evt.ZebraTagEvent.Data}", options);
 
                             logger.LogTrace("[Tevents] evt.ZebraTagEvent PORTAL: {tagCustom}", tagCustom);
 
@@ -302,7 +298,7 @@ public class ManagedMqttClientService : IManagedMqttClientService
                 try
                 {
                     ZebraMqttApplicationMessage evt = mapper.Map<ZebraMqttApplicationMessage>(arg.ApplicationMessage);
-                    var settings = new JsonSerializerOptions();
+                    var options = new JsonSerializerOptions();
 
                     string pattern = @"(/)";
                     Regex regex = new Regex(pattern);
@@ -311,7 +307,7 @@ public class ManagedMqttClientService : IManagedMqttClientService
                     switch (evt.ZebraMQTTResponses.Command)
                     {
                         case "get_version":
-                            var version = JsonSerializer.Deserialize<GetVersionResponse>($"{evt.ZebraMQTTResponses.Payload}", settings);
+                            var version = JsonSerializer.Deserialize<GetVersionResponse>($"{evt.ZebraMQTTResponses.Payload}", options);
 
                             //listener.Listen(version, arg.ApplicationMessage.Topic);
 
@@ -327,7 +323,7 @@ public class ManagedMqttClientService : IManagedMqttClientService
                             break;
 
                         case "get_network":
-                            var network = JsonSerializer.Deserialize<GetNetworkResponse>($"{evt.ZebraMQTTResponses.Payload}", settings);
+                            var network = JsonSerializer.Deserialize<GetNetworkResponse>($"{evt.ZebraMQTTResponses.Payload}", options);
 
                             //listener.Listen(network, arg.ApplicationMessage.Topic);
 
@@ -342,15 +338,15 @@ public class ManagedMqttClientService : IManagedMqttClientService
 
                             break;
                         case "get_status":
-                            //var status = JsonConvert.DeserializeObject<GetStatusResponse>($"{evt.ZebraMQTTResponses.Payload}", settings);
+                            //var status = JsonConvert.DeserializeObject<GetStatusResponse>($"{evt.ZebraMQTTResponses.Payload}", options);
                             //listener.Listen(status, arg.ApplicationMessage.Topic);
                             break;
                         case "get_mode":
-                            //var mode = JsonConvert.DeserializeObject<GetModeResponse>($"{evt.ZebraMQTTResponses.Payload}", settings);
+                            //var mode = JsonConvert.DeserializeObject<GetModeResponse>($"{evt.ZebraMQTTResponses.Payload}", options);
                             //listener.Listen(mode, arg.ApplicationMessage.Topic);
                             break;
                         case "set_gpo":
-                            //var gpo = JsonConvert.DeserializeObject<SetGpoResponse>($"{evt.ZebraMQTTResponses.Payload}", settings);
+                            //var gpo = JsonConvert.DeserializeObject<SetGpoResponse>($"{evt.ZebraMQTTResponses.Payload}", options);
                             //listener.Listen(gpo, arg.ApplicationMessage.Topic);
                             break;
                         default:
@@ -403,33 +399,5 @@ public class ManagedMqttClientService : IManagedMqttClientService
         {
             logger.LogError(ex, "[EnqueueAsync] Unexpected Exceprion");
         }
-    }
-}
-
-public class DateTimeOffsetConverterUsingDateTimeParse : JsonConverter<DateTimeOffset>
-{
-    public override DateTimeOffset Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-    {
-        Debug.Assert(typeToConvert == typeof(DateTimeOffset));
-        return DateTimeOffset.Parse(reader.GetString());
-    }
-
-    public override void Write(Utf8JsonWriter writer, DateTimeOffset value, JsonSerializerOptions options)
-    {
-        writer.WriteStringValue(value.ToString());
-    }
-}
-
-public class DateTimeConverterUsingDateTimeParse : JsonConverter<DateTime>
-{
-    public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-    {
-        Debug.Assert(typeToConvert == typeof(DateTime));
-        return DateTime.Parse(reader.GetString());
-    }
-
-    public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
-    {
-        writer.WriteStringValue(value.ToString());
     }
 }

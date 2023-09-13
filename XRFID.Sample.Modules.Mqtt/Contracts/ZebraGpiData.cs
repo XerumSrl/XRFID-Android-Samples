@@ -98,7 +98,7 @@ public class ZebraGpiData : IMqttMessageData, IRequestMessage
     /// <returns>JSON string presentation of the object</returns>
     public virtual string ToJson()
     {
-        return JsonSerializer.Serialize(this);
+        return JsonSerializer.Serialize(this, this.GetType());
     }
 
 }
