@@ -24,16 +24,17 @@
 		<PackageReference Include="OpenIddict.Validation.ServerIntegration" Version="4.7.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
 		<PackageReference Include="Xerum.XFramework.DefaultLogging" Version="7.0.9" />
+		<PackageReference Include="MudBlazor" Version="6.0.13" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\XRFID.Sample.Common\XRFID.Sample.Common.csproj" />
-	  <ProjectReference Include="..\XRFID.Sample.Modules.Mqtt\XRFID.Sample.Modules.Mqtt.csproj" />
-	  <ProjectReference Include="..\XRFID.Sample.Pages\XRFID.Sample.Pages.csproj" />
+		<ProjectReference Include="..\XRFID.Sample.Common\XRFID.Sample.Common.csproj" />
+		<ProjectReference Include="..\XRFID.Sample.Modules.Mqtt\XRFID.Sample.Modules.Mqtt.csproj" />
+		<ProjectReference Include="..\XRFID.Sample.Pages\XRFID.Sample.Pages.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Persist\" />
+		<Folder Include="Persist\" />
 	</ItemGroup>
 
 </Project>

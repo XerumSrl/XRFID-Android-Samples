@@ -1,8 +1,10 @@
 using MassTransit;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using MQTTnet.AspNetCore;
+using MudBlazor.Services;
 using Serilog;
 using Xerum.XFramework.Common;
 using Xerum.XFramework.Common.Exceptions;
@@ -37,6 +39,10 @@ try
     builder.Services.AddHostedMqttServer(mqttServer => mqttServer.WithoutDefaultEndpoint());
     builder.Services.AddMqttConnectionHandler();
     builder.Services.AddConnections();
+
+    #region Mud
+    builder.Services.AddMudServices();
+    #endregion
 
     #region BlazorSetup
     builder.Services.AddRazorPages();
