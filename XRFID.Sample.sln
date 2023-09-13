@@ -15,6 +15,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{8B83B1
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XRFID.Sample.Modules.Mqtt", "XRFID.Sample.Modules.Mqtt\XRFID.Sample.Modules.Mqtt.csproj", "{B055D38C-C0A2-476F-829F-F2AAA9BF7D7F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{77D7AC6B-3865-40BA-BAE6-AA862989FB3B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XRFID.Sample.ServerTests", "XRFID.Sample.ServerTests\XRFID.Sample.ServerTests.csproj", "{AEE012A2-F213-4BBF-B57A-665462BEDE75}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +47,10 @@ Global
 		{B055D38C-C0A2-476F-829F-F2AAA9BF7D7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B055D38C-C0A2-476F-829F-F2AAA9BF7D7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B055D38C-C0A2-476F-829F-F2AAA9BF7D7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AEE012A2-F213-4BBF-B57A-665462BEDE75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AEE012A2-F213-4BBF-B57A-665462BEDE75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AEE012A2-F213-4BBF-B57A-665462BEDE75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AEE012A2-F213-4BBF-B57A-665462BEDE75}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -50,6 +58,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{0F90B1B0-A96D-496B-B4D0-464C8FF94C6E} = {8B83B17A-1F80-4283-A144-D999B2C89A3F}
 		{B055D38C-C0A2-476F-829F-F2AAA9BF7D7F} = {8B83B17A-1F80-4283-A144-D999B2C89A3F}
+		{AEE012A2-F213-4BBF-B57A-665462BEDE75} = {77D7AC6B-3865-40BA-BAE6-AA862989FB3B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5B467AC4-9FC0-4F11-9782-BA682127A0F7}
