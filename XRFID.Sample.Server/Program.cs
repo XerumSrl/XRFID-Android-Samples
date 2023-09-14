@@ -1,5 +1,4 @@
 using MassTransit;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
@@ -32,8 +31,14 @@ try
 
     builder.WebHost.ConfigureKestrel(options =>
     {
+        int port = builder.Configuration.GetValue("Mqtt:MqttPort", 1883);
+        if (port <= 0)
+        {
+            port = 1883;
+            Log.ForContext<Program>().Warning("Using default MQTT port ({port})", port);
+        }
         //todo: port setup using appsettings.json
-        options.ListenAnyIP(1883, l => l.UseMqtt());
+        options.ListenAnyIP(port, l => l.UseMqtt());
     });
 
     builder.Services.AddHostedMqttServer(mqttServer => mqttServer.WithoutDefaultEndpoint());
