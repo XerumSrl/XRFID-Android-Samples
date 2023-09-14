@@ -5,7 +5,7 @@ using XRFID.Sample.Modules.Mqtt.Events;
 using XRFID.Sample.Modules.Mqtt.Interfaces;
 using XRFID.Sample.Modules.Mqtt.Payloads;
 
-namespace XRFID.Server.Modules.ZebraMqtt.Services;
+namespace XRFID.Sample.Modules.Mqtt.Services;
 
 
 public class MqttMessageEventListener

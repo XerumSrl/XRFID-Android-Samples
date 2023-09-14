@@ -10,10 +10,15 @@ using Xerum.XFramework.Common.Exceptions;
 using Xerum.XFramework.DefaultLogging;
 using XRFID.Sample.Modules.Mqtt;
 using XRFID.Sample.Modules.Mqtt.Consumers;
+using XRFID.Sample.Server.Consumers.Mqtt;
 using XRFID.Sample.Server.Database;
 using XRFID.Sample.Server.Mapper;
 using XRFID.Sample.Server.Repositories;
 using XRFID.Sample.Server.Services;
+using XRFID.Sample.Server.StateMachines.Shipment.Consumers;
+using XRFID.Sample.Server.StateMachines.Shipment.Contracts;
+using XRFID.Sample.Server.StateMachines.Shipment.StateMachines;
+using XRFID.Sample.Server.StateMachines.Shipment.States;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -194,15 +199,30 @@ try
     });
 
     builder.Services.AddSingleton(KebabCaseEndpointNameFormatter.Instance);
+    #endregion
 
+    #region Mass Transit
     builder.Services.AddMassTransit(mt =>
     {
+        //Modules.Mqtt.Consumers
         mt.AddConsumer<ZebraCommandConsumer>();
+
+        //Server.Consumer.Mqtt
+        mt.AddConsumer<GpioDataConsumer>();
+        mt.AddConsumer<HeartbeatConsumer>();
+        mt.AddConsumer<MresponseConsumer>();
+        mt.AddConsumer<TagDataConsumer>();
+
+        #region State Machine
+
+        mt.AddConsumersFromNamespaceContaining<ShipmentGpioConsumer>();
+        mt.AddRequestClient<ShipmentGpiData>();
+        mt.AddSagaStateMachine<ShipmentStateMachine, ShipmentState, ShipmentStateMachineDefinition>().InMemoryRepository();
+
+        #endregion
 
         mt.UsingInMemory();
     });
-
-
     #endregion
 
     WebApplication app = builder.Build();

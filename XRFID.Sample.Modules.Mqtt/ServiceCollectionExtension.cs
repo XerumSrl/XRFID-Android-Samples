@@ -5,7 +5,6 @@ using MQTTnet.Extensions.ManagedClient;
 using XRFID.Sample.Modules.Mqtt.Interfaces;
 using XRFID.Sample.Modules.Mqtt.Publishers;
 using XRFID.Sample.Modules.Mqtt.Services;
-using XRFID.Server.Modules.ZebraMqtt.Services;
 
 namespace XRFID.Sample.Modules.Mqtt;
 
