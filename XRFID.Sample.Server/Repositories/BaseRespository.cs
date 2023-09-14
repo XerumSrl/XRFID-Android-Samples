@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Data;
 using System.Linq.Expressions;
 using System.Reflection;
-using XRFID.Sample.Common.Utils;
 using XRFID.Sample.Server.Database;
 using XRFID.Sample.Server.Entities;
 
@@ -20,6 +19,7 @@ public class BaseRepository<T> where T : AuditEntity
         _logger = logger;
     }
 
+    #region Get
     public virtual async Task<List<T>> GetAsync()
     {
         return await _table.ToListAsync();
@@ -34,7 +34,9 @@ public class BaseRepository<T> where T : AuditEntity
     {
         return await _table.FirstOrDefaultAsync(f => f.Id == id);
     }
+    #endregion
 
+    #region Create
     public virtual async Task<T> CreateAsync(T entity)
     {
         if (entity == null)
@@ -49,7 +51,9 @@ public class BaseRepository<T> where T : AuditEntity
 
         EntityEntry<T> result = await _table.AddAsync(entity);
 
-        return ObjectUtils.DeepCopy(result.Entity);
+        //_table.Entry(entity).State = EntityState.Detached;
+
+        return result.Entity;
     }
 
     public virtual async Task<List<T>> CreateAsync(List<T> entities)
@@ -73,7 +77,10 @@ public class BaseRepository<T> where T : AuditEntity
         }
         return result;
     }
+    #endregion
 
+    #region Delete
+    [Obsolete("Use delete by Id as it is more reliable")]
     public virtual async Task<T> DeleteAsync(T entity)
     {
         if (!(await _table.AsNoTracking().AnyAsync(c => c.Id == entity.Id)))
@@ -81,32 +88,39 @@ public class BaseRepository<T> where T : AuditEntity
             throw new KeyNotFoundException("Resource not found");
         }
 
-        _table.Remove(entity);
-
-        return entity;
+        return _table.Remove(entity).Entity;
     }
 
+    public virtual async Task<T> DeleteAsync(Guid id)
+    {
+        T entity = await _table.FirstOrDefaultAsync(f => f.Id == id) ?? throw new KeyNotFoundException("Resource not found");
+        return _table.Remove(entity).Entity;
+    }
+    #endregion
+
+    #region Update
     public virtual async Task<T> UpdateAsync(T entity)
     {
         if (entity == null)
         {
             throw new ArgumentNullException(nameof(entity));
         }
-        T? existingEntity = await _table.FirstOrDefaultAsync(c => c.Id == entity.Id);
-        if (existingEntity is null)
-        {
-            throw new KeyNotFoundException("Resource not found");
-        }
+        T existingEntity = await _table.FirstOrDefaultAsync(c => c.Id == entity.Id) ?? throw new KeyNotFoundException("Resource not found");
 
-        #region UpdateCode
+        //uses reflection to swap out everything inside the Object, without changing the reference to the object itself
         PropertyInfo[] properties = entity.GetType().GetProperties();
 
         foreach (PropertyInfo property in properties)
         {
             property.SetValue(existingEntity, property.GetValue(entity));
         }
-        #endregion
         var result = _table.Update(existingEntity).Entity;
         return result;
+    }
+    #endregion
+
+    public virtual void Detach(T entity)
+    {
+        _table.Entry(entity).State = EntityState.Detached;
     }
 }
