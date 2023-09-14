@@ -9,6 +9,7 @@
 	<ItemGroup>
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.10" />
+		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.10">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -28,9 +29,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\XRFID.Sample.Common\XRFID.Sample.Common.csproj" />
-		<ProjectReference Include="..\XRFID.Sample.Modules.Mqtt\XRFID.Sample.Modules.Mqtt.csproj" />
-		<ProjectReference Include="..\XRFID.Sample.Pages\XRFID.Sample.Pages.csproj" />
+	  <ProjectReference Include="..\XRFID.Sample.Common\XRFID.Sample.Common.csproj" />
+	  <ProjectReference Include="..\XRFID.Sample.Modules.Mqtt\XRFID.Sample.Modules.Mqtt.csproj" />
+	  <ProjectReference Include="..\XRFID.Sample.Pages\XRFID.Sample.Pages.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

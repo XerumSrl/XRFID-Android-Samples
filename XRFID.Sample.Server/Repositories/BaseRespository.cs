@@ -10,8 +10,8 @@ namespace XRFID.Sample.Server.Repositories;
 
 public class BaseRepository<T> where T : AuditEntity
 {
-    private readonly DbSet<T> _table;
-    private readonly ILogger _logger;
+    protected readonly DbSet<T> _table;
+    protected readonly ILogger _logger;
 
     public BaseRepository(XRFIDSampleContext context, ILogger logger)
     {

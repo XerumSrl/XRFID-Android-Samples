@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Xerum.XFramework.Common" Version="7.0.10" />
+    <PackageReference Include="Xerum.XFramework.Domain" Version="7.0.11" />
   </ItemGroup>
 
 </Project>
