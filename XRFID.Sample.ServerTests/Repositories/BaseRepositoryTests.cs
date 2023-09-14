@@ -61,12 +61,7 @@ public class BaseRepositoryTests
     {
         Reader reader = await _readerRepository.CreateAsync(originalReader);
         await _unitOfWork.SaveAsync();
-
-        if (!ObjectUtils.GenericEquals(reader, originalReader))
-        {
-            Assert.Fail();
-        }
-        Assert.Pass();
+        Assert.IsTrue(ObjectUtils.GenericEquals(reader, originalReader));
     }
 
     [Test(), Order(2)]
@@ -74,24 +69,29 @@ public class BaseRepositoryTests
     {
         Reader reader = await _readerRepository.UpdateAsync(modifiedReader);
         await _unitOfWork.SaveAsync();
-        _context.Entry(reader).State = EntityState.Detached;
-        if (!ObjectUtils.GenericEquals(reader, originalReader))
-        {
-            Assert.Fail();
-        }
-        Assert.Pass();
+        Assert.IsTrue(ObjectUtils.GenericEquals(reader, modifiedReader));
     }
 
     [Test(), Order(3)]
     public async Task DeleteAsync()
     {
-        Reader reader = await _readerRepository.DeleteAsync(modifiedReader);
+        Reader reader = await _readerRepository.DeleteAsync(modifiedReader.Id);
+        await _unitOfWork.SaveAsync();
+        Reader? result = await _readerRepository.GetAsync(reader.Id);
+        Assert.IsNull(result);
+    }
+
+    [Test, Order(4)]
+    public async Task CombinedAddUpdateAsync()
+    {
+        Reader reader = await _readerRepository.CreateAsync(originalReader);
+        await _unitOfWork.SaveAsync();
+        reader = await _readerRepository.UpdateAsync(modifiedReader);
+        await _unitOfWork.SaveAsync();
+        reader = await _readerRepository.DeleteAsync(reader.Id);
         await _unitOfWork.SaveAsync();
         var result = await _readerRepository.GetAsync(g => g.Id == reader.Id);
-        if (result.Any())
-        {
-            Assert.Fail();
-        }
-        Assert.Pass();
+
+        Assert.IsFalse(result.Any());
     }
 }
