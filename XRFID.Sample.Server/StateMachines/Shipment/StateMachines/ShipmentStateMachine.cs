@@ -133,10 +133,10 @@ public class ShipmentStateMachine :
                     CorrelationId = context.Message.CorrelationId,
                     ReaderId = context.Message.ReaderId,
                     GpoBuzzerId = context.Message.GpoBuzzerId,
-                    GpoBuzzerValue = !context.Message.GpoBuzzerValue,   //mando un segnale inverso a quello ricevuto. si spera sia di spegnimento in base a LogicOn-LogicOff
+                    GpoBuzzerValue = !context.Message.GpoBuzzerValue, //buzzer off value
                     Timestamp = context.Message.Timestamp,
                 }),
-                 context => TimeSpan.FromMilliseconds(10000)),
+                 context => TimeSpan.FromMilliseconds(2000)),
             When(GpoBuzzerTimeout.Received)
                .Activity(x => x.OfType<GpoBuzzerActivity>()));
 

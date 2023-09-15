@@ -6,6 +6,7 @@ using XRFID.Sample.Server.Database;
 using XRFID.Sample.Server.Entities;
 using XRFID.Sample.Server.Repositories;
 using XRFID.Sample.Server.StateMachines.Shipment.Contracts;
+using XRFID.Sample.Server.StateMachines.Shipment.Interfaces;
 using XRFID.Sample.Server.Utilities;
 
 namespace XRFID.Sample.Server.StateMachines.Shipment.Consumers;
@@ -16,8 +17,6 @@ public class ShipmentTagConsumer :
     private readonly ReaderRepository readerRepository;
     private readonly MovementRepository movementRepository;
     private readonly MovementItemRepository movementItemRepository;
-    private readonly LoadingUnitRepository loadingUnitRepository;
-    private readonly LoadingUnitItemRepository loadingUnitItemRepository;
     private readonly UnitOfWork uowk;
     private readonly GpoUtility gpoUtility;
     private readonly ILogger<ShipmentTagConsumer> logger;
@@ -25,8 +24,6 @@ public class ShipmentTagConsumer :
     public ShipmentTagConsumer(ReaderRepository readerRepository,
                                MovementRepository movementRepository,
                                MovementItemRepository movementItemRepository,
-                               LoadingUnitRepository loadingUnitRepository,
-                               LoadingUnitItemRepository loadingUnitItemRepository,
                                UnitOfWork uowk,
                                GpoUtility gpoUtility,
                                ILogger<ShipmentTagConsumer> logger)
@@ -34,20 +31,11 @@ public class ShipmentTagConsumer :
         this.readerRepository = readerRepository;
         this.movementRepository = movementRepository;
         this.movementItemRepository = movementItemRepository;
-        this.loadingUnitRepository = loadingUnitRepository;
-        this.loadingUnitItemRepository = loadingUnitItemRepository;
         this.uowk = uowk;
         this.gpoUtility = gpoUtility;
         this.logger = logger;
     }
 
-    /// <summary>
-    /// Consume SubmitTag da tevent (TagData) consumer
-    /// Invia response a tevent con TagInStatus
-    /// Aggiorna state machine con ITagEvent
-    /// </summary>
-    /// <param name="context"></param>
-    /// <returns></returns>
     public async Task Consume(ConsumeContext<ShipmentTagData> context)
     {
         if (context.Message.CorrelationId == Guid.Empty)
@@ -198,25 +186,23 @@ public class ShipmentTagConsumer :
                     if (gpo is not null)
                     {
                         await gpoUtility.SetGpo(reader.Id, reader.Name, gpo.YellowLed, true); //Yellow on
+
+                        await gpoUtility.SetGpo(reader.Id, reader.Name, gpo.Buzzer, true); //Buzzer on
+
+                        await context.Publish<IGpoBuzzerEvent>(new
+                        {
+                            CorrelationId = context.Message.CorrelationId,
+                            ReaderId = context.Message.ReaderId,
+                            GpoBuzzerId = gpo.Buzzer,
+                            GpoBuzzerValue = true,
+                            Timestamp = DateTime.Now,
+                        });
                     }
                 }
-                //await gpoUtility.SetBuzzerGpo(context.Message.ReaderId, true);
 
-                //await context.Publish<IGpoBuzzerEvent>(new
-                //{
-                //    CorrelationId = context.Message.CorrelationId,
-                //    ReaderId = context.Message.ReaderId,
-                //    GpoBuzzerId = readerService.GetReaderCache(context.Message.ReaderId).GpioConfiguration.GpOutBuzzer.Id,
-                //    GpoBuzzerValue = readerService.GetReaderCache(context.Message.ReaderId).GpioConfiguration.GpOutBuzzer.LogicOn,
-                //    Timestamp = DateTime.Now,
-                //});
 
                 logger.LogDebug("[Consume<ShipmentTagData>] {CorrelationId}|Unexpected item found for Epc: {Epc}", context.Message.CorrelationId, movementItem.Epc);
             }
-
-            /* @@ TODO @@ 
-             * update loading unit items
-             */
         }
         catch (Exception ex)
         {
