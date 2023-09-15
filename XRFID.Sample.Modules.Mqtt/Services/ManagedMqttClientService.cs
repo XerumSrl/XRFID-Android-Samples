@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using XRFID.Sample.Modules.Mqtt.Contracts;
 using XRFID.Sample.Modules.Mqtt.Events;
 using XRFID.Sample.Modules.Mqtt.Interfaces;
+using XRFID.Sample.Modules.Mqtt.JsonConverters;
 using XRFID.Sample.Modules.Mqtt.Payloads;
 using XRFID.Sample.Modules.Mqtt.Publishers;
 
@@ -134,7 +135,6 @@ public class ManagedMqttClientService : IManagedMqttClientService
                                 string pattern = @"(/)";
                                 Regex regex = new Regex(pattern);
                                 var hostname = regex.Split(evt.Topic).Last().ToUpper();
-                                //mevents/FX9600FBDB58
                                 heartbeat.HostName = hostname;
 
                                 await client.Publish(heartbeat);
@@ -149,17 +149,12 @@ public class ManagedMqttClientService : IManagedMqttClientService
 
                             using (var scope = serviceScopeFactory.CreateScope())
                             {
-                                //    // *****************************************************************
-                                //    // trasformare in mqtt con solo publish come visto stamattina. 
-                                //    // non c'è bisogno che ci sia un response
-
                                 //var client = scope.ServiceProvider.GetService<IRequestPublisher<GpiEvent>>();
                                 var client = scope.ServiceProvider.GetService<IZebraMqttEventPublisher>();
 
                                 string pattern = @"(/)";
                                 Regex regex = new Regex(pattern);
                                 var hostname = regex.Split(evt.Topic).Last().ToUpper();
-                                //mevents/FX9600FBDB58
                                 gpi.HostName = hostname;
 
                                 await client.Publish(gpi);
@@ -209,6 +204,7 @@ public class ManagedMqttClientService : IManagedMqttClientService
                 {
                     ZebraMqttApplicationMessage evt = mapper.Map<ZebraMqttApplicationMessage>(arg.ApplicationMessage);
                     var options = new JsonSerializerOptions();
+                    options.Converters.Add(new DateTimeConverter());
 
                     string pattern = @"(/)";
                     Regex regex = new Regex(pattern);

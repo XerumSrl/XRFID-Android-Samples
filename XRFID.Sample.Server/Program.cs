@@ -209,6 +209,7 @@ try
     #region Mass Transit
 
     builder.Services.AddScoped<IZebraMqttCommandPublisher, ZebraMqttCommandPublisher>();
+    builder.Services.AddScoped<IZebraMqttEventPublisher, ZebraMqttEventPublisher>();
 
     builder.Services.AddMassTransit(mt =>
     {
@@ -216,10 +217,10 @@ try
         mt.AddConsumer<ZebraCommandConsumer>();
 
         //Server.Consumer.Mqtt
-        mt.AddConsumer<GpioDataConsumer>();
+        mt.AddConsumer<GpioDataConsumer, GpioDataConsumerDefinition>();
         mt.AddConsumer<HeartbeatConsumer>();
         mt.AddConsumer<MresponseConsumer>();
-        mt.AddConsumer<TagDataConsumer>();
+        mt.AddConsumer<TagDataConsumer, TagDataConsumerDefinition>();
 
         #region State Machine
 
@@ -229,7 +230,13 @@ try
 
         #endregion
 
-        mt.UsingInMemory();
+        mt.AddDelayedMessageScheduler();
+
+        mt.UsingInMemory((context, cfg) =>
+        {
+            cfg.ConfigureEndpoints(context);
+            cfg.UseDelayedMessageScheduler();
+        });
     });
     #endregion
 

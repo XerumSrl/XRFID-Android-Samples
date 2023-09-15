@@ -28,18 +28,18 @@ public class RAWMQTTCommands : IRequestMessage, IRAWCommand
     /// </summary>
     [DataMember(Name = "hostname", EmitDefaultValue = false)]
     [JsonPropertyName("hostname")]
-    [JsonIgnore]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     [Required]
-    public string HostName { get; set; }
+    public string? HostName { get; set; }
 
     /// <summary>
     /// Gets or Sets Topic
     /// </summary>
     [DataMember(Name = "topic", EmitDefaultValue = false)]
     [JsonPropertyName("topic")]
-    [JsonIgnore]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     [Required]
-    public string Topic { get; set; }
+    public string? Topic { get; set; }
 
     /// <summary>
     /// Gets or Sets Command

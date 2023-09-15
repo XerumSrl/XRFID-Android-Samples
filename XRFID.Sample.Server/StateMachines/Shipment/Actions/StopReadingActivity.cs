@@ -1,5 +1,6 @@
 ﻿using MassTransit;
 using System.Text.Json;
+using XRFID.Sample.Server.Database;
 using XRFID.Sample.Server.Entities;
 using XRFID.Sample.Server.Repositories;
 using XRFID.Sample.Server.StateMachines.Shipment.Interfaces;
@@ -13,16 +14,19 @@ public class StopReadingActivity :
 {
     private readonly CommandUtility commandUtility;
     private readonly ReaderRepository readerRepository;
+    private readonly UnitOfWork uowk;
     private readonly ILogger<StopReadingActivity> logger;
     private readonly GpoUtility gpoUtility;
 
     public StopReadingActivity(CommandUtility commandUtility,
         ReaderRepository readerRepository,
+        UnitOfWork uowk,
         ILogger<StopReadingActivity> logger,
         GpoUtility gpoUtility)
     {
         this.commandUtility = commandUtility;
         this.readerRepository = readerRepository;
+        this.uowk = uowk;
         this.logger = logger;
         this.gpoUtility = gpoUtility;
     }
@@ -34,9 +38,10 @@ public class StopReadingActivity :
 
     public async Task Execute(BehaviorContext<ShipmentState, IGpiEvent> context, IBehavior<ShipmentState, IGpiEvent> next)
     {
-        Reader reader = (await readerRepository.GetAsync(q => q.Id == context.Saga.ReaderId)).First();
         try
         {
+            Reader reader = await readerRepository.GetAsync(context.Saga.ReaderId) ?? throw new Exception("Missing Reader");
+
             if (reader.Name is null)
             {
                 throw new Exception($"Missing Reader Name for id {reader.Id}");
@@ -60,19 +65,18 @@ public class StopReadingActivity :
             await gpoUtility.SetGpo(reader.Id, reader.Name, gpo.YellowLed, false); //Yellow off
             await gpoUtility.SetGpo(reader.Id, reader.Name, gpo.RedLed, true); //Red on
 
+            //reset reader correlation id
+            reader.CorrelationId = Guid.Empty;
+            await readerRepository.UpdateAsync(reader);
+            await uowk.SaveAsync();
+
+            logger.LogDebug("Reset CorrelationId");
         }
         catch (Exception ex)
         {
             logger.LogError(ex.Message);
-            throw new Exception(ex.Message);
+            throw;
         }
-
-
-
-        //reset reader correlation id
-        //await readerManager.ResetCorrelationId(context.Saga.ReaderId);
-        //logger.LogDebug("GpiStopEventActivity|Resetting reader correlation id. ReaderId: {ReaderId}", context.Saga.ReaderId);
-
 
         await next.Execute(context);
 

@@ -4,9 +4,9 @@ public interface IRAWCommand
 {
     Guid ReaderId { get; set; }
 
-    string HostName { get; set; }
+    string? HostName { get; set; }
 
-    string Topic { get; set; }
+    string? Topic { get; set; }
 
     string Command { get; set; }
 

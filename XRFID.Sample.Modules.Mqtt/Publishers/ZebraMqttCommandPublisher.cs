@@ -21,6 +21,6 @@ public class ZebraMqttCommandPublisher : IZebraMqttCommandPublisher
     public async Task Publish(RAWMQTTCommands request)
     {
         logger.LogTrace(request.ToString());
-        await busControl.Publish<RAWMQTTCommands>(request);
+        await busControl.Publish(request);
     }
 }

@@ -43,6 +43,8 @@ public class ZebraCommandConsumer : IRequestConsumer<RAWMQTTCommands>
             var payload = JsonSerializer.Deserialize<dynamic>((JsonElement)context.Message.Payload);
             var command = JsonSerializer.Serialize(new RAWMQTTCommands
             {
+                HostName = null,
+                Topic = null,
                 Command = context.Message.Command,
                 CommandId = context.Message.CommandId,
                 Payload = payload ?? new Object(),

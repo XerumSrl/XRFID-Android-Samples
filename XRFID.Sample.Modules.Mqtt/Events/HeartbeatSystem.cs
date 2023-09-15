@@ -46,7 +46,7 @@ public class HeartbeatSystem
     /// </summary>
     [DataMember(Name = "ntp", EmitDefaultValue = false)]
     [JsonPropertyName("ntp")]
-    public HeartbeatSystemNtp Ntp { get; set; }
+    public dynamic Ntp { get; set; }
 
     /// <summary>
     /// Gets or Sets Temperature

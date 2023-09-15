@@ -15,13 +15,7 @@ namespace XRFID.Sample.Modules.Mqtt.Contracts;
 [DataContract]
 public class ZebraTagData : IMqttTagData, IRequestMessage
 {
-    public ZebraTagData()
-    {
-        Timestamp = DateTime.Now;
-        EventStatus = ItemStatus.None;
-    }
-
-    public DateTime Timestamp { get; set; }
+    public DateTime Timestamp { get; set; } = DateTime.Now;
 
     /// <summary>
     /// Host name of the reader
@@ -38,7 +32,7 @@ public class ZebraTagData : IMqttTagData, IRequestMessage
     /// <value>Host name of the reader</value>
     [DataMember(Name = "eventNum", EmitDefaultValue = false)]
     [JsonPropertyName("eventNum")]
-    public string? EventNum { get; set; }
+    public int? EventNum { get; set; }
 
     /// <summary>
     /// Host name of the reader
@@ -149,7 +143,7 @@ public class ZebraTagData : IMqttTagData, IRequestMessage
     [JsonPropertyName("userDefined")]
     public string? UserDefined { get; set; }
 
-    public ItemStatus EventStatus { get; set; }
+    public ItemStatus EventStatus { get; set; } = ItemStatus.None;
 
     public override string ToString()
     {
