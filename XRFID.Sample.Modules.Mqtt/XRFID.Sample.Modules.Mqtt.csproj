@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="OperatingModes\**" />
+    <Compile Remove="Settings\**" />
+    <EmbeddedResource Remove="OperatingModes\**" />
+    <EmbeddedResource Remove="Settings\**" />
+    <None Remove="OperatingModes\**" />
+    <None Remove="Settings\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <PackageReference Include="MQTTnet.Extensions.ManagedClient" Version="4.3.1.873" />
+    <PackageReference Include="Xerum.XFramework.Common" Version="7.0.10" />
+    <PackageReference Include="Xerum.XFramework.MassTransit" Version="7.0.9" />
+  </ItemGroup>
+
+</Project>

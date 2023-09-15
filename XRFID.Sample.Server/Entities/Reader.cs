@@ -1,9 +1,8 @@
-﻿using Xerum.XFramework.Common.Dto;
-using Xerum.XFramework.Common.Enums;
+﻿using Xerum.XFramework.Common.Enums;
 
-namespace XRFID.Sample.Common.Dto;
+namespace XRFID.Sample.Server.Entities;
 
-public class ReaderDto : RestEntityDto
+public class Reader : AuditEntity
 {
     public string Ip { get; set; } = "127.0.0.1";
 
