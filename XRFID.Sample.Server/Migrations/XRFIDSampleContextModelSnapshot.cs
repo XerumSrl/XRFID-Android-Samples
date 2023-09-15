@@ -377,10 +377,16 @@ namespace XRFID.Sample.Server.Migrations
                     b.Property<string>("Code")
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid>("CorrelationId")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CreatorUserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("GpoConfiguration")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Ip")

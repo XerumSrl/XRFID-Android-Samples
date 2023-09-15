@@ -11,7 +11,7 @@ using XRFID.Sample.Server.Database;
 namespace XRFID.Sample.Server.Migrations
 {
     [DbContext(typeof(XRFIDSampleContext))]
-    [Migration("20230908121752_Initial")]
+    [Migration("20230915075155_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -380,10 +380,16 @@ namespace XRFID.Sample.Server.Migrations
                     b.Property<string>("Code")
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid>("CorrelationId")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CreatorUserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("GpoConfiguration")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Ip")
