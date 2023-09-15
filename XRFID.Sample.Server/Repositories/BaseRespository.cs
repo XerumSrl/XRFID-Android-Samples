@@ -51,8 +51,6 @@ public class BaseRepository<T> where T : AuditEntity
 
         EntityEntry<T> result = await _table.AddAsync(entity);
 
-        //_table.Entry(entity).State = EntityState.Detached;
-
         return result.Entity;
     }
 

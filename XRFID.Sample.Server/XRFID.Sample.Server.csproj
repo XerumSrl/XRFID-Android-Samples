@@ -25,7 +25,6 @@
 		<PackageReference Include="OpenIddict.Validation.ServerIntegration" Version="4.7.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
 		<PackageReference Include="Xerum.XFramework.DefaultLogging" Version="7.0.9" />
-		<PackageReference Include="MudBlazor" Version="6.0.13" />
 	</ItemGroup>
 
 	<ItemGroup>

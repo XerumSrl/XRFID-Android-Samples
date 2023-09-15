@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XRFID.Sample.Modules.Mqtt",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{77D7AC6B-3865-40BA-BAE6-AA862989FB3B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XRFID.Sample.ServerTests", "XRFID.Sample.ServerTests\XRFID.Sample.ServerTests.csproj", "{AEE012A2-F213-4BBF-B57A-665462BEDE75}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XRFID.Sample.ServerTests", "XRFID.Sample.ServerTests\XRFID.Sample.ServerTests.csproj", "{AEE012A2-F213-4BBF-B57A-665462BEDE75}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
