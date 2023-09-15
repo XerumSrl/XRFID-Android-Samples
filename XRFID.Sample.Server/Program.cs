@@ -10,6 +10,7 @@ using Xerum.XFramework.Common.Exceptions;
 using Xerum.XFramework.DefaultLogging;
 using XRFID.Sample.Modules.Mqtt;
 using XRFID.Sample.Modules.Mqtt.Consumers;
+using XRFID.Sample.Modules.Mqtt.Publishers;
 using XRFID.Sample.Server.Consumers.Mqtt;
 using XRFID.Sample.Server.Database;
 using XRFID.Sample.Server.Mapper;
@@ -19,6 +20,7 @@ using XRFID.Sample.Server.StateMachines.Shipment.Consumers;
 using XRFID.Sample.Server.StateMachines.Shipment.Contracts;
 using XRFID.Sample.Server.StateMachines.Shipment.StateMachines;
 using XRFID.Sample.Server.StateMachines.Shipment.States;
+using XRFID.Sample.Server.Utilities;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -167,7 +169,7 @@ try
         });
     #endregion
 
-    #region MQTT & MassTransit
+    #region MQTT
 
     builder.Services.AddZebraManagedMqttClient(m =>
     {
@@ -201,7 +203,13 @@ try
     builder.Services.AddSingleton(KebabCaseEndpointNameFormatter.Instance);
     #endregion
 
+    builder.Services.AddScoped<CommandUtility>();
+    builder.Services.AddScoped<GpoUtility>();
+
     #region Mass Transit
+
+    builder.Services.AddScoped<IZebraMqttCommandPublisher, ZebraMqttCommandPublisher>();
+
     builder.Services.AddMassTransit(mt =>
     {
         //Modules.Mqtt.Consumers
