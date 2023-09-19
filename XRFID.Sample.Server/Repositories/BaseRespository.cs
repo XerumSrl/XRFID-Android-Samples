@@ -20,18 +20,32 @@ public class BaseRepository<T> where T : AuditEntity
     }
 
     #region Get
-    public virtual async Task<List<T>> GetAsync()
+    public virtual async Task<List<T>> GetAsync(string? include = null)
     {
+        if (include is not null)
+        {
+            return await _table.Include(include).ToListAsync();
+        }
+
         return await _table.ToListAsync();
     }
 
-    public virtual async Task<List<T>> GetAsync(Expression<Func<T, bool>> query)
+    public virtual async Task<List<T>> GetAsync(Expression<Func<T, bool>> query, string? include = null)
     {
+        if (include is not null)
+        {
+            return await _table.Where(query).Include(include).ToListAsync();
+        }
+
         return await _table.Where(query).ToListAsync();
     }
 
-    public virtual async Task<T?> GetAsync(Guid id)
+    public virtual async Task<T?> GetAsync(Guid id, string? include = null)
     {
+        if (include is not null)
+        {
+            return await _table.Include(include).FirstOrDefaultAsync(f => f.Id == id);
+        }
         return await _table.FirstOrDefaultAsync(f => f.Id == id);
     }
     #endregion

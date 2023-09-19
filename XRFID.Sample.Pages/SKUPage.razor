@@ -1,0 +1,39 @@
+﻿@page "/sku"
+@using System.ComponentModel.DataAnnotations;
+
+<h1>SKUPage</h1>
+
+<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+    <MudTextField T="string" Variant="Variant.Outlined" Label="Name" For="()=>model.Name" @bind-Value="model.Name" AutoFocus="true" />
+    <MudTextField T="string" Variant="Variant.Outlined" Label="Description" For="()=>model.Description" @bind-Value="model.Description" />
+    <MudDatePicker Variant="Variant.Outlined" Editable="true" Clearable="true" Label="Start Date" For="()=>model.StartDate" @bind-Date="model.StartDate" />
+    <MudDatePicker Variant="Variant.Outlined" Editable="true" Clearable="true" Label="Expiration Date" For="()=>model.ExpirationDate" @bind-Date="model.ExpirationDate" />
+    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Submit</MudButton>
+</EditForm>
+
+
+
+@code {
+    private FormModel model = new FormModel();
+    private void OnValidSubmit(EditContext context)
+    {
+ //need entities and repositories, pages may need to go in server
+        StateHasChanged();
+    }
+
+    private class FormModel
+    {
+        [Required]
+        public string Name { get; set; } = string.Empty;
+
+        [Required]
+        public string Description { get; set; } = string.Empty;
+
+        [Required]
+        public DateTime? StartDate { get; set; }
+
+        [Required]
+        public DateTime? ExpirationDate { get; set; }
+    }
+}

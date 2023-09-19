@@ -302,15 +302,6 @@ namespace XRFID.Sample.Server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Attrib1")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Attrib2")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Attrib3")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Code")
                         .HasColumnType("TEXT");
 
@@ -343,24 +334,19 @@ namespace XRFID.Sample.Server.Migrations
                     b.Property<string>("Note")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("OrderReference")
+                    b.Property<string>("Reference")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Reference")
+                    b.Property<Guid>("SKUId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SerialNumber")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("SKUId");
 
                     b.ToTable("Products");
                 });
@@ -431,6 +417,48 @@ namespace XRFID.Sample.Server.Migrations
                     b.ToTable("Readers");
                 });
 
+            modelBuilder.Entity("XRFID.Sample.Server.Entities.SKU", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Code")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatorUserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("EffectivityEnd")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("EffectivityStart")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("LastModificationTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastModifierUserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Reference")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SKU");
+                });
+
             modelBuilder.Entity("XRFID.Sample.Server.Entities.LoadingUnitItem", b =>
                 {
                     b.HasOne("XRFID.Sample.Server.Entities.LoadingUnit", "LoadingUnit")
@@ -465,6 +493,17 @@ namespace XRFID.Sample.Server.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("XRFID.Sample.Server.Entities.Product", b =>
+                {
+                    b.HasOne("XRFID.Sample.Server.Entities.SKU", "SKU")
+                        .WithMany("Products")
+                        .HasForeignKey("SKUId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SKU");
+                });
+
             modelBuilder.Entity("XRFID.Sample.Server.Entities.LoadingUnit", b =>
                 {
                     b.Navigation("LoadingUnitItems");
@@ -473,6 +512,11 @@ namespace XRFID.Sample.Server.Migrations
             modelBuilder.Entity("XRFID.Sample.Server.Entities.Movement", b =>
                 {
                     b.Navigation("MovementItems");
+                });
+
+            modelBuilder.Entity("XRFID.Sample.Server.Entities.SKU", b =>
+                {
+                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

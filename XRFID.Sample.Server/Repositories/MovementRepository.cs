@@ -40,7 +40,7 @@ public class MovementRepository : BaseRepository<Movement>
         }
         else
         {
-            if (rowsWithErrors.Where(x => x.Status == ItemStatus.NotFound).Count() > 0)
+            if (rowsWithErrors.Where(x => x.Status == ItemStatus.NotFound).Any())
             {
                 movWithItems.MissingItem = true;
             }
@@ -48,7 +48,7 @@ public class MovementRepository : BaseRepository<Movement>
             {
                 movWithItems.MissingItem = false;
             }
-            if (rowsWithErrors.Where(x => x.Status == ItemStatus.Unexpected).Count() > 0)
+            if (rowsWithErrors.Where(x => x.Status == ItemStatus.Unexpected).Any())
             {
                 movWithItems.UnexpectedItem = true;
             }
@@ -56,7 +56,7 @@ public class MovementRepository : BaseRepository<Movement>
             {
                 movWithItems.UnexpectedItem = false;
             }
-            if (rowsWithErrors.Where(x => x.Status == ItemStatus.Overflow).Count() > 0)
+            if (rowsWithErrors.Where(x => x.Status == ItemStatus.Overflow).Any())
             {
                 movWithItems.OverflowItem = true;
             }
