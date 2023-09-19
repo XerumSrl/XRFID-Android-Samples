@@ -11,6 +11,7 @@ using Xerum.XFramework.DefaultLogging;
 using XRFID.Sample.Modules.Mqtt;
 using XRFID.Sample.Modules.Mqtt.Consumers;
 using XRFID.Sample.Modules.Mqtt.Publishers;
+using XRFID.Sample.Pages.Hubs;
 using XRFID.Sample.Server.Consumers.Mqtt;
 using XRFID.Sample.Server.Database;
 using XRFID.Sample.Server.Mapper;
@@ -290,6 +291,7 @@ try
     app.MapDefaultControllerRoute();
 
     app.MapBlazorHub();
+    app.MapHub<UiMessageHub>("/uimessagehub");
     app.MapFallbackToPage("/_Host");
 
     app.Run();

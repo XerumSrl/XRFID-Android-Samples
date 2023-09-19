@@ -1,0 +1,100 @@
+﻿@page "/check"
+@using XRFID.Sample.Pages.Data;
+@using XRFID.Sample.Pages.Data.Enums;
+@using Microsoft.AspNetCore.SignalR.Client;
+@inject NavigationManager Navigation;
+@implements IAsyncDisposable;
+
+
+<MudDataGrid Items="@Items">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Real Time Tag</MudText>
+        <MudSpacer />
+    </ToolBarContent>
+    <Columns>
+        <PropertyColumn Property="x => x.DateTime" Title="Date Time" />
+        <PropertyColumn Property="x => x.CheckStatus" Title="Status" CellStyleFunc="@_cellStyleFunc" />
+        <PropertyColumn Property="x => x.Name" />
+        <PropertyColumn Property="x => x.Epc" />
+        <PropertyColumn Property="x => x.Description" />
+    </Columns>
+</MudDataGrid>
+
+@code {
+    private IEnumerable<ViewItem> Items = new List<ViewItem>();
+
+    private HubConnection? hubConnection;
+
+    protected override async Task OnInitializedAsync()
+    {
+        #region SignalR
+        //Subscribe this blazor page to refreshub signalR topic
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(Navigation.ToAbsoluteUri("/uimessagehub"))
+            .Build();
+
+        //Wait for a message "RefreshTag"
+        //When he receives it, it executes the lambda expression
+        hubConnection.On("RefreshTag", async () =>
+        {
+        });
+        await hubConnection.StartAsync();
+        #endregion
+
+
+        var itemList = new List<ViewItem>();
+
+        for (int i = 0; i < 4; i++)
+        {
+            var item = new ViewItem
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "item_" + i,
+                    Epc = i.ToString(),
+                    CheckStatus = CheckStatusEnum.Found,
+                };
+
+            itemList.Add(item);
+        }
+
+        Items = itemList;
+    }
+
+    //signalR connection open
+    public bool IsConnected =>
+        hubConnection?.State == HubConnectionState.Connected;
+
+    private Func<ViewItem, string> _cellStyleFunc => x =>
+    {
+        string style = "";
+
+        switch (x.CheckStatus)
+        {
+            case CheckStatusEnum.NotFound:
+                style += "background-color:#B5D6DB";
+                break;
+
+            case CheckStatusEnum.Found:
+                style += "background-color:#66FF33";
+                break;
+
+            case CheckStatusEnum.Error:
+                style += "background-color:#FF0000";
+                break;
+
+            default:
+                style += "background-color:#FFFFFF";
+                break;
+        }
+
+        return style;
+    };
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+}

@@ -1,0 +1,82 @@
+﻿@page "/lucreation"
+@using XRFID.Sample.Common.Dto;
+
+<MudDataGrid T="ProductDto" MultiSelection="true" Items="@Products" SortMode="SortMode.Multiple" Filterable="true"
+             Hideable="true" RowClick="@RowClicked" SelectedItemsChanged="@SelectedItemsChanged">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Products</MudText>
+        <MudSpacer />
+    </ToolBarContent>
+    <Columns>
+        <SelectColumn T="ProductDto" />
+        <PropertyColumn Property="x => x.CreationTime" Title="Date Time" />
+        <PropertyColumn Property="x => x.Name" />
+        <PropertyColumn Property="x => x.Epc" />
+        <PropertyColumn Property="x => x.Description" />
+        <PropertyColumn Property="x => x.ContentQuantity" Title="Quantity" />
+        <PropertyColumn Property="x => x.SerialNumber" Title="Serial Number" />
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="ProductDto" />
+    </PagerContent>
+</MudDataGrid>
+
+<MudExpansionPanels Style="flex:1">
+    <MudExpansionPanel Text="Show Events">
+
+        <MudText Typo="@Typo.body2">@selectedProducts.Count</MudText>
+        <br />
+
+        @foreach (var message in _events)
+        {
+            <MudText Typo="@Typo.body2">@message</MudText>
+        }
+        @if (_events.Count > 0)
+        {
+            <div class="d-flex">
+                <MudSpacer />
+                <MudButton Class="mt-3" ButtonType="ButtonType.Button" Variant="Variant.Filled" OnClick="@(() => _events.Clear())">Clear</MudButton>
+            </div>
+        }
+    </MudExpansionPanel>
+</MudExpansionPanels>
+
+
+@code {
+
+    private IEnumerable<ProductDto> Products = new List<ProductDto>();
+    private List<string> _events = new();
+
+    private List<ProductDto> selectedProducts = new List<ProductDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        List<ProductDto> testProducts = new List<ProductDto>();
+        for (int i = 0; i < 10; i++)
+        {
+            testProducts.Add(new ProductDto());
+        }
+        Products = testProducts;
+    }
+
+    // events
+    void RowClicked(DataGridRowClickEventArgs<ProductDto> args)
+    {
+        if (!selectedProducts.Exists(e => e.Id == args.Item.Id))
+        {
+            selectedProducts.Add(args.Item);
+        }
+        else
+        {
+            selectedProducts.Remove(args.Item);
+        }
+
+        _events.Insert(0, $"Event = RowClick, Index = {args.RowIndex}, Data = {System.Text.Json.JsonSerializer.Serialize(args.Item)}");
+    }
+
+    void SelectedItemsChanged(HashSet<ProductDto> items)
+    {
+        selectedProducts = items.ToList();
+        _events.Insert(0, $"Event = SelectedItemsChanged, Data = {System.Text.Json.JsonSerializer.Serialize(items)}");
+    }
+}
