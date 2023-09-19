@@ -12,6 +12,7 @@ using XRFID.Sample.Modules.Mqtt;
 using XRFID.Sample.Modules.Mqtt.Consumers;
 using XRFID.Sample.Modules.Mqtt.Publishers;
 using XRFID.Sample.Pages.Hubs;
+using XRFID.Sample.Server.Consumers.Frontend;
 using XRFID.Sample.Server.Consumers.Mqtt;
 using XRFID.Sample.Server.Database;
 using XRFID.Sample.Server.Mapper;
@@ -22,6 +23,7 @@ using XRFID.Sample.Server.StateMachines.Shipment.Contracts;
 using XRFID.Sample.Server.StateMachines.Shipment.StateMachines;
 using XRFID.Sample.Server.StateMachines.Shipment.States;
 using XRFID.Sample.Server.Utilities;
+using XRFID.Sample.Server.Workers;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -223,12 +225,13 @@ try
         mt.AddConsumer<MresponseConsumer>();
         mt.AddConsumer<TagDataConsumer, TagDataConsumerDefinition>();
 
-        #region State Machine
+        //Server.Consumers.Frontend;
+        mt.AddConsumer<UpdateUiConsumer>();
 
+        #region State Machine
         mt.AddConsumersFromNamespaceContaining<ShipmentGpioConsumer>();
         mt.AddRequestClient<ShipmentGpiData>();
         mt.AddSagaStateMachine<ShipmentStateMachine, ShipmentState, ShipmentStateMachineDefinition>().InMemoryRepository();
-
         #endregion
 
         mt.AddDelayedMessageScheduler();
@@ -239,6 +242,10 @@ try
             cfg.UseDelayedMessageScheduler();
         });
     });
+    #endregion
+
+    #region Workers
+    builder.Services.AddSingleton<CheckPageWorker>();
     #endregion
 
     WebApplication app = builder.Build();

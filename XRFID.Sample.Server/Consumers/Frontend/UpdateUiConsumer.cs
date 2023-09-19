@@ -23,6 +23,8 @@ public class UpdateUiConsumer : IConsumer<StateMachineUiTagPublish>
 
     public async Task Consume(ConsumeContext<StateMachineUiTagPublish> context)
     {
+        logger.LogDebug("[Consume<StateMachineUiTagPublish>] Tag {Epc} Receved", context.Message.Tag.Tag.Epc);
+
         //Reaload items
         await worker.SetViewItems();
 

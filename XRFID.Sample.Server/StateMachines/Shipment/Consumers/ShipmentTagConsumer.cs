@@ -2,6 +2,7 @@
 using System.Text.Json;
 using Xerum.XFramework.Common.Enums;
 using XRFID.Sample.Common.Dto;
+using XRFID.Sample.Server.Contracts;
 using XRFID.Sample.Server.Database;
 using XRFID.Sample.Server.Entities;
 using XRFID.Sample.Server.Repositories;
@@ -203,6 +204,13 @@ public class ShipmentTagConsumer :
 
                 logger.LogDebug("[Consume<ShipmentTagData>] {CorrelationId}|Unexpected item found for Epc: {Epc}", context.Message.CorrelationId, movementItem.Epc);
             }
+
+            //Send message to update UI
+            await context.Publish(new StateMachineUiTagPublish
+            {
+                ReaderId = context.Message.ReaderId,
+                Tag = context.Message.TagAction,
+            });
         }
         catch (Exception ex)
         {

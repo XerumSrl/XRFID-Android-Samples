@@ -1,8 +1,10 @@
 ﻿@page "/check"
 @using XRFID.Sample.Pages.Data;
 @using XRFID.Sample.Pages.Data.Enums;
+@using XRFID.Sample.Server.Workers;
 @using Microsoft.AspNetCore.SignalR.Client;
 @inject NavigationManager Navigation;
+@inject CheckPageWorker Worker;
 @implements IAsyncDisposable;
 
 
@@ -37,27 +39,20 @@
         //When he receives it, it executes the lambda expression
         hubConnection.On("RefreshTag", async () =>
         {
+            Items = await Worker.GetViewItems();
+            await InvokeAsync(StateHasChanged);
         });
         await hubConnection.StartAsync();
         #endregion
 
-
-        var itemList = new List<ViewItem>();
-
-        for (int i = 0; i < 4; i++)
+        if (!Items.Any())
         {
-            var item = new ViewItem
-                {
-                    Id = Guid.NewGuid(),
-                    Name = "item_" + i,
-                    Epc = i.ToString(),
-                    CheckStatus = CheckStatusEnum.Found,
-                };
-
-            itemList.Add(item);
+            if (Worker.ItemsIsEmpty())
+            {
+                await Worker.SetViewItems();
+            }
+            Items = await Worker.GetViewItems();
         }
-
-        Items = itemList;
     }
 
     //signalR connection open

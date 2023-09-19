@@ -1,0 +1,73 @@
+﻿@page "/sku2"
+@using XRFID.Sample.Server.Entities;
+@inject NavigationManager navigation;
+
+<MudDataGrid Items="@Skus"
+             ReadOnly="true">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">SKUs</MudText>
+        <MudSpacer />
+        <MudButton Size="@Size.Large" Variant="@Variant.Filled" Color="@Color.Primary">New SKU</MudButton>
+    </ToolBarContent>
+    <Columns>
+        <HierarchyColumn T="SKU"/>
+        <PropertyColumn Property="x => x.CreationTime" Title="Date Creation" />
+        <PropertyColumn Property="x => x.Name" />
+        <PropertyColumn Property="x => x.Code" />
+        <PropertyColumn Property="x => x.Description" />
+        <PropertyColumn Property="x => x.EffectivityStart" Title="Effectivity Start" />
+        <PropertyColumn Property="x => x.EffectivityEnd" Title="Effectivity End" />
+        <TemplateColumn CellClass="d-flex justify-end">
+            <CellTemplate>
+                <MudStack Row>
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" Size="Size.Medium"/>
+                    <MudButton Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Primary">New Product</MudButton>
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <ChildRowContent>
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">@context.Item.Name</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudText>@context.Item.Code</MudText>
+                <MudText>@context.Item.Description</MudText>
+            </MudCardContent>
+        </MudCard>
+    </ChildRowContent>
+    <PagerContent>
+        <MudDataGridPager T="SKU" />
+    </PagerContent>
+</MudDataGrid>
+@code {
+    private IEnumerable<SKU> Skus = new List<SKU>();
+    private List<string> _events = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        List<SKU> x = new List<SKU>();
+        for (int i = 0; i < 6; i++)
+        {
+            SKU s = new SKU
+                {
+                    Name = "sku_" + i.ToString(),
+                    Description = "sku_"+i.ToString()+"_Description"
+                };
+            x.Add(s);
+        }
+        Skus = x;
+    }
+
+    // events
+    void RowClicked(DataGridRowClickEventArgs<SKU> args)
+    {
+        _events.Insert(0, $"Event = RowClick, Index = {args.RowIndex}, Data = {System.Text.Json.JsonSerializer.Serialize(args.Item)}");
+        navigation.NavigateTo("/product");
+    }
+
+
+}

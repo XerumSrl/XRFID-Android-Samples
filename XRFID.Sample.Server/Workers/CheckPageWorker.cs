@@ -11,17 +11,19 @@ public class CheckPageWorker
 {
     private readonly MovementItemRepository movementItemRepository;
     private readonly ILogger<CheckPageWorker> logger;
-    private List<ViewItem> viewItems = new List<ViewItem>();
+    private List<ViewItem> _viewItems = new List<ViewItem>();
 
-    public CheckPageWorker(MovementItemRepository movementItemRepository, ILogger<CheckPageWorker> logger)
+    public CheckPageWorker(IServiceProvider serviceProvider, ILogger<CheckPageWorker> logger)
     {
-        this.movementItemRepository = movementItemRepository;
+        var scope = serviceProvider.CreateScope();
+        movementItemRepository = scope.ServiceProvider.GetRequiredService<MovementItemRepository>();
+
         this.logger = logger;
     }
 
     public async Task SetViewItems()
     {
-        viewItems.Clear();
+        _viewItems.Clear();
 
         List<MovementItem> dailyItems = new List<MovementItem>();
 
@@ -44,8 +46,9 @@ public class CheckPageWorker
                         Description = dItem.Description,
                         CheckStatus = dItem.Status == ItemStatus.Found ? CheckStatusEnum.Found :
                                              (dItem.Status == ItemStatus.NotFound ? CheckStatusEnum.NotFound : CheckStatusEnum.Error),
+                        DateTime = dItem.LastModificationTime,
                     };
-                    viewItems.Add(vItem);
+                    _viewItems.Add(vItem);
                 }
                 catch (Exception ex)
                 {
@@ -57,5 +60,18 @@ public class CheckPageWorker
         {
             return;
         }
+    }
+
+    public async Task<List<ViewItem>> GetViewItems()
+    {
+        List<ViewItem> items = new List<ViewItem>();
+        items = _viewItems.OrderByDescending(o => o.DateTime).ToList();
+
+        return items;
+    }
+
+    public bool ItemsIsEmpty()
+    {
+        return !_viewItems.Any();
     }
 }
