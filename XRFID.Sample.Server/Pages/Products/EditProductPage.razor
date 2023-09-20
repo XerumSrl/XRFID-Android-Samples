@@ -1,12 +1,15 @@
-﻿@page "/product"
+﻿@page "/Products/Edit/{Id:guid}"
 @using System.Text.RegularExpressions;
 @using System.ComponentModel.DataAnnotations;
+@using XRFID.Sample.Server.Entities;
+@using XRFID.Sample.Server.Repositories;
+@inject ProductRepository productRepository;
 
-<h3>SKUPage</h3>
+<h3>Add New Product</h3>
 
 <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
     <DataAnnotationsValidator />
-    <MudTextField T="string" Variant="Variant.Outlined" Label="Name"  For="()=>model.Name" @bind-Value="model.Name" AutoFocus="true" />
+    <MudTextField T="string" Variant="Variant.Outlined" Label="Name" For="()=>model.Name" @bind-Value="model.Name" AutoFocus="true" />
     <MudTextField T="string" Variant="Variant.Outlined" Label="Description" For="()=>model.Description" @bind-Value="model.Description" />
     <MudTextField T="string" Variant="Variant.Outlined" Label="EPC" HelperText="24 or 32 characther HEX string" For="()=>model.Epc" @bind-Value="model.Epc" />
     <MudNumericField Variant="Variant.Outlined" Label="Quantity" For="()=>model.ContentQuantity" @bind-Value="model.ContentQuantity" />
@@ -16,8 +19,24 @@
 
 
 @code {
+    [Parameter]
+    public Guid Id { get; set; }
+    private Product? product;
+    public bool IsDisabled { get; set; } = false;
+
     private FormModel model = new FormModel();
 
+
+    protected override async Task OnInitializedAsync()
+    {
+        product = await productRepository.GetAsync(Id);
+        IsDisabled = product == null;
+
+        if (product is null)
+        {
+            return;
+        }
+    }
     private void OnValidSubmit(EditContext context)
     {
         StateHasChanged();
@@ -35,7 +54,7 @@
         public string? Note { get; set; }
 
         [Required]
-        [RegularExpression(@"^([0-9a-fA-F]{32}|[0-9a-fA-F]{24})$", ErrorMessage ="EPC must be a valix HEX rapresentation of 24 or 32 charachers")]
+        [RegularExpression(@"^([0-9a-fA-F]{32}|[0-9a-fA-F]{24})$", ErrorMessage = "EPC must be a valix HEX rapresentation of 24 or 32 charachers")]
         public string Epc { get; set; } = string.Empty;
 
         [Range(minimum: 1, maximum: int.MaxValue)]

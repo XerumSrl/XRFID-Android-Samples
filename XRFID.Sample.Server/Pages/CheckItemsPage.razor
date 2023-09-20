@@ -1,6 +1,6 @@
-﻿@page "/check"
-@using XRFID.Sample.Pages.Data;
-@using XRFID.Sample.Pages.Data.Enums;
+﻿@page "/CheckItems"
+@using XRFID.Sample.Server.ViewModels;
+@using XRFID.Sample.Server.ViewModels.Enums;
 @using XRFID.Sample.Server.Workers;
 @using Microsoft.AspNetCore.SignalR.Client;
 @inject NavigationManager Navigation;
@@ -23,7 +23,7 @@
 </MudDataGrid>
 
 @code {
-    private IEnumerable<ViewItem> Items = new List<ViewItem>();
+    private IEnumerable<CheckItemModel> Items = new List<CheckItemModel>();
 
     private HubConnection? hubConnection;
 
@@ -59,7 +59,7 @@
     public bool IsConnected =>
         hubConnection?.State == HubConnectionState.Connected;
 
-    private Func<ViewItem, string> _cellStyleFunc => x =>
+    private Func<CheckItemModel, string> _cellStyleFunc => x =>
     {
         string style = "";
 

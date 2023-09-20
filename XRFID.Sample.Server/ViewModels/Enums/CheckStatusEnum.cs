@@ -1,4 +1,4 @@
-﻿namespace XRFID.Sample.Pages.Data.Enums;
+﻿namespace XRFID.Sample.Server.ViewModels.Enums;
 
 public enum CheckStatusEnum
 {

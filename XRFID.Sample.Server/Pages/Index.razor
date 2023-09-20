@@ -1,0 +1,26 @@
+﻿@page "/"
+
+<PageTitle>Index</PageTitle>
+
+<MudGrid>
+    <MudItem xs="6">
+        <MudLink Href="/CheckItem">
+            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
+                <MudIcon Icon="@Icons.Material.Filled.Checklist"
+                         Color="Color.Primary"
+                         Size="Size.Large"
+                         Style="font-size: 8rem;" />
+            </MudPaper>
+        </MudLink>
+    </MudItem>
+    <MudItem xs="6">
+        <MudLink Href="/Settings">
+            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
+                <MudIcon Icon="@Icons.Material.Filled.Settings"
+                         Color="Color.Primary"
+                         Size="Size.Large"
+                         Style="font-size: 8rem;" />
+            </MudPaper>
+        </MudLink>
+    </MudItem>
+</MudGrid>

@@ -1,0 +1,47 @@
+﻿@page "/Products/Add"
+@using System.Text.RegularExpressions;
+@using System.ComponentModel.DataAnnotations;
+
+<h3>Add New Product</h3>
+
+<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+    <MudTextField T="string" Variant="Variant.Outlined" Label="Name"  For="()=>model.Name" @bind-Value="model.Name" AutoFocus="true" />
+    <MudTextField T="string" Variant="Variant.Outlined" Label="Description" For="()=>model.Description" @bind-Value="model.Description" />
+    <MudTextField T="string" Variant="Variant.Outlined" Label="EPC" HelperText="24 or 32 characther HEX string" For="()=>model.Epc" @bind-Value="model.Epc" />
+    <MudNumericField Variant="Variant.Outlined" Label="Quantity" For="()=>model.ContentQuantity" @bind-Value="model.ContentQuantity" />
+    <MudTextField T="string" Variant="Variant.Outlined" Label="Serial Number" For="()=>model.SerialNumber" @bind-Value="model.SerialNumber" />
+    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Submit</MudButton>
+</EditForm>
+
+
+@code {
+    private FormModel model = new FormModel();
+
+    private void OnValidSubmit(EditContext context)
+    {
+        StateHasChanged();
+    }
+
+
+    private class FormModel
+    {
+        [Required]
+        public string Name { get; set; } = string.Empty;
+
+        [Required]
+        public string Description { get; set; } = string.Empty;
+
+        public string? Note { get; set; }
+
+        [Required]
+        [RegularExpression(@"^([0-9a-fA-F]{32}|[0-9a-fA-F]{24})$", ErrorMessage ="EPC must be a valix HEX rapresentation of 24 or 32 charachers")]
+        public string Epc { get; set; } = string.Empty;
+
+        [Range(minimum: 1, maximum: int.MaxValue)]
+        public int ContentQuantity { get; set; } = 1;
+
+        [Required]
+        public string SerialNumber { get; set; } = string.Empty;
+    }
+}

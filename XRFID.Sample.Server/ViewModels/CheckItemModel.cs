@@ -1,8 +1,8 @@
-﻿using XRFID.Sample.Pages.Data.Enums;
+﻿using XRFID.Sample.Server.ViewModels.Enums;
 
-namespace XRFID.Sample.Pages.Data;
+namespace XRFID.Sample.Server.ViewModels;
 
-public class ViewItem
+public class CheckItemModel
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;

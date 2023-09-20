@@ -1,9 +1,9 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using Xerum.XFramework.Common.Enums;
-using XRFID.Sample.Pages.Data;
-using XRFID.Sample.Pages.Data.Enums;
 using XRFID.Sample.Server.Entities;
 using XRFID.Sample.Server.Repositories;
+using XRFID.Sample.Server.ViewModels;
+using XRFID.Sample.Server.ViewModels.Enums;
 
 namespace XRFID.Sample.Server.Workers;
 
@@ -11,7 +11,7 @@ public class CheckPageWorker
 {
     private readonly MovementItemRepository movementItemRepository;
     private readonly ILogger<CheckPageWorker> logger;
-    private List<ViewItem> _viewItems = new List<ViewItem>();
+    private List<CheckItemModel> _viewItems = new List<CheckItemModel>();
 
     public CheckPageWorker(IServiceProvider serviceProvider, ILogger<CheckPageWorker> logger)
     {
@@ -39,7 +39,7 @@ public class CheckPageWorker
             {
                 try
                 {
-                    ViewItem vItem = new ViewItem
+                    CheckItemModel vItem = new CheckItemModel
                     {
                         Name = dItem.Name ?? string.Empty,
                         Epc = dItem.Epc,
@@ -62,9 +62,9 @@ public class CheckPageWorker
         }
     }
 
-    public async Task<List<ViewItem>> GetViewItems()
+    public async Task<List<CheckItemModel>> GetViewItems()
     {
-        List<ViewItem> items = new List<ViewItem>();
+        List<CheckItemModel> items = new List<CheckItemModel>();
         items = _viewItems.OrderByDescending(o => o.DateTime).ToList();
 
         return items;

@@ -1,7 +1,29 @@
 ﻿<MudNavMenu>
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
-    <MudNavLink Href="product" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Product</MudNavLink>
-    <MudNavLink Href="sku2" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">SKU</MudNavLink>
-    <MudNavLink Href="lucreation" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Loading Unit</MudNavLink>
-    <MudNavLink Href="check" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AutoAwesome">Real Time Items</MudNavLink>
+    <MudDivider Class="my-2" />
+    <MudNavLink Href="CheckItems" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Checklist">Check Items</MudNavLink>
+    <MudDivider Class="my-2" />
+    <MudNavGroup Title="Master Data" Icon="@Icons.Material.Filled.Settings" Expanded="false">
+        <MudNavLink Href="Settings" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Settings">Settings</MudNavLink>
+
+        <MudNavGroup Title="Loading Units" Icon="@Icons.Material.Filled.List" Expanded="false">
+            <MudNavLink Href="LoadingUnits/Add" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Add Loading Unit</MudNavLink>
+
+        </MudNavGroup>
+        <MudNavGroup Title="Skus" Icon="@Icons.Material.Filled.AddBox" Expanded="false">
+            <MudNavLink Href="Skus" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AddBox">List Skus</MudNavLink>
+            <MudNavLink Href="Skus/Add" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Add SKU</MudNavLink>
+
+        </MudNavGroup>
+        <MudNavGroup Title="Products" Icon="@Icons.Material.Filled.Label" Expanded="false">
+            <MudNavLink Href="Products" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Label">List Products</MudNavLink>
+            <MudNavLink Href="Products/Add" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Add Product</MudNavLink>
+
+        </MudNavGroup>
+        <MudNavGroup Title="Printers" Icon="@Icons.Material.Filled.Print" Expanded="false">
+            <MudNavLink Href="Products/Add" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Add Printer</MudNavLink>
+            <MudNavLink Href="Products/Add" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Add Label</MudNavLink>
+
+        </MudNavGroup>
+    </MudNavGroup>
 </MudNavMenu>

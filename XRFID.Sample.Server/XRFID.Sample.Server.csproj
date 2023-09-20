@@ -9,6 +9,7 @@
 	<ItemGroup>
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.10" />
+		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.11" />
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.10">
 			<PrivateAssets>all</PrivateAssets>
@@ -17,6 +18,7 @@
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.10" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="7.0.1" />
 		<PackageReference Include="MQTTnet.AspNetCore" Version="4.3.1.873" />
+		<PackageReference Include="MudBlazor" Version="6.10.0" />
 		<PackageReference Include="OpenIddict.Core" Version="4.7.0" />
 		<PackageReference Include="OpenIddict.EntityFrameworkCore" Version="4.7.0" />
 		<PackageReference Include="OpenIddict.Server" Version="4.7.0" />
@@ -30,10 +32,12 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\XRFID.Sample.Common\XRFID.Sample.Common.csproj" />
 	  <ProjectReference Include="..\XRFID.Sample.Modules.Mqtt\XRFID.Sample.Modules.Mqtt.csproj" />
-	  <ProjectReference Include="..\XRFID.Sample.Pages\XRFID.Sample.Pages.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<Folder Include="Data\" />
+		<Folder Include="Pages\Labels\" />
+		<Folder Include="Pages\Movements\" />
 		<Folder Include="Persist\" />
 	</ItemGroup>
 
