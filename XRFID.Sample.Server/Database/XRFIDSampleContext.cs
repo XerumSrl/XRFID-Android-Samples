@@ -11,6 +11,7 @@ public class XRFIDSampleContext : DbContext
     public DbSet<Movement> Movements { get; set; }
     public DbSet<MovementItem> MovementItems { get; set; }
 
+    public DbSet<Sku> Skus { get; set; }
     public DbSet<Product> Products { get; set; }
 
     public DbSet<Reader> Readers { get; set; }
@@ -27,6 +28,7 @@ public class XRFIDSampleContext : DbContext
         modelBuilder.Entity<MovementItem>().HasKey(k => k.Id);
         modelBuilder.Entity<Product>().HasKey(k => k.Id);
         modelBuilder.Entity<Reader>().HasKey(k => k.Id);
+        modelBuilder.Entity<Sku>().HasKey(k => k.Id);
 
         base.OnModelCreating(modelBuilder);
     }

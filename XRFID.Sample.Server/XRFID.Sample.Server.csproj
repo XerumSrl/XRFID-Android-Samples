@@ -35,7 +35,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Data\" />
 		<Folder Include="Pages\Labels\" />
 		<Folder Include="Pages\Movements\" />
 		<Folder Include="Persist\" />

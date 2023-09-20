@@ -1,7 +1,11 @@
 ﻿@page "/Products"
-@using XRFID.Sample.Server.Entities;
+@using AutoMapper;
+@using XRFID.Sample.Server.Repositories;
+@using XRFID.Sample.Server.ViewModels;
 @inject NavigationManager Navigation;
 @inject IDialogService DialogService
+@inject ProductRepository productRepository;
+@inject IMapper mapper;
 
 <MudDataGrid Items="@ProductList"
              ReadOnly="true"
@@ -24,7 +28,7 @@
             </CellTemplate>
         </TemplateColumn>
 
-        <PropertyColumn Property="x => x.SKU.Code" Title="SKU" />
+        <PropertyColumn Property="x => x.SkuCode" Title="Sku Code" />
         <PropertyColumn Property="x => x.CreationTime" Title="Date Creation" />
         <PropertyColumn Property="x => x.Name" />
         <PropertyColumn Property="x => x.Code" />
@@ -33,29 +37,19 @@
         <PropertyColumn Property="x => x.SerialNumber" />
     </Columns>
     <PagerContent>
-        <MudDataGridPager T="Product" />
+        <MudDataGridPager T="ProductModel" />
     </PagerContent>
 </MudDataGrid>
 
 @code {
-    private List<Product> ProductList = new List<Product>();
+    private List<ProductModel> ProductList = new List<ProductModel>();
     private string _searchString;
     private List<string> _events = new();
 
     protected override async Task OnInitializedAsync()
     {
-        List<Product> x = new List<Product>();
-        for (int i = 0; i < 6; i++)
-        {
-            Product s = new Product
-                {
-                    Name = "product_" + i.ToString(),
-                    Description = "product_" + i.ToString() + "_description",
-                    Epc = "product_" + i.ToString() + "_epc",
-                };
-            x.Add(s);
-        }
-        ProductList.AddRange(x);
+        var products = await productRepository.GetAsync("Sku");
+        ProductList.AddRange(mapper.Map<List<ProductModel>>(products).OrderBy(q => q.SkuCode).ThenBy(q => q.Code));
     }
 
     async Task AddProduct()
@@ -63,7 +57,7 @@
         Navigation.NavigateTo($"Products/Add");
     }
 
-    async Task EditProduct(Product item)
+    async Task EditProduct(ProductModel item)
     {
         var parameters = new DialogParameters<ConfirmDialog>();
         parameters.Add(x => x.ContentText, "Do you really want to edit these records?");
@@ -80,7 +74,7 @@
         }
     }
 
-    async Task DeleteProduct(Product item)
+    async Task DeleteProduct(ProductModel item)
     {
         var parameters = new DialogParameters<ConfirmDialog>();
         parameters.Add(x => x.ContentText, "Do you really want to delete these records? This process cannot be undone.");
@@ -98,7 +92,7 @@
     }
 
     // quick filter - filter gobally across multiple columns with the same input
-    private Func<Product, bool> _quickFilter => x =>
+    private Func<ProductModel, bool> _quickFilter => x =>
     {
         if (string.IsNullOrWhiteSpace(_searchString))
             return true;

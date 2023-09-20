@@ -3,9 +3,9 @@ using XRFID.Sample.Server.Entities;
 
 namespace XRFID.Sample.Server.Repositories;
 
-public class SKURepository : BaseRepository<SKU>
+public class SkuRepository : BaseRepository<Sku>
 {
-    public SKURepository(XRFIDSampleContext context, ILogger<SKURepository> logger) : base(context, logger)
+    public SkuRepository(XRFIDSampleContext context, ILogger<SkuRepository> logger) : base(context, logger)
     {
     }
 }

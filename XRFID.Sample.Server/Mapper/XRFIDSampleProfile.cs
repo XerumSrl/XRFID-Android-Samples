@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using XRFID.Sample.Common.Dto;
 using XRFID.Sample.Server.Entities;
+using XRFID.Sample.Server.ViewModels;
 
 namespace XRFID.Sample.Server.Mapper;
 
@@ -19,5 +20,10 @@ public class XRFIDSampleProfile : Profile
         CreateMap<Reader, ReaderDto>().ReverseMap().ForAllMembers(opt => opt.AllowNull());
 
         CreateMap<Product, ProductDto>().ReverseMap().ForAllMembers(opt => opt.AllowNull());
+
+        //repository <-> pagine
+        CreateMap<Sku, SkuModel>().ReverseMap().ForAllMembers(opt => opt.AllowNull());
+        CreateMap<Product, ProductModel>().ReverseMap().ForAllMembers(opt => opt.AllowNull());
+
     }
 }

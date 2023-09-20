@@ -98,7 +98,7 @@ namespace XRFID.Sample.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SKU",
+                name: "Skus",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
@@ -115,7 +115,7 @@ namespace XRFID.Sample.Server.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SKU", x => x.Id);
+                    table.PrimaryKey("PK_Skus", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -159,7 +159,7 @@ namespace XRFID.Sample.Server.Migrations
                     Epc = table.Column<string>(type: "TEXT", nullable: false),
                     ContentQuantity = table.Column<int>(type: "INTEGER", nullable: false),
                     SerialNumber = table.Column<string>(type: "TEXT", nullable: false),
-                    SKUId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    SkuId = table.Column<Guid>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: true),
                     Code = table.Column<string>(type: "TEXT", nullable: true),
                     Reference = table.Column<string>(type: "TEXT", nullable: true),
@@ -172,9 +172,9 @@ namespace XRFID.Sample.Server.Migrations
                 {
                     table.PrimaryKey("PK_Products", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Products_SKU_SKUId",
-                        column: x => x.SKUId,
-                        principalTable: "SKU",
+                        name: "FK_Products_Skus_SkuId",
+                        column: x => x.SkuId,
+                        principalTable: "Skus",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -251,9 +251,9 @@ namespace XRFID.Sample.Server.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Products_SKUId",
+                name: "IX_Products_SkuId",
                 table: "Products",
-                column: "SKUId");
+                column: "SkuId");
         }
 
         /// <inheritdoc />
@@ -278,7 +278,7 @@ namespace XRFID.Sample.Server.Migrations
                 name: "LoadingUnits");
 
             migrationBuilder.DropTable(
-                name: "SKU");
+                name: "Skus");
         }
     }
 }

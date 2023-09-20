@@ -88,7 +88,7 @@ try
     builder.Services.AddScoped<UnitOfWork>();
 
     builder.Services.AddScoped<ProductRepository>();
-    builder.Services.AddScoped<SKURepository>();
+    builder.Services.AddScoped<SkuRepository>();
     builder.Services.AddScoped<LoadingUnitRepository>();
     builder.Services.AddScoped<LoadingUnitItemRepository>();
     builder.Services.AddScoped<MovementRepository>();
@@ -247,6 +247,9 @@ try
 
     #region Workers
     builder.Services.AddSingleton<CheckPageWorker>();
+
+    //demo data
+    builder.Services.AddHostedService<InitializeWorker>();
     #endregion
 
     WebApplication app = builder.Build();

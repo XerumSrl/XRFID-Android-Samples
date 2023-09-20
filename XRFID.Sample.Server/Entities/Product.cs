@@ -12,7 +12,7 @@ public class Product : AuditEntity
 
     public string SerialNumber { get; set; } = string.Empty;
 
-    public Guid SKUId { get; set; }
+    public Guid SkuId { get; set; }
 
-    public SKU SKU { get; set; } = new SKU();
+    public Sku Sku { get; set; } = new Sku();
 }

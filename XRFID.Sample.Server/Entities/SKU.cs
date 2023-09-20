@@ -1,6 +1,6 @@
 ﻿namespace XRFID.Sample.Server.Entities;
 
-public class SKU : AuditEntity
+public class Sku : AuditEntity
 {
     public string Description { get; set; } = string.Empty;
 

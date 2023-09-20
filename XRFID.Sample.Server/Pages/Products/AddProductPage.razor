@@ -1,11 +1,13 @@
 ﻿@page "/Products/Add"
 @using System.Text.RegularExpressions;
 @using System.ComponentModel.DataAnnotations;
+@using XRFID.Sample.Server.Database;
 @using XRFID.Sample.Server.Repositories;
 @using XRFID.Sample.Server.ViewModels;
 @inject NavigationManager Navigation;
-@inject SKURepository skuRepository;
+@inject SkuRepository skuRepository;
 @inject ProductRepository productRepository;
+@inject UnitOfWork uow;
 
 <h3>Add New Product</h3>
 
@@ -13,10 +15,10 @@
     <MudStack Class="my-3">
 
         <DataAnnotationsValidator />
-        <MudSelect T="SkuModel" Label="Sku" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter" @bind-Value="@SelectedSku" Required="true">
-            @foreach (var sku in SkuList)
+        <MudSelect T="SkuModel" Label="Sku" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-Value="@SelectedSku" Required="true">
+            @foreach (var sku in SkuList.OrderBy(q => q.Code))
             {
-                <MudSelectItem Value="@sku.Id">@sku.Code</MudSelectItem>
+                <MudSelectItem Value="@sku">@sku.Code - @sku.Description</MudSelectItem>
             }
         </MudSelect>
         <MudTextField T="string" Variant="Variant.Outlined" Label="Name" For="()=>model.Name" @bind-Value="model.Name" AutoFocus="true" />
@@ -35,7 +37,7 @@
 @code {
     private AddProductModel model = new();
     private List<SkuModel> SkuList = new();
-    private SkuModel SelectedSku = new();
+    private SkuModel SelectedSku;
 
     protected override async Task OnInitializedAsync()
     {
@@ -47,6 +49,7 @@
                     Id = sku.Id,
                     Name = sku.Name ?? sku.Id.ToString(),
                     Code = sku.Code ?? sku.Id.ToString(),
+                    Description = sku.Description,
                 });
         }
 
@@ -54,6 +57,10 @@
 
     private async Task OnValidSubmit(EditContext context)
     {
+        if (SelectedSku is null)
+        {
+            return;
+        }
         var result = await productRepository.CreateAsync(new Entities.Product
             {
                 Name = model.Name,
@@ -62,8 +69,9 @@
                 Epc = model.Epc,
                 ContentQuantity = model.ContentQuantity,
                 SerialNumber = model.SerialNumber,
+                SkuId = SelectedSku.Id,
             });
-
+        await uow.SaveAsync();
         //fare comparire un popup che inserimento ok e rimanare alla pagina
 
         Navigation.NavigateTo($"Products");

@@ -337,16 +337,16 @@ namespace XRFID.Sample.Server.Migrations
                     b.Property<string>("Reference")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("SKUId")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("SerialNumber")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid>("SkuId")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("SKUId");
+                    b.HasIndex("SkuId");
 
                     b.ToTable("Products");
                 });
@@ -417,7 +417,7 @@ namespace XRFID.Sample.Server.Migrations
                     b.ToTable("Readers");
                 });
 
-            modelBuilder.Entity("XRFID.Sample.Server.Entities.SKU", b =>
+            modelBuilder.Entity("XRFID.Sample.Server.Entities.Sku", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -456,7 +456,7 @@ namespace XRFID.Sample.Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SKU");
+                    b.ToTable("Skus");
                 });
 
             modelBuilder.Entity("XRFID.Sample.Server.Entities.LoadingUnitItem", b =>
@@ -495,13 +495,13 @@ namespace XRFID.Sample.Server.Migrations
 
             modelBuilder.Entity("XRFID.Sample.Server.Entities.Product", b =>
                 {
-                    b.HasOne("XRFID.Sample.Server.Entities.SKU", "SKU")
+                    b.HasOne("XRFID.Sample.Server.Entities.Sku", "Sku")
                         .WithMany("Products")
-                        .HasForeignKey("SKUId")
+                        .HasForeignKey("SkuId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("SKU");
+                    b.Navigation("Sku");
                 });
 
             modelBuilder.Entity("XRFID.Sample.Server.Entities.LoadingUnit", b =>
@@ -514,7 +514,7 @@ namespace XRFID.Sample.Server.Migrations
                     b.Navigation("MovementItems");
                 });
 
-            modelBuilder.Entity("XRFID.Sample.Server.Entities.SKU", b =>
+            modelBuilder.Entity("XRFID.Sample.Server.Entities.Sku", b =>
                 {
                     b.Navigation("Products");
                 });

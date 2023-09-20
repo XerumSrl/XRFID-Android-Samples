@@ -21,6 +21,9 @@ public class ProductModel
 
     public string SerialNumber { get; set; } = string.Empty;
 
+    public SkuModel? Sku { get; set; }
     public Guid? SkuId { get; set; }
+    public string? SkuName { get; set; }
+    public string? SkuCode { get; set; }
 
 }
