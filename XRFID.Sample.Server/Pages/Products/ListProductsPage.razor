@@ -9,9 +9,21 @@
     <ToolBarContent>
         <MudText Typo="Typo.h6">Products</MudText>
         <MudSpacer />
-        <MudButton Size="@Size.Large" Variant="@Variant.Filled" Color="@Color.Primary">New Product</MudButton>
+        <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        <MudButton Class="ml-3" Variant="@Variant.Filled" Color="@Color.Secondary" SartIcon="@Icons.Material.Filled.Add" 
+        OnClick="@(() => AddProduct())">Add New</MudButton>
     </ToolBarContent>
     <Columns>
+        <TemplateColumn Filterable="false" Sortable="false">
+            <CellTemplate>
+                <MudStack Row>
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit" Size="Size.Small" OnClick="@((e) => EditProduct(@context.Item))" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" Size="Size.Small" OnClick="@((e) => DeleteProduct(@context.Item))" />
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+
         <PropertyColumn Property="x => x.SKU.Code" Title="SKU" />
         <PropertyColumn Property="x => x.CreationTime" Title="Date Creation" />
         <PropertyColumn Property="x => x.Name" />
@@ -19,14 +31,6 @@
         <PropertyColumn Property="x => x.Description" />
         <PropertyColumn Property="x => x.Epc" />
         <PropertyColumn Property="x => x.SerialNumber" />
-        <TemplateColumn CellClass="d-flex justify-end">
-            <CellTemplate>
-                <MudStack Row>
-                    <MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit" Size="Size.Medium" OnClick="@((e) => EditProduct(@context.Item))" />
-                    <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" Size="Size.Medium" OnClick="@(() => DeleteProduct(@context.Item))" />
-                </MudStack>
-            </CellTemplate>
-        </TemplateColumn>
     </Columns>
     <PagerContent>
         <MudDataGridPager T="Product" />
@@ -54,10 +58,15 @@
         ProductList.AddRange(x);
     }
 
+    async Task AddProduct()
+    {
+        Navigation.NavigateTo($"Products/Add");
+    }
+
     async Task EditProduct(Product item)
     {
         var parameters = new DialogParameters<ConfirmDialog>();
-        parameters.Add(x => x.ContentText, "Do you really want to edit these records? This process cannot be undone.");
+        parameters.Add(x => x.ContentText, "Do you really want to edit these records?");
         parameters.Add(x => x.ButtonText, "Edit");
         parameters.Add(x => x.Color, Color.Primary);
 
@@ -94,10 +103,10 @@
         if (string.IsNullOrWhiteSpace(_searchString))
             return true;
 
-        if (x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+        if (!string.IsNullOrEmpty(x.Name) && x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
-        if (x.Code.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+        if (!string.IsNullOrEmpty(x.Code) && x.Code.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
         if (x.Epc.Contains(_searchString, StringComparison.OrdinalIgnoreCase))

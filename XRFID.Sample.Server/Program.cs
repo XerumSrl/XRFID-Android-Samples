@@ -88,6 +88,7 @@ try
     builder.Services.AddScoped<UnitOfWork>();
 
     builder.Services.AddScoped<ProductRepository>();
+    builder.Services.AddScoped<SKURepository>();
     builder.Services.AddScoped<LoadingUnitRepository>();
     builder.Services.AddScoped<LoadingUnitItemRepository>();
     builder.Services.AddScoped<MovementRepository>();

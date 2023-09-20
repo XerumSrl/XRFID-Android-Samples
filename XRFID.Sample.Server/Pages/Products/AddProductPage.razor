@@ -1,47 +1,74 @@
 ﻿@page "/Products/Add"
 @using System.Text.RegularExpressions;
 @using System.ComponentModel.DataAnnotations;
+@using XRFID.Sample.Server.Repositories;
+@using XRFID.Sample.Server.ViewModels;
+@inject NavigationManager Navigation;
+@inject SKURepository skuRepository;
+@inject ProductRepository productRepository;
 
 <h3>Add New Product</h3>
 
 <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
-    <DataAnnotationsValidator />
-    <MudTextField T="string" Variant="Variant.Outlined" Label="Name"  For="()=>model.Name" @bind-Value="model.Name" AutoFocus="true" />
-    <MudTextField T="string" Variant="Variant.Outlined" Label="Description" For="()=>model.Description" @bind-Value="model.Description" />
-    <MudTextField T="string" Variant="Variant.Outlined" Label="EPC" HelperText="24 or 32 characther HEX string" For="()=>model.Epc" @bind-Value="model.Epc" />
-    <MudNumericField Variant="Variant.Outlined" Label="Quantity" For="()=>model.ContentQuantity" @bind-Value="model.ContentQuantity" />
-    <MudTextField T="string" Variant="Variant.Outlined" Label="Serial Number" For="()=>model.SerialNumber" @bind-Value="model.SerialNumber" />
-    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Submit</MudButton>
+    <MudStack Class="my-3">
+
+        <DataAnnotationsValidator />
+        <MudSelect T="SkuModel" Label="Sku" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter" @bind-Value="@SelectedSku" Required="true">
+            @foreach (var sku in SkuList)
+            {
+                <MudSelectItem Value="@sku.Id">@sku.Code</MudSelectItem>
+            }
+        </MudSelect>
+        <MudTextField T="string" Variant="Variant.Outlined" Label="Name" For="()=>model.Name" @bind-Value="model.Name" AutoFocus="true" />
+        <MudTextField T="string" Variant="Variant.Outlined" Label="Description" For="()=>model.Description" @bind-Value="model.Description" />
+        <MudTextField T="string" Variant="Variant.Outlined" Label="EPC" HelperText="24 or 32 characther HEX string" For="()=>model.Epc" @bind-Value="model.Epc" />
+        <MudTextField T="string" Variant="Variant.Outlined" Label="Serial Number" For="()=>model.SerialNumber" @bind-Value="model.SerialNumber" />
+
+        <MudStack Row="true" Class="my-6 d-flex justify-end">
+            <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Reset</MudButton>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-3">Submit</MudButton>
+        </MudStack>
+    </MudStack>
 </EditForm>
 
 
 @code {
-    private FormModel model = new FormModel();
+    private AddProductModel model = new();
+    private List<SkuModel> SkuList = new();
+    private SkuModel SelectedSku = new();
 
-    private void OnValidSubmit(EditContext context)
+    protected override async Task OnInitializedAsync()
     {
+        var skus = await skuRepository.GetAsync();
+        foreach (var sku in skus)
+        {
+            SkuList.Add(new SkuModel
+                {
+                    Id = sku.Id,
+                    Name = sku.Name ?? sku.Id.ToString(),
+                    Code = sku.Code ?? sku.Id.ToString(),
+                });
+        }
+
+    }
+
+    private async Task OnValidSubmit(EditContext context)
+    {
+        var result = await productRepository.CreateAsync(new Entities.Product
+            {
+                Name = model.Name,
+                Description = model.Description,
+                Note = model.Note,
+                Epc = model.Epc,
+                ContentQuantity = model.ContentQuantity,
+                SerialNumber = model.SerialNumber,
+            });
+
+        //fare comparire un popup che inserimento ok e rimanare alla pagina
+
+        Navigation.NavigateTo($"Products");
+
         StateHasChanged();
     }
 
-
-    private class FormModel
-    {
-        [Required]
-        public string Name { get; set; } = string.Empty;
-
-        [Required]
-        public string Description { get; set; } = string.Empty;
-
-        public string? Note { get; set; }
-
-        [Required]
-        [RegularExpression(@"^([0-9a-fA-F]{32}|[0-9a-fA-F]{24})$", ErrorMessage ="EPC must be a valix HEX rapresentation of 24 or 32 charachers")]
-        public string Epc { get; set; } = string.Empty;
-
-        [Range(minimum: 1, maximum: int.MaxValue)]
-        public int ContentQuantity { get; set; } = 1;
-
-        [Required]
-        public string SerialNumber { get; set; } = string.Empty;
-    }
 }
