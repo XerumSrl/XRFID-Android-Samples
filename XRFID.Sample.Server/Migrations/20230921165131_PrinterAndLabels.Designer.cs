@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using XRFID.Sample.Server.Database;
 
@@ -10,9 +11,11 @@ using XRFID.Sample.Server.Database;
 namespace XRFID.Sample.Server.Migrations
 {
     [DbContext(typeof(XRFIDSampleContext))]
-    partial class XRFIDSampleContextModelSnapshot : ModelSnapshot
+    [Migration("20230921165131_PrinterAndLabels")]
+    partial class PrinterAndLabels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.10");

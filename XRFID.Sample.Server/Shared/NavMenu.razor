@@ -1,28 +1,34 @@
 ﻿<MudNavMenu>
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
     <MudDivider Class="my-2" />
-    <MudNavLink Href="CheckItems" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Checklist">Check Items</MudNavLink>
+    <MudNavLink Href="CheckItems" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Checklist">Check RFID</MudNavLink>
+    <MudNavLink Href="PrintLabels" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Nfc">Print RFID</MudNavLink>
     <MudDivider Class="my-2" />
     <MudNavGroup Title="Master Data" Icon="@Icons.Material.Filled.Settings" Expanded="false">
         <MudNavLink Href="Settings" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Settings">Settings</MudNavLink>
 
-        <MudNavGroup Title="Loading Units" Icon="@Icons.Material.Filled.List" Expanded="false">
+        <MudNavGroup Title="Loading Units" Icon="@Icons.Material.Filled.List" Expanded="true">
             <MudNavLink Href="LoadingUnits/Add" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Add Loading Unit</MudNavLink>
 
         </MudNavGroup>
-        <MudNavGroup Title="Skus" Icon="@Icons.Material.Filled.AddBox" Expanded="false">
+        <MudNavGroup Title="Skus" Icon="@Icons.Material.Filled.AddBox" Expanded="true">
             <MudNavLink Href="Skus" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AddBox">List Skus</MudNavLink>
             <MudNavLink Href="Skus/Add" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Add Sku</MudNavLink>
 
         </MudNavGroup>
-        <MudNavGroup Title="Products" Icon="@Icons.Material.Filled.Label" Expanded="false">
+        <MudNavGroup Title="Products" Icon="@Icons.Material.Filled.Label" Expanded="true">
             <MudNavLink Href="Products" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Label">List Products</MudNavLink>
             <MudNavLink Href="Products/Add" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Add Product</MudNavLink>
 
         </MudNavGroup>
-        <MudNavGroup Title="Printers" Icon="@Icons.Material.Filled.Print" Expanded="false">
-            <MudNavLink Href="Products/Add" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Add Printer</MudNavLink>
-            <MudNavLink Href="Products/Add" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Add Label</MudNavLink>
+        <MudNavGroup Title="Printers" Icon="@Icons.Material.Filled.Print" Expanded="true">
+            <MudNavLink Href="Printers" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Print">List Printers</MudNavLink>
+            <MudNavLink Href="Printers/Add" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Add Printer</MudNavLink>
+
+        </MudNavGroup>
+        <MudNavGroup Title="Labels" Icon="@Icons.Material.Filled.NewLabel" Expanded="true">
+            <MudNavLink Href="Labels" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.NewLabel">List Labels</MudNavLink>
+            <MudNavLink Href="Labels/Add" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Add Label</MudNavLink>
 
         </MudNavGroup>
     </MudNavGroup>

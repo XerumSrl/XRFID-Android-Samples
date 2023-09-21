@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using MQTTnet.AspNetCore;
+using MudBlazor;
 using MudBlazor.Services;
 using Serilog;
 using Xerum.XFramework.Common;
@@ -56,7 +57,18 @@ try
     builder.Services.AddConnections();
 
     #region Mud
-    builder.Services.AddMudServices();
+    builder.Services.AddMudServices(config =>
+    {
+        config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomLeft;
+
+        config.SnackbarConfiguration.PreventDuplicates = false;
+        config.SnackbarConfiguration.NewestOnTop = false;
+        config.SnackbarConfiguration.ShowCloseIcon = true;
+        config.SnackbarConfiguration.VisibleStateDuration = 10000;
+        config.SnackbarConfiguration.HideTransitionDuration = 500;
+        config.SnackbarConfiguration.ShowTransitionDuration = 500;
+        config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
+    });
     #endregion
 
     #region BlazorSetup
@@ -80,6 +92,8 @@ try
     builder.Services.AddTransient<ReaderService>();
     builder.Services.AddTransient<LoadingUnitItemService>();
     builder.Services.AddTransient<MovementService>();
+    builder.Services.AddTransient<LabelService>();
+    builder.Services.AddTransient<PrinterService>();
     #endregion
 
     builder.Services.AddDbContext<XRFIDSampleContext>(optionsAction: options => options.UseSqlite("Data Source = Persist/persist.db"));
@@ -94,6 +108,8 @@ try
     builder.Services.AddScoped<MovementRepository>();
     builder.Services.AddScoped<MovementItemRepository>();
     builder.Services.AddScoped<ReaderRepository>();
+    builder.Services.AddScoped<LabelRepository>();
+    builder.Services.AddScoped<PrinterRepository>();
     #endregion
 
     #region SwaggerSetup

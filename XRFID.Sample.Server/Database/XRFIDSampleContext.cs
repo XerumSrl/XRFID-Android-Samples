@@ -15,6 +15,8 @@ public class XRFIDSampleContext : DbContext
     public DbSet<Product> Products { get; set; }
 
     public DbSet<Reader> Readers { get; set; }
+    public DbSet<Label> Labels { get; set; }
+    public DbSet<Printer> Printers{ get; set; }
 
     public XRFIDSampleContext(DbContextOptions options) : base(options)
     {
@@ -29,6 +31,8 @@ public class XRFIDSampleContext : DbContext
         modelBuilder.Entity<Product>().HasKey(k => k.Id);
         modelBuilder.Entity<Reader>().HasKey(k => k.Id);
         modelBuilder.Entity<Sku>().HasKey(k => k.Id);
+        modelBuilder.Entity<Printer>().HasKey(k => k.Id);
+        modelBuilder.Entity<Label>().HasKey(k => k.Id);
 
         base.OnModelCreating(modelBuilder);
     }
