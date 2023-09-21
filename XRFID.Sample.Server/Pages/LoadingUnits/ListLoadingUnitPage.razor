@@ -1,0 +1,104 @@
+﻿@page "/LoadingUnits"
+@using XRFID.Sample.Server.Entities;
+@using XRFID.Sample.Server.Repositories;
+@inject NavigationManager Navigation;
+@inject LoadingUnitRepository loadingUnitRepository;
+
+<MudDataGrid Items="@LuList"
+             ReadOnly="true"
+             SortMode="SortMode.Single" Filterable="true" QuickFilter="@_quickFilter" Striped="true">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Loading Units</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        <MudButton Class="ml-3" Variant="@Variant.Filled" Color="@Color.Secondary" SartIcon="@Icons.Material.Filled.Add"
+                   OnClick="@(() => AddLoadingUnit())">Add New</MudButton>
+    </ToolBarContent>
+    <Columns>
+        <HierarchyColumn T="LoadingUnit" />
+        <TemplateColumn Filterable="false" Sortable="false">
+            <CellTemplate>
+                <MudStack Row>
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit" Size="Size.Small" OnClick="@((e) => EditLoadingUnit(@context.Item))" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" Size="Size.Small" OnClick="@((e) => DeleteLoadingUnit(@context.Item))" />
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="x => x.Name" />
+        <PropertyColumn Property="x => x.Code" />
+        <PropertyColumn Property="x => x.Description" />
+        <PropertyColumn Property="x => x.CreationTime" Title="Date Creation" />
+    </Columns>
+    <ChildRowContent>
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">@context.Item.Name</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudDataGrid Items="@context.Item.LoadingUnitItems"
+                             ReadOnly="true">
+                    <Columns>
+                        <PropertyColumn Property="x => x.Name" />
+                        <PropertyColumn Property="x => x.Code" />
+                        <PropertyColumn Property="x => x.Epc" />
+                        <PropertyColumn Property="x => x.SerialNumber" />
+                    </Columns>
+                </MudDataGrid>
+            </MudCardContent>
+        </MudCard>
+    </ChildRowContent>
+    <PagerContent>
+        <MudDataGridPager T="LoadingUnit" />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    private List<LoadingUnit> LuList = new List<LoadingUnit>();
+
+    private string _searchString = string.Empty;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var loadingUnits = await loadingUnitRepository.GetAsync();
+        if (loadingUnits is not null)
+        {
+            LuList = loadingUnits;
+        }
+    }
+
+    async Task AddLoadingUnit()
+    {
+        Navigation.NavigateTo($"LoadingUnits/Add");
+    }
+
+    async Task EditLoadingUnit(LoadingUnit item)
+    {
+        
+    }
+
+    async Task DeleteLoadingUnit(LoadingUnit item)
+    {
+       
+    }
+    // quick filter - filter gobally across multiple columns with the same input
+    private Func<LoadingUnit, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (!string.IsNullOrEmpty(x.Name) && x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (!string.IsNullOrEmpty(x.Code) && x.Code.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (x.Description.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    };
+}
