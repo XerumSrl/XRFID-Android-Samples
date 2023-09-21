@@ -11,7 +11,7 @@ using XRFID.Sample.Server.Database;
 namespace XRFID.Sample.Server.Migrations
 {
     [DbContext(typeof(XRFIDSampleContext))]
-    [Migration("20230920232130_Initial")]
+    [Migration("20230921073245_Initial")]
     partial class Initial
     {
         /// <inheritdoc />

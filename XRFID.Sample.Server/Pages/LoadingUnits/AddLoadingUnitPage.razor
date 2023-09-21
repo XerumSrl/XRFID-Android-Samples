@@ -1,7 +1,11 @@
 ﻿@page "/LoadingUnits/Add"
-@using XRFID.Sample.Common.Dto;
+@using XRFID.Sample.Server.Entities;
+@using XRFID.Sample.Server.Repositories;
+@using Xerum.XFramework.Common.Enums;
+@inject ProductRepository pRepos;
+@inject LoadingUnitRepository luRepos;
 
-<MudDataGrid T="ProductDto" MultiSelection="true" Items="@Products" SortMode="SortMode.Multiple" Filterable="true"
+<MudDataGrid T="Product" MultiSelection="true" Items="@Products" SortMode="SortMode.Multiple" Filterable="true"
              Hideable="true" RowClick="@RowClicked" SelectedItemsChanged="@SelectedItemsChanged">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Products</MudText>
@@ -12,7 +16,7 @@
         }
     </ToolBarContent>
     <Columns>
-        <SelectColumn T="ProductDto" />
+        <SelectColumn T="Product" />
         <PropertyColumn Property="x => x.CreationTime" Title="Date Time" />
         <PropertyColumn Property="x => x.Name" />
         <PropertyColumn Property="x => x.Epc" />
@@ -21,50 +25,28 @@
         <PropertyColumn Property="x => x.SerialNumber" Title="Serial Number" />
     </Columns>
     <PagerContent>
-        <MudDataGridPager T="ProductDto" />
+        <MudDataGridPager T="Product" />
     </PagerContent>
 </MudDataGrid>
 
-<MudExpansionPanels Style="flex:1">
-    <MudExpansionPanel Text="Show Events">
-
-        <MudText Typo="@Typo.body2">@selectedProducts.Count</MudText>
-        <br />
-
-        @foreach (var message in _events)
-        {
-            <MudText Typo="@Typo.body2">@message</MudText>
-        }
-        @if (_events.Count > 0)
-        {
-            <div class="d-flex">
-                <MudSpacer />
-                <MudButton Class="mt-3" ButtonType="ButtonType.Button" Variant="Variant.Filled" OnClick="@(() => _events.Clear())">Clear</MudButton>
-            </div>
-        }
-    </MudExpansionPanel>
-</MudExpansionPanels>
-
-
 @code {
 
-    private IEnumerable<ProductDto> Products = new List<ProductDto>();
-    private List<string> _events = new();
+    private IEnumerable<Product> Products = new List<Product>();
 
-    private List<ProductDto> selectedProducts = new List<ProductDto>();
+    private List<Product> selectedProducts = new List<Product>();
 
     protected override async Task OnInitializedAsync()
     {
-        List<ProductDto> testProducts = new List<ProductDto>();
+        List<Product> testProducts = new List<Product>();
         for (int i = 0; i < 10; i++)
         {
-            testProducts.Add(new ProductDto());
+            testProducts.Add(new Product());
         }
         Products = testProducts;
     }
 
-    // events
-    void RowClicked(DataGridRowClickEventArgs<ProductDto> args)
+    #region Events
+    void RowClicked(DataGridRowClickEventArgs<Product> args)
     {
         if (!selectedProducts.Exists(e => e.Id == args.Item.Id))
         {
@@ -74,13 +56,46 @@
         {
             selectedProducts.Remove(args.Item);
         }
-
-        _events.Insert(0, $"Event = RowClick, Index = {args.RowIndex}, Data = {System.Text.Json.JsonSerializer.Serialize(args.Item)}");
     }
 
-    void SelectedItemsChanged(HashSet<ProductDto> items)
+    void SelectedItemsChanged(HashSet<Product> items)
     {
         selectedProducts = items.ToList();
-        _events.Insert(0, $"Event = SelectedItemsChanged, Data = {System.Text.Json.JsonSerializer.Serialize(items)}");
     }
+    #endregion
+
+    #region DataMethods
+    private async Task FillProductTable()
+    {
+        List<Product> allProds = await pRepos.GetAsync();
+        if (allProds is null)
+        {
+            Products = new List<Product>();
+            return;
+        }
+        Products = allProds;
+    }
+
+    private async Task CreateLoadingUnit()
+    {
+        List<LoadingUnitItem> luItems = new();
+        foreach (Product prod in selectedProducts)
+        {
+            LoadingUnitItem newItem = new LoadingUnitItem
+                {
+                    Name = prod.Name,
+                    Code = prod.Code,
+                    Reference = prod.Reference,
+
+                    Description = prod.Description,
+                    SerialNumber = prod.SerialNumber,
+                    Epc = prod.Epc,
+
+                    Status = ItemStatus.NotFound,
+
+                    // LoadingUnitId = 
+                };
+        };
+    }
+    #endregion
 }

@@ -1,9 +1,12 @@
 ﻿@page "/Products/Edit/{Id:guid}"
 @using System.Text.RegularExpressions;
 @using System.ComponentModel.DataAnnotations;
+@using XRFID.Sample.Server.Database;
 @using XRFID.Sample.Server.Entities;
 @using XRFID.Sample.Server.Repositories;
+@inject NavigationManager Navigation;
 @inject ProductRepository productRepository;
+@inject UnitOfWork uowk;
 
 <h3>Edit Product</h3>
 
@@ -36,9 +39,37 @@
         {
             return;
         }
+
+        model = new FormModel
+            {
+                Name = product.Name ?? string.Empty,
+                Description = product.Description,
+                Epc = product.Epc,
+                ContentQuantity = product.ContentQuantity,
+                SerialNumber = product.SerialNumber,
+                Note = product.Note,
+            };
+
     }
-    private void OnValidSubmit(EditContext context)
+    private async void OnValidSubmit(EditContext context)
     {
+        if (product is null)
+        {
+            return;
+        }
+
+        product.Name = model.Name;
+        product.Description = model.Description;
+        product.Epc = model.Epc;
+        product.ContentQuantity = model.ContentQuantity;
+        product.SerialNumber = model.SerialNumber;
+        product.Note = model.Note;
+
+        Product? result = await productRepository.UpdateAsync(product);
+        await uowk.SaveAsync();
+
+        Navigation.NavigateTo($"Products");
+
         StateHasChanged();
     }
 
