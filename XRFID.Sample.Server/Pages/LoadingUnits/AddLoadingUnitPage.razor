@@ -1,4 +1,5 @@
 ﻿@page "/LoadingUnits/Add"
+@using XRFID.Sample.Server.Database;
 @using XRFID.Sample.Server.Entities;
 @using XRFID.Sample.Server.Repositories;
 @using XRFID.Sample.Server.ViewModels;
@@ -7,6 +8,8 @@
 @inject ProductRepository pRepos;
 @inject LoadingUnitRepository loadingUnitRepository;
 @inject ReaderRepository readerRepository;
+@inject UnitOfWork uowk;
+@inject ILogger<AddLoadingUnitPage> logger;
 
 <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
     <MudStack Class="my-3">
@@ -76,36 +79,47 @@
         {
             return;
         }
-        LoadingUnit newLu = new LoadingUnit
-            {
-                Name = model.Name,
-                Code = model.Code,
-                Reference = model.Reference,
-                Description = model.Description,
-                ReaderId = selectedReader.Id,
-                LoadingUnitItems = new List<LoadingUnitItem>(),
-            };
 
-        foreach (var item in selectedProducts)
+        try
         {
-            LoadingUnitItem newItem = new LoadingUnitItem
+            LoadingUnit newLu = new LoadingUnit
                 {
-                    Name = item.Name,
-                    Code = item.Code,
-                    Reference = item.Reference,
-
-                    Description = item.Description,
-                    SerialNumber = item.SerialNumber,
-                    Epc = item.Epc,
-
-                    Status = ItemStatus.NotFound,
-
-                    LoadingUnitId = newLu.Id,
+                    Name = model.Name,
+                    Code = model.Code,
+                    Reference = model.Reference,
+                    Description = model.Description,
+                    ReaderId = selectedReader.Id,
+                    LoadingUnitItems = new List<LoadingUnitItem>(),
                 };
 
-            newLu.LoadingUnitItems.Add(newItem);
+            foreach (var item in selectedProducts)
+            {
+                LoadingUnitItem newItem = new LoadingUnitItem
+                    {
+                        Name = item.Name,
+                        Code = item.Code,
+                        Reference = item.Reference,
+
+                        Description = item.Description,
+                        SerialNumber = item.SerialNumber,
+                        Epc = item.Epc,
+
+                        Status = ItemStatus.NotFound,
+
+                        LoadingUnitId = newLu.Id,
+                    };
+
+                newLu.LoadingUnitItems.Add(newItem);
+            }
+            var result = await loadingUnitRepository.CreateAsync(newLu);
+            await uowk.SaveAsync();
         }
-        var result = await loadingUnitRepository.CreateAsync(newLu);
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex,"");
+        }
+
+
 
         Navigation.NavigateTo($"LoadingUnits");
         StateHasChanged();

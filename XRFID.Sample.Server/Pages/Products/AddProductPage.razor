@@ -22,6 +22,7 @@
             }
         </MudSelect>
         <MudTextField T="string" Variant="Variant.Outlined" Label="Name" For="()=>model.Name" @bind-Value="model.Name" AutoFocus="true" />
+        <MudTextField T="string" Variant="Variant.Outlined" Label="Code" For="()=>model.Code" @bind-Value="model.Code" AutoFocus="true" />
         <MudTextField T="string" Variant="Variant.Outlined" Label="Description" For="()=>model.Description" @bind-Value="model.Description" />
         <MudTextField T="string" Variant="Variant.Outlined" Label="EPC" HelperText="24 or 32 characther HEX string" For="()=>model.Epc" @bind-Value="model.Epc" />
         <MudTextField T="string" Variant="Variant.Outlined" Label="Serial Number" For="()=>model.SerialNumber" @bind-Value="model.SerialNumber" />
@@ -65,11 +66,13 @@
             {
                 Name = model.Name,
                 Description = model.Description,
+                Code = model.Code,
                 Note = model.Note,
                 Epc = model.Epc,
                 ContentQuantity = model.ContentQuantity,
                 SerialNumber = model.SerialNumber,
                 SkuId = SelectedSku.Id,
+
             });
         await uow.SaveAsync();
         //fare comparire un popup che inserimento ok e rimanare alla pagina

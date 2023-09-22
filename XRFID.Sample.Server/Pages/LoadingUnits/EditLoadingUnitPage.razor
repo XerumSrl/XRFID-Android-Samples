@@ -1,0 +1,84 @@
+﻿@page "/LoadingUnits/Edit/{Id:guid}"
+@using XRFID.Sample.Server.Database;
+@using XRFID.Sample.Server.Entities;
+@using XRFID.Sample.Server.Repositories;
+@using XRFID.Sample.Server.ViewModels;
+@inject NavigationManager Navigation;
+@inject LoadingUnitRepository loadingUnitRepository;
+@inject ReaderRepository readerRepository;
+@inject UnitOfWork uowk;
+
+<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+    <MudStack Class="my-3">
+
+        <DataAnnotationsValidator />
+        <MudSelect T="Reader" Label="Reader" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-Value="@selectedReader" Required="true">
+            @foreach (var reader in readers.OrderBy(q => q.Name))
+            {
+                <MudSelectItem Value="@reader">@reader.Name</MudSelectItem>
+            }
+        </MudSelect>
+        <MudTextField T="string" Variant="Variant.Outlined" Label="Name" For="()=>model.Name" @bind-Value="model.Name" AutoFocus="true" />
+        <MudTextField T="string" Variant="Variant.Outlined" Label="Code" For="()=>model.Code" @bind-Value="model.Code" />
+        <MudTextField T="string" Variant="Variant.Outlined" Label="Reference" For="()=>model.Reference" @bind-Value="model.Reference" />
+        <MudTextField T="string" Variant="Variant.Outlined" Label="Description" For="()=>model.Description" @bind-Value="model.Description" Lines="10" />
+
+        <MudStack Row="true" Class="my-6 d-flex justify-end">
+            <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Reset</MudButton>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-3">Submit</MudButton>
+
+        </MudStack>
+    </MudStack>
+</EditForm>
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+    private LoadingUnit? loadingUnit { get; set; }
+
+    private List<Reader> readers = new();
+    private Reader? selectedReader;
+
+    private AddLoadingUnitModel model = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        loadingUnit = await loadingUnitRepository.GetAsync(Id);
+        if (loadingUnit is null)
+        {
+            return;
+        }
+
+        readers = await readerRepository.GetAsync();
+
+        model = new AddLoadingUnitModel
+            {
+                Name = loadingUnit.Name ?? string.Empty,
+                Code = loadingUnit.Code ?? string.Empty,
+                Reference = loadingUnit.Reference ?? string.Empty,
+                Description = loadingUnit.Description,
+            };
+
+        selectedReader = readers.Where(q => q.Id == loadingUnit.ReaderId).FirstOrDefault();
+    }
+
+    private async Task OnValidSubmit(EditContext context)
+    {
+        if (loadingUnit is null)
+        {
+            return;
+        }
+
+        loadingUnit.Name = model.Name;
+        loadingUnit.Code = model.Code;
+        loadingUnit.Reference = model.Reference;
+        loadingUnit.Description = model.Description;
+
+        LoadingUnit? result = await loadingUnitRepository.UpdateAsync(loadingUnit);
+        await uowk.SaveAsync();
+
+        Navigation.NavigateTo($"LoadingUnits");
+
+        StateHasChanged();
+    }
+}
