@@ -1,12 +1,17 @@
 ﻿@page "/Skus"
 @using AutoMapper;
+@using XRFID.Sample.Server.Database;
 @using XRFID.Sample.Server.Entities;
 @using XRFID.Sample.Server.Repositories;
 @using XRFID.Sample.Server.ViewModels;
 @inject NavigationManager Navigation;
 @inject IDialogService DialogService
 @inject SkuRepository skuRepository;
+@inject UnitOfWork uow;
 @inject IMapper mapper;
+@inject ISnackbar Snackbar;
+
+<h1>Skus</h1>
 
 <MudDataGrid Items="@SkuList"
              ReadOnly="true"
@@ -109,10 +114,14 @@
             if (checkItem is not null)
             {
                 await skuRepository.DeleteAsync(item.Id);
+                await uow.SaveAsync();
+                SkuList.Remove(item);
+                Snackbar.Add($"Sku {item.Name} deleted.", Severity.Success);
             }
             else
             {
                 //notificare item non esistente
+                Snackbar.Add("Invalid sku Id.", Severity.Error);
             }
         }
     }

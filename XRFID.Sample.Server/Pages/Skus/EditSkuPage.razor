@@ -8,7 +8,7 @@
 @inject SkuRepository skuRepository;
 @inject UnitOfWork uow;
 
-<h1>Add New Sku</h1>
+<h1>Edit Sku @model.Name?</h1>
 
 <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
     <MudStack Class="my-3">

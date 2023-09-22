@@ -8,37 +8,40 @@
 @inject SkuRepository skuRepository;
 @inject ProductRepository productRepository;
 @inject UnitOfWork uow;
+@inject ISnackbar Snackbar;
 
-<h3>Add New Product</h3>
+<h1>Add New Product</h1>
 
-<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+<MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
     <MudStack Class="my-3">
-
-        <DataAnnotationsValidator />
-        <MudSelect T="SkuModel" Label="Sku" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-Value="@SelectedSku" Required="true">
+        <MudSelect Label="Sku" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter"
+                   @bind-Value="SelectedSku" Required="true" RequiredError="Please select a Sku before creating a product">
             @foreach (var sku in SkuList.OrderBy(q => q.Code))
             {
                 <MudSelectItem Value="@sku">@sku.Code - @sku.Description</MudSelectItem>
             }
         </MudSelect>
         <MudTextField T="string" Variant="Variant.Outlined" Label="Name" For="()=>model.Name" @bind-Value="model.Name" AutoFocus="true" />
-        <MudTextField T="string" Variant="Variant.Outlined" Label="Code" For="()=>model.Code" @bind-Value="model.Code" AutoFocus="true" />
+        <MudTextField T="string" Variant="Variant.Outlined" Label="Code" For="()=>model.Code" @bind-Value="model.Code" />
         <MudTextField T="string" Variant="Variant.Outlined" Label="Description" For="()=>model.Description" @bind-Value="model.Description" />
         <MudTextField T="string" Variant="Variant.Outlined" Label="EPC" HelperText="24 or 32 characther HEX string" For="()=>model.Epc" @bind-Value="model.Epc" />
         <MudTextField T="string" Variant="Variant.Outlined" Label="Serial Number" For="()=>model.SerialNumber" @bind-Value="model.SerialNumber" />
 
         <MudStack Row="true" Class="my-6 d-flex justify-end">
-            <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Reset</MudButton>
-            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-3">Submit</MudButton>
+            <MudButton OnClick="@(()=>form.ResetAsync())" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Reset</MudButton>
+            <MudButton OnClick="@(async ()=> await Submit())" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-3">Submit</MudButton>
         </MudStack>
     </MudStack>
-</EditForm>
+</MudForm>
 
 
 @code {
+    bool success;
+    string[] errors = { };
+    MudForm form;
     private AddProductModel model = new();
     private List<SkuModel> SkuList = new();
-    private SkuModel SelectedSku;
+    private SkuModel? SelectedSku;
 
     protected override async Task OnInitializedAsync()
     {
@@ -56,12 +59,15 @@
 
     }
 
-    private async Task OnValidSubmit(EditContext context)
+    private async Task Submit()
     {
-        if (SelectedSku is null)
+        await form.Validate();
+
+        if (!form.IsValid)
         {
             return;
         }
+
         var result = await productRepository.CreateAsync(new Entities.Product
             {
                 Name = model.Name,
@@ -76,6 +82,8 @@
             });
         await uow.SaveAsync();
         //fare comparire un popup che inserimento ok e rimanare alla pagina
+
+        Snackbar.Add($"Product {model.Name} created.", Severity.Success);
 
         Navigation.NavigateTo($"Products");
 

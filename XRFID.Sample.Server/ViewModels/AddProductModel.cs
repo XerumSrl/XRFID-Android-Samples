@@ -24,4 +24,7 @@ public class AddProductModel
 
     [Required]
     public string SerialNumber { get; set; } = string.Empty;
+
+    [Required]
+    public Guid SkuId { get; set; }
 }

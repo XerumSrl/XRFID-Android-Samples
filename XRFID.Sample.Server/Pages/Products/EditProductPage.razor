@@ -8,7 +8,7 @@
 @inject ProductRepository productRepository;
 @inject UnitOfWork uowk;
 
-<h3>Edit Product</h3>
+<h1>Edit Product @model.Name?</h1>
 
 <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
     <DataAnnotationsValidator />

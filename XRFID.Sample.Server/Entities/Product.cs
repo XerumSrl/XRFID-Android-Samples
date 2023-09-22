@@ -14,5 +14,5 @@ public class Product : AuditEntity
 
     public Guid SkuId { get; set; }
 
-    public Sku Sku { get; set; } = new Sku();
+    public Sku Sku { get; set; }
 }

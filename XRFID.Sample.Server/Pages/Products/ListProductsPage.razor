@@ -1,11 +1,16 @@
 ﻿@page "/Products"
 @using AutoMapper;
+@using XRFID.Sample.Server.Database;
 @using XRFID.Sample.Server.Repositories;
 @using XRFID.Sample.Server.ViewModels;
 @inject NavigationManager Navigation;
 @inject IDialogService DialogService
 @inject ProductRepository productRepository;
+@inject UnitOfWork uow;
 @inject IMapper mapper;
+@inject ISnackbar Snackbar;
+
+<h1>Products</h1>
 
 <MudDataGrid Items="@ProductList"
              ReadOnly="true"
@@ -28,13 +33,14 @@
             </CellTemplate>
         </TemplateColumn>
 
-        <PropertyColumn Property="x => x.SkuCode" Title="Sku Code" />
-        <PropertyColumn Property="x => x.CreationTime" Title="Date Creation" />
         <PropertyColumn Property="x => x.Name" />
         <PropertyColumn Property="x => x.Code" />
         <PropertyColumn Property="x => x.Description" />
         <PropertyColumn Property="x => x.Epc" />
         <PropertyColumn Property="x => x.SerialNumber" />
+        <PropertyColumn Property="x => x.SkuCode" Title="Sku Code" />
+        <PropertyColumn Property="x => x.CreationTime" Title="Date Creation" />
+
     </Columns>
     <PagerContent>
         <MudDataGridPager T="ProductModel" />
@@ -87,7 +93,21 @@
         var result = await dialog.Result;
         if (!result.Canceled)
         {
-            ProductList.Remove(item);
+            var checkItem = await productRepository.GetAsync(item.Id);
+            if (checkItem is not null)
+            {
+                await productRepository.DeleteAsync(item.Id);
+                await uow.SaveAsync();
+                ProductList.Remove(item);
+                Snackbar.Add($"Product {item.Name} deleted.", Severity.Success);
+
+            }
+            else
+            {
+                Snackbar.Add("Invalid product Id.", Severity.Error);
+                //notificare item non esistente
+            }
+            
         }
     }
 
