@@ -9,7 +9,7 @@
 @inject LoadingUnitRepository loadingUnitRepository;
 @inject ReaderRepository readerRepository;
 @inject UnitOfWork uowk;
-@inject ILogger<AddLoadingUnitPage> logger;
+@inject ISnackbar Snackbar;
 
 <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
     <MudStack Class="my-3">
@@ -114,12 +114,13 @@
             var result = await loadingUnitRepository.CreateAsync(newLu);
             await uowk.SaveAsync();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            logger.LogWarning(ex,"");
+            Snackbar.Add($"Loading Unit {model.Name} error in creation.", Severity.Error);
+            return;
         }
 
-
+        Snackbar.Add($"Loading Unit {model.Name} created.", Severity.Success);
 
         Navigation.NavigateTo($"LoadingUnits");
         StateHasChanged();
