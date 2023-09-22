@@ -30,7 +30,7 @@
         <MudTextField T="string" Variant="Variant.Outlined" Label="Serial Number" For="()=>model.SerialNumber" @bind-Value="model.SerialNumber" />
 
         <MudStack Row="true" Class="my-6 d-flex justify-end">
-            <MudButton OnClick="@(()=>form.ResetAsync())" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Reset</MudButton>
+            <MudButton OnClick="@(()=> Back())" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Back</MudButton>
             <MudButton OnClick="@(async ()=> await Submit())" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-3">Submit</MudButton>
         </MudStack>
     </MudStack>
@@ -123,6 +123,11 @@
         Navigation.NavigateTo($"Products");
 
         StateHasChanged();
+    }
+
+    private void Back()
+    {
+        Navigation.NavigateTo($"Products");
     }
 
     private async Task<bool> IsEpcUniqueAsync(string epc)

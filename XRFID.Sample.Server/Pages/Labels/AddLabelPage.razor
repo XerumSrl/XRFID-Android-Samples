@@ -27,8 +27,10 @@
         </MudSelect>
         <MudCheckBox T="bool" Variant="Variant.Outlined" Label="Is Active" For="()=>model.IsActive" @bind-Checked="model.IsActive" />
 
-        <MudTextField T="string" Variant="Variant.Outlined" Label="Template" For="()=>model.Content" @bind-Value="model.Content" Lines="10" />
-
+        <MudTextField T="string" Variant="Variant.Outlined" Label="Template"
+                      Placeholder="Label template using machine language. Place variable between markers like {myvariable}"
+                      For="()=>model.Content" @bind-Value="model.Content" Lines="10" />
+        <MudText Typo="Typo.body2">Label template using machine language. Place variable between markers like <strong>{myvariable}</strong></MudText>
         <MudStack Row="true" Class="my-6 d-flex justify-end">
             <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Reset</MudButton>
             <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-3">Submit</MudButton>

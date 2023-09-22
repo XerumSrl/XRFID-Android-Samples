@@ -20,7 +20,7 @@
         <MudDatePicker Variant="Variant.Outlined" Editable="true" Clearable="true" Label="Start Date" For="()=>model.StartDate" @bind-Date="model.StartDate" />
         <MudDatePicker Variant="Variant.Outlined" Editable="true" Clearable="true" Label="Expiration Date" For="()=>model.ExpirationDate" @bind-Date="model.ExpirationDate" />
         <MudStack Row="true" Class="my-6 d-flex justify-end">
-            <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Reset</MudButton>
+            <MudButton OnClick="@(()=> Back())" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Back</MudButton>
             <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-3">Submit</MudButton>
         </MudStack>
     </MudStack>
@@ -77,5 +77,8 @@
         StateHasChanged();
     }
 
-
+    private void Back()
+    {
+        Navigation.NavigateTo($"Skus");
+    }
 }

@@ -24,7 +24,7 @@
         <MudTextField T="string" Variant="Variant.Outlined" Label="Description" For="()=>model.Description" @bind-Value="model.Description" Lines="10" />
 
         <MudStack Row="true" Class="my-6 d-flex justify-end">
-            <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Reset</MudButton>
+            <MudButton OnClick="@(()=> Back())" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Back</MudButton>
             <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-3">Submit</MudButton>
 
         </MudStack>
@@ -80,5 +80,10 @@
         Navigation.NavigateTo($"LoadingUnits");
 
         StateHasChanged();
+    }
+
+    private void Back()
+    {
+        Navigation.NavigateTo($"LoadingUnits");
     }
 }

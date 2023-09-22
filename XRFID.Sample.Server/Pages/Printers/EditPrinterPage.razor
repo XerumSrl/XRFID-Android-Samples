@@ -1,4 +1,4 @@
-﻿@page "/Printers/Add"
+﻿@page "/Printers/Edit/{Id:guid}"
 @using System.Text.RegularExpressions;
 @using System.ComponentModel.DataAnnotations;
 @using XRFID.Sample.Server.Database;
@@ -20,7 +20,7 @@
         <MudNumericField T="int" Variant="Variant.Outlined" Label="Port" For="()=>model.Port" @bind-Value="model.Port" />
 
         <MudStack Row="true" Class="my-6 d-flex justify-end">
-            <MudButton OnClick="@(()=>form.ResetAsync())" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Reset</MudButton>
+            <MudButton OnClick="@(()=> Back())" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Back</MudButton>
             <MudButton OnClick="@(async ()=> await Submit())" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-3">Submit</MudButton>
         </MudStack>
     </MudStack>
@@ -64,7 +64,7 @@
             return;
         }
 
-        if (!(await IsNameUniqueAsync(model.Name)))
+        if (printer.Name != model.Name && !(await IsNameUniqueAsync(model.Name)))
         {
             Snackbar.Add($"Printer name {model.Name} already in use.", MudBlazor.Severity.Error);
             return;
@@ -87,6 +87,11 @@
         Navigation.NavigateTo($"Printers");
 
         StateHasChanged();
+    }
+
+    private void Back()
+    {
+        Navigation.NavigateTo($"Printers");
     }
 
     private async Task<bool> IsNameUniqueAsync(string name)

@@ -70,7 +70,7 @@
         parameters.Add(x => x.ButtonText, "Edit");
         parameters.Add(x => x.Color, Color.Primary);
 
-        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, DisableBackdropClick = true };
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, DisableBackdropClick = true, CloseOnEscapeKey = true };
 
         var dialog = await DialogService.ShowAsync<ConfirmDialog>("Edit", parameters, options);
         var result = await dialog.Result;
@@ -87,7 +87,7 @@
         parameters.Add(x => x.ButtonText, "Delete");
         parameters.Add(x => x.Color, Color.Error);
 
-        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, DisableBackdropClick = true };
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, DisableBackdropClick = true, CloseOnEscapeKey = true };
 
         var dialog = await DialogService.ShowAsync<ConfirmDialog>("Delete", parameters, options);
         var result = await dialog.Result;

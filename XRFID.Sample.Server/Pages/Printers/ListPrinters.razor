@@ -24,7 +24,6 @@
                    OnClick="@(() => AddPrinter())">Add New</MudButton>
     </ToolBarContent>
     <Columns>
-        <HierarchyColumn T="PrinterModel" />
         <TemplateColumn Filterable="false" Sortable="false">
             <CellTemplate>
                 <MudStack Row>
@@ -38,6 +37,9 @@
         <PropertyColumn Property="x => x.Port" />
         <PropertyColumn Property="x => x.Description" />
     </Columns>
+    <PagerContent>
+        <MudDataGridPager T="PrinterModel" />
+    </PagerContent>
 </MudDataGrid>
 @code {
     private List<PrinterModel> PrinterList = new List<PrinterModel>();
@@ -62,7 +64,7 @@
         parameters.Add(x => x.ButtonText, "Edit");
         parameters.Add(x => x.Color, Color.Primary);
 
-        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, DisableBackdropClick = true };
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, DisableBackdropClick = true, CloseOnEscapeKey = true };
 
         var dialog = await DialogService.ShowAsync<ConfirmDialog>("Edit", parameters, options);
         var result = await dialog.Result;
@@ -79,7 +81,7 @@
         parameters.Add(x => x.ButtonText, "Delete");
         parameters.Add(x => x.Color, Color.Error);
 
-        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, DisableBackdropClick = true };
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, DisableBackdropClick = true, CloseOnEscapeKey = true };
 
         var dialog = await DialogService.ShowAsync<ConfirmDialog>("Delete", parameters, options);
         var result = await dialog.Result;
