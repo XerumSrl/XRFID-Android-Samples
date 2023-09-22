@@ -34,13 +34,10 @@
             </CellTemplate>
         </TemplateColumn>
         <PropertyColumn Property="x => x.Name" />
-        <PropertyColumn Property="x => x.Address" />
+        <PropertyColumn Property="x => x.Ip" />
         <PropertyColumn Property="x => x.Port" />
         <PropertyColumn Property="x => x.Description" />
     </Columns>
-    <PagerContent>
-        <MudDataGridPager T="PrinterModel" />
-    </PagerContent>
 </MudDataGrid>
 @code {
     private List<PrinterModel> PrinterList = new List<PrinterModel>();
@@ -114,7 +111,7 @@
         if (!string.IsNullOrEmpty(x.Description) && x.Description.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
-        if (!string.IsNullOrEmpty(x.Address) && x.Address.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+        if (!string.IsNullOrEmpty(x.Ip) && x.Ip.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
         if (!string.IsNullOrEmpty(x.Port.ToString()) && x.Port.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))

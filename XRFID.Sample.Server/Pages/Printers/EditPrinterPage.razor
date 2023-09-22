@@ -1,0 +1,96 @@
+﻿@page "/Printers/Add"
+@using System.Text.RegularExpressions;
+@using System.ComponentModel.DataAnnotations;
+@using XRFID.Sample.Server.Database;
+@using XRFID.Sample.Server.Entities;
+@using XRFID.Sample.Server.Repositories;
+@using XRFID.Sample.Server.ViewModels;
+@inject NavigationManager Navigation;
+@inject PrinterRepository printerRepository;
+@inject UnitOfWork uow;
+@inject ISnackbar Snackbar;
+
+<h1>Edit Printer @model.Name?</h1>
+
+<MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+    <MudStack Class="my-3">
+        <MudTextField T="string" Variant="Variant.Outlined" Label="Name" For="()=>model.Name" @bind-Value="model.Name" AutoFocus="true" />
+        <MudTextField T="string" Variant="Variant.Outlined" Label="Description" For="()=>model.Description" @bind-Value="model.Description" />
+        <MudTextField T="string" Variant="Variant.Outlined" Label="IP Address" For="()=>model.Ip" @bind-Value="model.Ip" />
+        <MudNumericField T="int" Variant="Variant.Outlined" Label="Port" For="()=>model.Port" @bind-Value="model.Port" />
+
+        <MudStack Row="true" Class="my-6 d-flex justify-end">
+            <MudButton OnClick="@(()=>form.ResetAsync())" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Reset</MudButton>
+            <MudButton OnClick="@(async ()=> await Submit())" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-3">Submit</MudButton>
+        </MudStack>
+    </MudStack>
+</MudForm>
+
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+    private Printer? printer;
+
+    bool success;
+    string[] errors = { };
+    MudForm form;
+
+    private AddPrinterModel model = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        printer = await printerRepository.GetAsync(Id);
+        if (printer is null)
+        {
+            return;
+        }
+
+        model = new AddPrinterModel
+            {
+                Name = printer.Name ?? string.Empty,
+                Description = printer.Description,
+                Ip = printer.Ip,
+                Port = printer.Port,
+            };
+    }
+
+    private async Task Submit()
+    {
+        await form.Validate();
+
+        if (!form.IsValid)
+        {
+            return;
+        }
+
+        if (!(await IsNameUniqueAsync(model.Name)))
+        {
+            Snackbar.Add($"Printer name {model.Name} already in use.", MudBlazor.Severity.Error);
+            return;
+        }
+
+        var result = await printerRepository.UpdateAsync(new Entities.Printer
+            {
+                Id = printer.Id,
+                Name = model.Name,
+                Ip = model.Ip,
+                Port = model.Port,
+                Description = model.Description,
+
+            });
+        await uow.SaveAsync();
+        //fare comparire un popup che inserimento ok e rimanare alla pagina
+
+        Snackbar.Add($"Printer {model.Name} updated.", MudBlazor.Severity.Success);
+
+        Navigation.NavigateTo($"Printers");
+
+        StateHasChanged();
+    }
+
+    private async Task<bool> IsNameUniqueAsync(string name)
+    {
+        return !(await printerRepository.GetAsync(q => q.Name == name)).Any();
+    }
+}

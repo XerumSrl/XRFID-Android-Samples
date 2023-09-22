@@ -110,7 +110,16 @@
         var result = await dialog.Result;
         if (!result.Canceled)
         {
-            var checkItem = await skuRepository.GetAsync(item.Id);
+            var checkItem = await skuRepository.GetAsync(item.Id, "Products");
+
+            if (checkItem.Products.Any())
+            {
+                Snackbar.Add($"Sku {item.Name} has {checkItem.Products.Count()} related product(s). Please remove the product(s) before deleting.", Severity.Warning);
+
+                return;
+
+            }
+
             if (checkItem is not null)
             {
                 await skuRepository.DeleteAsync(item.Id);

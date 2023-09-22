@@ -12,6 +12,29 @@ namespace XRFID.Sample.Server.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Labels",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Version = table.Column<int>(type: "INTEGER", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: false),
+                    Content = table.Column<string>(type: "TEXT", nullable: false),
+                    Language = table.Column<int>(type: "INTEGER", nullable: false),
+                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: true),
+                    Code = table.Column<string>(type: "TEXT", nullable: true),
+                    Reference = table.Column<string>(type: "TEXT", nullable: true),
+                    CreatorUserId = table.Column<string>(type: "TEXT", nullable: true),
+                    CreationTime = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    LastModifierUserId = table.Column<string>(type: "TEXT", nullable: true),
+                    LastModificationTime = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Labels", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "LoadingUnits",
                 columns: table => new
                 {
@@ -66,6 +89,36 @@ namespace XRFID.Sample.Server.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Movements", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Printers",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Model = table.Column<string>(type: "TEXT", nullable: true),
+                    Version = table.Column<string>(type: "TEXT", nullable: true),
+                    LicenseStatus = table.Column<int>(type: "INTEGER", nullable: false),
+                    Ip = table.Column<string>(type: "TEXT", nullable: false),
+                    Port = table.Column<int>(type: "INTEGER", nullable: false),
+                    MacAddress = table.Column<string>(type: "TEXT", nullable: true),
+                    SerialNumber = table.Column<string>(type: "TEXT", nullable: true),
+                    Description = table.Column<string>(type: "TEXT", nullable: true),
+                    Manufacturer = table.Column<int>(type: "INTEGER", nullable: true),
+                    Language = table.Column<int>(type: "INTEGER", nullable: true),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false),
+                    WorkflowType = table.Column<int>(type: "INTEGER", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: true),
+                    Code = table.Column<string>(type: "TEXT", nullable: true),
+                    Reference = table.Column<string>(type: "TEXT", nullable: true),
+                    CreatorUserId = table.Column<string>(type: "TEXT", nullable: true),
+                    CreationTime = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    LastModifierUserId = table.Column<string>(type: "TEXT", nullable: true),
+                    LastModificationTime = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Printers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -260,7 +313,13 @@ namespace XRFID.Sample.Server.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Labels");
+
+            migrationBuilder.DropTable(
                 name: "MovementItems");
+
+            migrationBuilder.DropTable(
+                name: "Printers");
 
             migrationBuilder.DropTable(
                 name: "Readers");

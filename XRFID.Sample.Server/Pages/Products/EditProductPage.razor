@@ -4,43 +4,76 @@
 @using XRFID.Sample.Server.Database;
 @using XRFID.Sample.Server.Entities;
 @using XRFID.Sample.Server.Repositories;
+@using XRFID.Sample.Server.ViewModels;
 @inject NavigationManager Navigation;
+@inject SkuRepository skuRepository;
 @inject ProductRepository productRepository;
-@inject UnitOfWork uowk;
+@inject UnitOfWork uow;
+@inject ISnackbar Snackbar;
 
 <h1>Edit Product @model.Name?</h1>
 
-<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
-    <DataAnnotationsValidator />
-    <MudTextField T="string" Variant="Variant.Outlined" Label="Name" For="()=>model.Name" @bind-Value="model.Name" AutoFocus="true" />
-    <MudTextField T="string" Variant="Variant.Outlined" Label="Description" For="()=>model.Description" @bind-Value="model.Description" />
-    <MudTextField T="string" Variant="Variant.Outlined" Label="EPC" HelperText="24 or 32 characther HEX string" For="()=>model.Epc" @bind-Value="model.Epc" />
-    <MudNumericField Variant="Variant.Outlined" Label="Quantity" For="()=>model.ContentQuantity" @bind-Value="model.ContentQuantity" />
-    <MudTextField T="string" Variant="Variant.Outlined" Label="Serial Number" For="()=>model.SerialNumber" @bind-Value="model.SerialNumber" />
-    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Submit</MudButton>
-</EditForm>
+<MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Disabled="@isDisabled">
+    <MudStack Class="my-3">
+        <MudSelect Label="Sku" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter"
+        @bind-Value="SelectedSku" Required="true" RequiredError="Please select a Sku before creating a product">
+            @foreach (var sku in SkuList.OrderBy(q => q.Code))
+            {
+                <MudSelectItem Value="@sku">@sku.Code - @sku.Description</MudSelectItem>
+            }
+        </MudSelect>
+        <MudTextField T="string" Variant="Variant.Outlined" Label="Name" For="()=>model.Name" @bind-Value="model.Name" AutoFocus="true" />
+        <MudTextField T="string" Variant="Variant.Outlined" Label="Code" For="()=>model.Code" @bind-Value="model.Code" />
+        <MudTextField T="string" Variant="Variant.Outlined" Label="Description" For="()=>model.Description" @bind-Value="model.Description" />
+        <MudTextField T="string" Variant="Variant.Outlined" Label="EPC" HelperText="24 or 32 characther HEX string"
+                      For="()=>model.Epc" @bind-Value="model.Epc" />
+        <MudTextField T="string" Variant="Variant.Outlined" Label="Serial Number" For="()=>model.SerialNumber" @bind-Value="model.SerialNumber" />
+
+        <MudStack Row="true" Class="my-6 d-flex justify-end">
+            <MudButton OnClick="@(()=>form.ResetAsync())" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Reset</MudButton>
+            <MudButton OnClick="@(async ()=> await Submit())" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-3">Submit</MudButton>
+        </MudStack>
+    </MudStack>
+</MudForm>
 
 
 @code {
     [Parameter]
     public Guid Id { get; set; }
+    bool success;
+    string[] errors = { };
+    MudForm form;
     private Product? product;
-    public bool IsDisabled { get; set; } = false;
-
-    private FormModel model = new FormModel();
-
+    private AddProductModel model = new();
+    private List<SkuModel> SkuList = new();
+    private SkuModel? SelectedSku;
+    private bool isDisabled = false;
 
     protected override async Task OnInitializedAsync()
     {
-        product = await productRepository.GetAsync(Id);
-        IsDisabled = product == null;
+        product = await productRepository.GetAsync(Id, "Sku");
+        isDisabled = product == null;
 
         if (product is null)
         {
             return;
         }
 
-        model = new FormModel
+        var skus = await skuRepository.GetAsync();
+        foreach (var sku in skus)
+        {
+            SkuList.Add(new SkuModel
+                {
+                    Id = sku.Id,
+                    Name = sku.Name ?? sku.Id.ToString(),
+                    Code = sku.Code ?? sku.Id.ToString(),
+                    Description = sku.Description,
+                });
+        }
+
+        SelectedSku = SkuList.Where(q => q.Id == product.SkuId).FirstOrDefault();
+
+        model = new AddProductModel
             {
                 Name = product.Name ?? string.Empty,
                 Description = product.Description,
@@ -48,50 +81,53 @@
                 ContentQuantity = product.ContentQuantity,
                 SerialNumber = product.SerialNumber,
                 Note = product.Note,
+                Code = product.Code,
+                SkuId = product.SkuId
             };
 
     }
-    private async void OnValidSubmit(EditContext context)
+
+    private async Task Submit()
     {
-        if (product is null)
+        await form.Validate();
+
+        if (!form.IsValid)
         {
             return;
         }
 
-        product.Name = model.Name;
-        product.Description = model.Description;
-        product.Epc = model.Epc;
-        product.ContentQuantity = model.ContentQuantity;
-        product.SerialNumber = model.SerialNumber;
-        product.Note = model.Note;
+        if (!(await IsEpcUniqueAsync(model.Epc)))
+        {
+            Snackbar.Add($"Epc {model.Epc} already in use.", MudBlazor.Severity.Error);
+            return;
+        }
 
-        Product? result = await productRepository.UpdateAsync(product);
-        await uowk.SaveAsync();
+        var result = await productRepository.UpdateAsync(new Entities.Product
+            {
+                Id = product.Id,
+                Name = model.Name,
+                Description = model.Description,
+                Code = model.Code,
+                Note = model.Note,
+                Epc = model.Epc,
+                ContentQuantity = model.ContentQuantity,
+                SerialNumber = model.SerialNumber,
+                SkuId = SelectedSku.Id,
+
+            });
+        await uow.SaveAsync();
+        //fare comparire un popup che inserimento ok e rimanare alla pagina
+
+        Snackbar.Add($"Product {model.Name} updated.", MudBlazor.Severity.Success);
 
         Navigation.NavigateTo($"Products");
 
         StateHasChanged();
     }
 
-
-    private class FormModel
+    private async Task<bool> IsEpcUniqueAsync(string epc)
     {
-        [Required]
-        public string Name { get; set; } = string.Empty;
-
-        [Required]
-        public string Description { get; set; } = string.Empty;
-
-        public string? Note { get; set; }
-
-        [Required]
-        [RegularExpression(@"^([0-9a-fA-F]{32}|[0-9a-fA-F]{24})$", ErrorMessage = "EPC must be a valix HEX rapresentation of 24 or 32 charachers")]
-        public string Epc { get; set; } = string.Empty;
-
-        [Range(minimum: 1, maximum: int.MaxValue)]
-        public int ContentQuantity { get; set; } = 1;
-
-        [Required]
-        public string SerialNumber { get; set; } = string.Empty;
+        return !(await productRepository.GetAsync(q => q.Epc == epc)).Any();
     }
+
 }

@@ -15,7 +15,7 @@
 <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
     <MudStack Class="my-3">
         <MudSelect Label="Sku" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter"
-                   @bind-Value="SelectedSku" Required="true" RequiredError="Please select a Sku before creating a product">
+        @bind-Value="SelectedSku" Required="true" RequiredError="Please select a Sku before creating a product">
             @foreach (var sku in SkuList.OrderBy(q => q.Code))
             {
                 <MudSelectItem Value="@sku">@sku.Code - @sku.Description</MudSelectItem>
@@ -24,7 +24,8 @@
         <MudTextField T="string" Variant="Variant.Outlined" Label="Name" For="()=>model.Name" @bind-Value="model.Name" AutoFocus="true" />
         <MudTextField T="string" Variant="Variant.Outlined" Label="Code" For="()=>model.Code" @bind-Value="model.Code" />
         <MudTextField T="string" Variant="Variant.Outlined" Label="Description" For="()=>model.Description" @bind-Value="model.Description" />
-        <MudTextField T="string" Variant="Variant.Outlined" Label="EPC" HelperText="24 or 32 characther HEX string" For="()=>model.Epc" @bind-Value="model.Epc" />
+        <MudTextField T="string" Variant="Variant.Outlined" Label="EPC" HelperText="24 or 32 characther HEX string"
+                      For="()=>model.Epc" @bind-Value="model.Epc" />
         <MudTextField T="string" Variant="Variant.Outlined" Label="Serial Number" For="()=>model.SerialNumber" @bind-Value="model.SerialNumber" />
 
         <MudStack Row="true" Class="my-6 d-flex justify-end">
@@ -68,6 +69,12 @@
             return;
         }
 
+        if (!(await IsEpcUniqueAsync(model.Epc)))
+        {
+            Snackbar.Add($"Epc {model.Epc} already in use.", MudBlazor.Severity.Error);
+            return;
+        }
+
         var result = await productRepository.CreateAsync(new Entities.Product
             {
                 Name = model.Name,
@@ -83,11 +90,16 @@
         await uow.SaveAsync();
         //fare comparire un popup che inserimento ok e rimanare alla pagina
 
-        Snackbar.Add($"Product {model.Name} created.", Severity.Success);
+        Snackbar.Add($"Product {model.Name} created.", MudBlazor.Severity.Success);
 
         Navigation.NavigateTo($"Products");
 
         StateHasChanged();
+    }
+
+    private async Task<bool> IsEpcUniqueAsync(string epc)
+    {
+        return !(await productRepository.GetAsync(q => q.Epc == epc)).Any();
     }
 
 }

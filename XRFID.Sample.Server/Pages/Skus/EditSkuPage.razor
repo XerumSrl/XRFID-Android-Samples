@@ -32,6 +32,7 @@
     [Parameter]
     public Guid Id { get; set; }
     private Sku? sku;
+    private bool isDisabled = false;
 
     private AddSkuModel model = new AddSkuModel();
 

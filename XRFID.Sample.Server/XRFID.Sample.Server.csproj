@@ -35,6 +35,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Folder Include="Migrations\" />
 		<Folder Include="Pages\Movements\" />
 		<Folder Include="Persist\" />
 	</ItemGroup>

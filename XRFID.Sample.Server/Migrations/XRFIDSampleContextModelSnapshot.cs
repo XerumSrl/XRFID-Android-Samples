@@ -360,11 +360,14 @@ namespace XRFID.Sample.Server.Migrations
                     b.Property<string>("CreatorUserId")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Ip")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Language")
+                    b.Property<int?>("Language")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("LastModificationTime")
@@ -377,14 +380,12 @@ namespace XRFID.Sample.Server.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("MacAddress")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Manufacturer")
+                    b.Property<int?>("Manufacturer")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Model")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
@@ -397,18 +398,12 @@ namespace XRFID.Sample.Server.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SerialNumber")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Uid")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Version")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("WorkflowType")
