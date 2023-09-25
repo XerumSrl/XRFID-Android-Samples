@@ -24,7 +24,7 @@
             <MudSelectItem Value="@label">@label.Name Rev. @label.Version</MudSelectItem>
         }
     </MudSelect>
-    @if (showvars)
+    @if (selectedLabel is not null)
     {
         @foreach (var variable in variables)
         {
@@ -53,8 +53,6 @@
     private LabelModel? selectedLabel;
 
     private List<ZPLVar> variables = new List<ZPLVar>();
-
-    private bool showvars = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -94,8 +92,6 @@
             startIndex = closeIndex + 1;
 
         } while (true);
-
-        showvars = true;
     }
 
     private class ZPLVar
