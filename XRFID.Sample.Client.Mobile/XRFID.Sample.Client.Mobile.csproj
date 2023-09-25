@@ -91,6 +91,9 @@
 	  <Compile Update="Views\Inventory\InventoryView.xaml.cs">
 	    <DependentUpon>InventoryView.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Views\ScanPrintView.xaml.cs">
+	    <DependentUpon>ScanPrintView.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Views\PageSettings\FindSettings.xaml.cs">
 	    <DependentUpon>FindSettings.xaml</DependentUpon>
 	  </Compile>
@@ -119,6 +122,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Inventory\InventoryView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\ScanPrintView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\PageSettings\FindSettings.xaml">

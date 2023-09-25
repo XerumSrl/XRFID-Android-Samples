@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<mvvm:TinyView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               xmlns:mvvm="clr-namespace:TinyMvvm;assembly=TinyMvvm.Maui"
+               x:Class="XRFID.Sample.Client.Mobile.Views.ScanPrintView"
+             Title="SCAN PRINT">
+
+    <Shell.TitleView>
+        <Grid Padding="0,0,5,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0" Padding="0,0,0,0" 
+                   VerticalTextAlignment="Center" 
+                   VerticalOptions="CenterAndExpand" 
+                   HorizontalOptions="StartAndExpand" 
+                   Text="SCAN PRINT"
+                   TextColor="#FFF"
+                   FontSize="Medium"
+                   FontAttributes="Bold"/>
+
+            <!--<Button Grid.Column="1" ImageSource="info_icon.svg"                    
+                    BackgroundColor="Transparent" 
+                    Clicked="ShowInfoPage" 
+                    HeightRequest="50" WidthRequest="65" 
+                    HorizontalOptions="End"/>-->
+        </Grid>
+    </Shell.TitleView>
+
+    <Picker x:Name="picker"
+        Title="Select a monkey">
+        <Picker.ItemsSource>
+            <x:Array Type="{x:Type x:String}">
+                <x:String>Baboon</x:String>
+                <x:String>Capuchin Monkey</x:String>
+                <x:String>Blue Monkey</x:String>
+                <x:String>Squirrel Monkey</x:String>
+                <x:String>Golden Lion Tamarin</x:String>
+                <x:String>Howler Monkey</x:String>
+                <x:String>Japanese Macaque</x:String>
+            </x:Array>
+        </Picker.ItemsSource>
+    </Picker>
+
+</mvvm:TinyView>

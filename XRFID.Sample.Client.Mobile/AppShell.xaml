@@ -50,6 +50,10 @@
         </Tab>
     </FlyoutItem>
 
+    <FlyoutItem Title="ScanPrint" Icon="settings_gear_blue.svg">
+        <ShellContent ContentTemplate="{DataTemplate views:ScanPrintView}" Route="scanprint"/>
+    </FlyoutItem>
+    
     <FlyoutItem Title="Settings" Icon="settings_gear_blue.svg">
         <ShellContent ContentTemplate="{DataTemplate views:SettingsPage}" Route="settings"/>
     </FlyoutItem>
