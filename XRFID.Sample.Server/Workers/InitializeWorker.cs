@@ -87,6 +87,59 @@ public sealed class InitializeWorker : IHostedService
             }
             await ctx.SaveChangesAsync();
         }
+
+        if (!ctx.Printers.Any())
+        {
+            Printer p = new Printer
+            {
+                Name = "default printer",
+                Code = "default printer",
+                Description = "default printer",
+                Ip = "192.168.1.2",
+                Port = 9100,
+                Language = Xerum.XFramework.Common.Enums.PrinterLanguage.PGL,
+                LicenseStatus = Xerum.XFramework.Common.Enums.LicenseStatus.VALID,
+                Manufacturer = Xerum.XFramework.Common.Enums.PrinterManufacturers.Printronix,
+            };
+            ctx.Printers.Add(p);
+            await ctx.SaveChangesAsync();
+        }
+
+        if (!ctx.Labels.Any())
+        {
+            Label l = new Label
+            {
+                Name = "default label",
+                Code = "default label",
+                Description = "default label",
+                Language = Xerum.XFramework.Common.Enums.PrinterLanguage.PGL,
+                Version = 1,
+                IsActive = true,
+                Content = @"~NORMAL
+~DELETE LOGO;*ALL
+~CREATE;LAB;97
+SCALE;DOT;203;203
+ISET;0
+FONT;FACE 92250;BOLD OFF;SLANT OFF
+ALPHA
+POINT;243;79;19;20;""{barcode}""
+STOP
+BARCODE
+C128C;XRD4:4:8:8:12:12:16:16;H4.92;22;31
+""'{barcode}""
+PDF;S
+STOP
+RFWTAG;96
+96;H;""{EPC}""
+STOP
+END
+~EXECUTE;LAB
+
+~NORMAL"
+            };
+            ctx.Labels.Add(l);
+            await ctx.SaveChangesAsync();
+        }
     }
 
     public async Task StopAsync(CancellationToken cancellationToken)

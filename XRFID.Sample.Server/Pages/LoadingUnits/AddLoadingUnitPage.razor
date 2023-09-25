@@ -9,7 +9,7 @@
 @inject LoadingUnitRepository loadingUnitRepository;
 @inject ReaderRepository readerRepository;
 @inject UnitOfWork uowk;
-@inject ISnackbar Snackbar;
+@inject ISnackbar snackbar;
 
 <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
     <MudStack Class="my-3">
@@ -116,11 +116,11 @@
         }
         catch (Exception)
         {
-            Snackbar.Add($"Loading Unit {model.Name} error in creation.", Severity.Error);
+            snackbar.Add($"Loading Unit {model.Name} error in creation.", Severity.Error);
             return;
         }
 
-        Snackbar.Add($"Loading Unit {model.Name} created.", Severity.Success);
+        snackbar.Add($"Loading Unit {model.Name} created.", Severity.Success);
 
         Navigation.NavigateTo($"LoadingUnits");
         StateHasChanged();

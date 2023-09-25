@@ -3,6 +3,7 @@
 @using System.ComponentModel.DataAnnotations;
 @using XRFID.Sample.Server.Database;
 @using XRFID.Sample.Server.Entities;
+@using XRFID.Sample.Server.Helpers;
 @using XRFID.Sample.Server.Repositories;
 @using XRFID.Sample.Server.ViewModels;
 @using Xerum.XFramework.Common.Enums;
@@ -10,7 +11,7 @@
 @inject SkuRepository labelRepository;
 @inject LabelRepository labelRepository;
 @inject UnitOfWork uow;
-@inject ISnackbar Snackbar;
+@inject ISnackbar snackbar;
 
 <h1>Edit Label @model.Name?</h1>
 
@@ -24,7 +25,7 @@
         <MudSelect Label="Language" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-Value="@model.Language" Required="true">
             @foreach (PrinterLanguage item in Enum.GetValues(typeof(PrinterLanguage)))
             {
-                <MudSelectItem Value="@item">@GetDisplayText(item)</MudSelectItem>
+                <MudSelectItem Value="@item">@EnumHelper.GetDisplayText(item)</MudSelectItem>
             }
         </MudSelect>
         <MudCheckBox T="bool" Variant="Variant.Outlined" Label="Is Active" For="()=>model.IsActive" @bind-Checked="model.IsActive" />
@@ -51,7 +52,7 @@
         label = await labelRepository.GetAsync(Id);
         if (label is null)
         {
-            Snackbar.Add("Invalid label Id.", Severity.Error);
+            snackbar.Add("Invalid label Id.", Severity.Error);
             return;
         }
         initialLabelName = label.Name;
@@ -89,7 +90,7 @@
         Navigation.NavigateTo($"Labels");
 
         StateHasChanged();
-        Snackbar.Add($"Label {model.Name} updated.", Severity.Success);
+        snackbar.Add($"Label {model.Name} updated.", Severity.Success);
 
     }
 
@@ -123,47 +124,5 @@
         {
             model.Version = initialLabelVersion;
         }
-    }
-
-    private string GetDisplayText(Enum value)
-    {
-        if (value == null)
-            throw new ArgumentNullException(nameof(value));
-
-        Type type = value.GetType();
-        if (Attribute.IsDefined(type, typeof(FlagsAttribute)))
-        {
-            var sb = new System.Text.StringBuilder();
-
-            foreach (Enum field in Enum.GetValues(type))
-            {
-                if (Convert.ToInt64(field) == 0 && Convert.ToInt32(value) > 0)
-                    continue;
-
-                if (value.HasFlag(field))
-                {
-                    if (sb.Length > 0)
-                        sb.Append(", ");
-
-                    var f = type.GetField(field.ToString());
-                    var da = (DisplayAttribute)Attribute.GetCustomAttribute(f, typeof(DisplayAttribute));
-                    sb.Append(da?.ShortName ?? da?.Name ?? field.ToString());
-                }
-            }
-
-            return sb.ToString();
-        }
-        else
-        {
-            var f = type.GetField(value.ToString());
-            if (f != null)
-            {
-                var da = (DisplayAttribute)Attribute.GetCustomAttribute(f, typeof(DisplayAttribute));
-                if (da != null)
-                    return da.ShortName ?? da.Name;
-            }
-        }
-
-        return value.ToString();
     }
 }

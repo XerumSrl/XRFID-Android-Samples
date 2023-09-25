@@ -10,4 +10,9 @@ public class PrinterModel
     public string Ip { get; set; }
     public int Port { get; set; }
     public string Description { get; set; }
+
+    public PrinterManufacturers? Manufacturer { get; set; }
+    public PrinterLanguage? Language { get; set; }
+    public PrinterStatus Status { get; set; } = PrinterStatus.Connected;
+    public WorkflowType WorkflowType { get; set; } = WorkflowType.Printer;
 }

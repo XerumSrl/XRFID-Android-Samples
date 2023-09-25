@@ -9,7 +9,7 @@
 @inject SkuRepository skuRepository;
 @inject UnitOfWork uow;
 @inject IMapper mapper;
-@inject ISnackbar Snackbar;
+@inject ISnackbar snackbar;
 
 <h1>Skus</h1>
 
@@ -114,7 +114,7 @@
 
             if (checkItem.Products.Any())
             {
-                Snackbar.Add($"Sku {item.Name} has {checkItem.Products.Count()} related product(s). Please remove the product(s) before deleting.", Severity.Warning);
+                snackbar.Add($"Sku {item.Name} has {checkItem.Products.Count()} related product(s). Please remove the product(s) before deleting.", Severity.Warning);
 
                 return;
 
@@ -125,12 +125,12 @@
                 await skuRepository.DeleteAsync(item.Id);
                 await uow.SaveAsync();
                 SkuList.Remove(item);
-                Snackbar.Add($"Sku {item.Name} deleted.", Severity.Success);
+                snackbar.Add($"Sku {item.Name} deleted.", Severity.Success);
             }
             else
             {
                 //notificare item non esistente
-                Snackbar.Add("Invalid sku Id.", Severity.Error);
+                snackbar.Add("Invalid sku Id.", Severity.Error);
             }
         }
     }
