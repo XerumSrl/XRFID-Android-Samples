@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel;
 using XRFID.Sample.Server.Database;
 using XRFID.Sample.Server.Entities;
 
@@ -59,7 +58,8 @@ public sealed class InitializeWorker : IHostedService
         //demo data
         if (!ctx.Skus.Any())
         {
-            for (int i = 0; i < 20; i++)
+            Random rng = new Random();
+            for (int i = 0; i < 16; i++)
             {
                 Sku s = new Sku
                 {
@@ -69,14 +69,15 @@ public sealed class InitializeWorker : IHostedService
                     Products = new(),
                 };
 
-                for (int j = 0; j < 6; j++)
+                for (int j = 0; j < 4; j++)
                 {
                     Product p = new Product
                     {
-                        Name = "product_" + j.ToString(),
-                        Code = "product_" + j.ToString(),
-                        Description = "product_" + j.ToString() + "_description",
-                        Epc = "product_" + j.ToString() + "_epc",
+                        Name = $"product_{i}_{j}",
+                        Code = $"product_{i}_{j}",
+                        Description = $"product_{i}_{j}_description",
+                        //Epc = $"{Guid.NewGuid():N}".ToUpperInvariant(),
+                        Epc = rng.Next(0, 2) == 0 ? $"{Guid.NewGuid():N}".ToUpperInvariant() : $"{Guid.NewGuid():N}".Substring(0, 24).ToUpperInvariant(),
                         SerialNumber = Guid.NewGuid().ToString(),
                         CreationTime = DateTime.Now,
                     };
@@ -86,7 +87,6 @@ public sealed class InitializeWorker : IHostedService
             }
             await ctx.SaveChangesAsync();
         }
-
     }
 
     public async Task StopAsync(CancellationToken cancellationToken)

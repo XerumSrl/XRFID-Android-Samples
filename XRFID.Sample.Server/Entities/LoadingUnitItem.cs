@@ -17,7 +17,7 @@ public class LoadingUnitItem : AuditEntity
     public bool IsValid { get => Status == ItemStatus.Found; }
 
     public Guid LoadingUnitId { get; set; }
-    public LoadingUnit LoadingUnit { get; set; } = new LoadingUnit();//entityframework likes this syntax for automatic foreignkey contraint setup
+    public LoadingUnit LoadingUnit { get; set; }//entityframework likes this syntax for automatic foreignkey contraint setup
 
     public string LoadingUnitReference { get; set; } = string.Empty;
 }

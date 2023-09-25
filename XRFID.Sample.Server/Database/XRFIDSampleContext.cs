@@ -16,10 +16,11 @@ public class XRFIDSampleContext : DbContext
 
     public DbSet<Reader> Readers { get; set; }
     public DbSet<Label> Labels { get; set; }
-    public DbSet<Printer> Printers{ get; set; }
+    public DbSet<Printer> Printers { get; set; }
 
     public XRFIDSampleContext(DbContextOptions options) : base(options)
     {
+
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -29,8 +30,13 @@ public class XRFIDSampleContext : DbContext
         modelBuilder.Entity<Movement>().HasKey(k => k.Id);
         modelBuilder.Entity<MovementItem>().HasKey(k => k.Id);
         modelBuilder.Entity<Product>().HasKey(k => k.Id);
+        modelBuilder.Entity<Product>().HasAlternateKey(ak => ak.Epc);
+        modelBuilder.Entity<Product>().HasAlternateKey(ak => ak.Name);
+        modelBuilder.Entity<Product>().HasAlternateKey(ak => ak.Code);
         modelBuilder.Entity<Reader>().HasKey(k => k.Id);
         modelBuilder.Entity<Sku>().HasKey(k => k.Id);
+        modelBuilder.Entity<Sku>().HasAlternateKey(ak => ak.Name);
+        modelBuilder.Entity<Sku>().HasAlternateKey(ak => ak.Code);
         modelBuilder.Entity<Printer>().HasKey(k => k.Id);
         modelBuilder.Entity<Label>().HasKey(k => k.Id);
 

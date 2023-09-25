@@ -158,8 +158,8 @@ namespace XRFID.Sample.Server.Migrations
                     Description = table.Column<string>(type: "TEXT", nullable: false),
                     EffectivityStart = table.Column<DateTime>(type: "TEXT", nullable: false),
                     EffectivityEnd = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: true),
-                    Code = table.Column<string>(type: "TEXT", nullable: true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Code = table.Column<string>(type: "TEXT", nullable: false),
                     Reference = table.Column<string>(type: "TEXT", nullable: true),
                     CreatorUserId = table.Column<string>(type: "TEXT", nullable: true),
                     CreationTime = table.Column<DateTime>(type: "TEXT", nullable: false),
@@ -169,6 +169,8 @@ namespace XRFID.Sample.Server.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Skus", x => x.Id);
+                    table.UniqueConstraint("AK_Skus_Code", x => x.Code);
+                    table.UniqueConstraint("AK_Skus_Name", x => x.Name);
                 });
 
             migrationBuilder.CreateTable(
@@ -213,8 +215,8 @@ namespace XRFID.Sample.Server.Migrations
                     ContentQuantity = table.Column<int>(type: "INTEGER", nullable: false),
                     SerialNumber = table.Column<string>(type: "TEXT", nullable: false),
                     SkuId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: true),
-                    Code = table.Column<string>(type: "TEXT", nullable: true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Code = table.Column<string>(type: "TEXT", nullable: false),
                     Reference = table.Column<string>(type: "TEXT", nullable: true),
                     CreatorUserId = table.Column<string>(type: "TEXT", nullable: true),
                     CreationTime = table.Column<DateTime>(type: "TEXT", nullable: false),
@@ -224,6 +226,9 @@ namespace XRFID.Sample.Server.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Products", x => x.Id);
+                    table.UniqueConstraint("AK_Products_Code", x => x.Code);
+                    table.UniqueConstraint("AK_Products_Epc", x => x.Epc);
+                    table.UniqueConstraint("AK_Products_Name", x => x.Name);
                     table.ForeignKey(
                         name: "FK_Products_Skus_SkuId",
                         column: x => x.SkuId,

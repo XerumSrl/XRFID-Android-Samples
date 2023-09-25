@@ -11,7 +11,7 @@ using XRFID.Sample.Server.Database;
 namespace XRFID.Sample.Server.Migrations
 {
     [DbContext(typeof(XRFIDSampleContext))]
-    [Migration("20230922155907_Initial")]
+    [Migration("20230925100132_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -424,6 +424,7 @@ namespace XRFID.Sample.Server.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Code")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("ContentQuantity")
@@ -450,6 +451,7 @@ namespace XRFID.Sample.Server.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Note")
@@ -466,6 +468,12 @@ namespace XRFID.Sample.Server.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasAlternateKey("Code");
+
+                    b.HasAlternateKey("Epc");
+
+                    b.HasAlternateKey("Name");
 
                     b.HasIndex("SkuId");
 
@@ -545,6 +553,7 @@ namespace XRFID.Sample.Server.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Code")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreationTime")
@@ -570,12 +579,17 @@ namespace XRFID.Sample.Server.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Reference")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasAlternateKey("Code");
+
+                    b.HasAlternateKey("Name");
 
                     b.ToTable("Skus");
                 });
