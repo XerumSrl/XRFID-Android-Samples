@@ -5,5 +5,8 @@ namespace XRFID.Sample.Server.Contracts;
 public record StateMachineUiTagPublish
 {
     public Guid ReaderId { get; set; }
-    public TagActionDto Tag { get; set; } = new TagActionDto();
+
+    public Guid ActivMoveId { get; set; }
+
+    public TagActionDto? Tag { get; set; }
 }

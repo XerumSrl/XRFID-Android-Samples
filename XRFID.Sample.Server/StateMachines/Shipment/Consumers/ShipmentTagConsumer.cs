@@ -209,6 +209,7 @@ public class ShipmentTagConsumer :
             await context.Publish(new StateMachineUiTagPublish
             {
                 ReaderId = context.Message.ReaderId,
+                ActivMoveId = movementId,
                 Tag = context.Message.TagAction,
             });
         }

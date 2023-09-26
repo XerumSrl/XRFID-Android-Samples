@@ -11,7 +11,10 @@ public class CheckPageWorker
 {
     private readonly MovementItemRepository movementItemRepository;
     private readonly ILogger<CheckPageWorker> logger;
+
+
     private List<CheckItemModel> _viewItems = new List<CheckItemModel>();
+    private Guid ActiveId = Guid.Empty;
 
     public CheckPageWorker(IServiceProvider serviceProvider, ILogger<CheckPageWorker> logger)
     {
@@ -21,9 +24,38 @@ public class CheckPageWorker
         this.logger = logger;
     }
 
+    public async Task SetViewItem(string epc)
+    {
+        CheckItemModel? foundItem = _viewItems.Where(w => w.Epc == epc).FirstOrDefault();
+        if (foundItem is not null)
+        {
+            foundItem.CheckStatus = CheckStatusEnum.Found;
+        }
+        else
+        {
+            var item = (await movementItemRepository.GetAsync(q => q.Epc == epc)).FirstOrDefault();
+            if (item is null)
+            {
+                return;
+            }
+
+            _viewItems.Add(new CheckItemModel
+            {
+                Name = item.Name ?? string.Empty,
+                Epc = epc,
+                Description = item.Description,
+                CheckStatus = item.Status == ItemStatus.Found ? CheckStatusEnum.Found :
+                                         (item.Status == ItemStatus.NotFound ? CheckStatusEnum.NotFound : CheckStatusEnum.Error),
+                DateTime = item.LastModificationTime,
+            });
+        }
+    }
+
     public async Task SetViewItems()
     {
         _viewItems.Clear();
+
+
 
         List<MovementItem> dailyItems = new List<MovementItem>();
 
@@ -68,6 +100,46 @@ public class CheckPageWorker
         items = _viewItems.OrderByDescending(o => o.DateTime).ToList();
 
         return items;
+    }
+
+    public async Task<bool> IdIsEqual(Guid Id)
+    {
+        if (ActiveId == Id)
+        {
+            return true;
+        }
+
+        ActiveId = Id;
+        _viewItems.Clear();
+
+        List<MovementItem> itemList = await movementItemRepository.GetAsync(q => q.MovementId == Id);
+        if (itemList.IsNullOrEmpty())
+        {
+            throw new Exception("No items");
+        }
+
+        foreach (var item in itemList)
+        {
+            try
+            {
+                CheckItemModel vItem = new CheckItemModel
+                {
+                    Name = item.Name ?? string.Empty,
+                    Epc = item.Epc,
+                    Description = item.Description,
+                    CheckStatus = item.Status == ItemStatus.Found ? CheckStatusEnum.Found :
+                                         (item.Status == ItemStatus.NotFound ? CheckStatusEnum.NotFound : CheckStatusEnum.Error),
+                    DateTime = item.LastModificationTime,
+                };
+                _viewItems.Add(vItem);
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "");
+            }
+        }
+
+        return false;
     }
 
     public bool ItemsIsEmpty()
