@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MassTransit;
 using Xerum.XFramework.Common.Enums;
+using XRFID.Sample.Server.Contracts;
 using XRFID.Sample.Server.Database;
 using XRFID.Sample.Server.Entities;
 using XRFID.Sample.Server.Repositories;
@@ -126,6 +127,8 @@ internal class InitializeCreateMovementActivity :
                             IsValid = true,
 
                             LoadingUnitItemId = loadingUnitItem.Id,
+
+                            MovementId = newMovement.Id,
                         };
 
                         newMovement.MovementItems.Add(movementItem);
@@ -146,6 +149,13 @@ internal class InitializeCreateMovementActivity :
 
         // faccio coincidere le due informazioni
         context.Saga.MovementId = movement.Id;
+
+        //Send message to refresh UI
+        await context.Publish(new StateMachineUiTagPublish
+        {
+            ReaderId = context.Message.ReaderId,
+            ActivMoveId = movement.Id,
+        });
 
         await next.Execute(context);
     }

@@ -23,10 +23,23 @@ public class UpdateUiConsumer : IConsumer<StateMachineUiTagPublish>
 
     public async Task Consume(ConsumeContext<StateMachineUiTagPublish> context)
     {
-        logger.LogDebug("[Consume<StateMachineUiTagPublish>] Tag {Epc} Receved", context.Message.Tag.Tag.Epc);
+        if (context.Message.Tag is null)
+        {
+            logger.LogDebug("[Consume<StateMachineUiTagPublish>] State Machine Message Receved");
+        }
+        else
+        {
+            logger.LogDebug("[Consume<StateMachineUiTagPublish>] Tag {Epc} Receved", context.Message.Tag.Tag.Epc);
+        }
 
         //Reaload items
-        await worker.SetViewItems();
+        if (await worker.IdIsEqual(context.Message.ActivMoveId))
+        {
+            if (context.Message.Tag is not null)
+            {
+                await worker.SetViewItem(context.Message.Tag.Tag.Epc);
+            }
+        }
 
         //Send signalR messages
         await hubContext.Clients.All.SendAsync("RefreshTag");
