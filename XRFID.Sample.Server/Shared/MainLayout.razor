@@ -1,13 +1,14 @@
-﻿@inherits LayoutComponentBase
+﻿@using MudBlazor.Utilities;
+@inherits LayoutComponentBase
 
 <PageTitle>XRFID Sample Webserver</PageTitle>
 
-<MudThemeProvider />
+<MudThemeProvider Theme="@theme" />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
 <MudLayout>
-    <MudAppBar Elevation="0" Style="background-color:#E55A33">
+    <MudAppBar Elevation="0">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudSpacer />
     </MudAppBar>
@@ -26,6 +27,16 @@
 
 @code {
     bool _drawerOpen = true;
+
+    MudTheme theme = new MudTheme
+        {
+            Palette = new PaletteLight
+            {
+                AppbarBackground = new MudColor(229, 90, 51, 255),
+                Primary = new MudColor(229, 90, 51, 255),
+                Secondary = new MudColor(53, 102, 139, 255)
+            }
+        };
 
     void DrawerToggle()
     {
