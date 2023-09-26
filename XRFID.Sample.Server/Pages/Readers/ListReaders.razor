@@ -25,7 +25,8 @@
         <PropertyColumn Property="x => x.Name" />
         <PropertyColumn Property="x => x.Code" />
         <PropertyColumn Property="x => x.Ip" />
-        <TemplateColumn Title="Workflow" Filterable="false" Sortable="false">
+        <PropertyColumn Property="x => x.HasCorrelation" />
+        <TemplateColumn  Filterable="false" Sortable="false">
             <CellTemplate>
                 <MudStack>
                     @if (context.Item.HasCorrelation)
@@ -40,7 +41,6 @@
                 </MudStack>
             </CellTemplate>
         </TemplateColumn>
-        <PropertyColumn Property="x => x.HasCorrelation" />
     </Columns>
     <PagerContent>
         <MudDataGridPager T="ReaderModel" />
@@ -53,8 +53,11 @@
 
     protected override async Task OnInitializedAsync()
     {
+        ReaderList.Clear();
         var reader = await readerRepository.GetAsync();
         ReaderList.AddRange(mapper.Map<List<ReaderModel>>(reader));
+
+        StateHasChanged();
     }
 
     async Task AddReader()

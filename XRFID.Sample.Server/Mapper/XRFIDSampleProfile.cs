@@ -28,6 +28,7 @@ public class XRFIDSampleProfile : Profile
         CreateMap<Product, ProductModel>().ReverseMap().ForAllMembers(opt => opt.AllowNull());
         CreateMap<Label, LabelModel>().ReverseMap().ForAllMembers(opt => opt.AllowNull());
         CreateMap<Printer, PrinterModel>().ReverseMap().ForAllMembers(opt => opt.AllowNull());
+        CreateMap<Reader, ReaderModel>().ReverseMap().ForAllMembers(opt => opt.AllowNull());
 
     }
 }

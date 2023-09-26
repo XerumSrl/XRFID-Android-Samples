@@ -99,11 +99,49 @@
     </ToolBarContent>
     <Columns>
         <PropertyColumn Property="x => x.DateTime" Title="Date Time" />
-        <PropertyColumn Property="x => x.CheckStatus" Title="Status" CellStyleFunc="@_cellStyleFunc" />
+        @* <PropertyColumn Property="x => x.CheckStatus" Title="Status" CellStyleFunc="@_cellStyleFunc" /> *@
+        <TemplateColumn Filterable="false" Sortable="false" Title="Status">
+            <CellTemplate>
+                <MudStack Row>
+                    @if (context.Item.CheckStatus == CheckStatusEnum.NotFound)
+                    {
+                        <MudChip Color="Color.Default">@context.Item.CheckStatus</MudChip>
+                    }
+                    else if (context.Item.CheckStatus == CheckStatusEnum.Found)
+                    {
+                        <MudChip Color="Color.Success">@context.Item.CheckStatus</MudChip>
+
+                    }
+                    else if (context.Item.CheckStatus == CheckStatusEnum.Error)
+                    {
+                        <MudChip Color="Color.Error">@context.Item.CheckStatus</MudChip>
+                    }
+                    else
+                    {
+                        <MudChip Color="Color.Dark">@context.Item.CheckStatus</MudChip>
+                    }
+
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
         <PropertyColumn Property="x => x.Name" />
         <PropertyColumn Property="x => x.Epc" />
         <PropertyColumn Property="x => x.Description" />
-        <PropertyColumn Property="x => x.Direction" />
+        <TemplateColumn Filterable="false" Sortable="false" Title="Direction">
+            <CellTemplate>
+                <MudStack Row>
+                    @if (context.Item.Direction == Common.Enumerations.MovementDirection.In)
+                    {
+                        <MudChip Color="Color.Primary">@context.Item.Direction</MudChip>
+                    }
+                    else
+                    {
+                        <MudChip Color="Color.Secondary">@context.Item.Direction</MudChip>
+                    }
+
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
     </Columns>
 </MudDataGrid>
 

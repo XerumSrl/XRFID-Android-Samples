@@ -110,6 +110,9 @@ internal class InitializeCreateMovementActivity :
                 Name = $"{reader.Name}_{DateTime.Now}",
                 IsActive = true,
 
+                Direction = context.Message.GpiId == 2 ? Common.Enumerations.MovementDirection.In :
+                (context.Message.GpiId == 3 ? Common.Enumerations.MovementDirection.Out : Common.Enumerations.MovementDirection.In),
+
                 MovementItems = new List<MovementItem>(),
             };
 

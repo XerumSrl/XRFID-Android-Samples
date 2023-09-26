@@ -60,6 +60,7 @@ public class CheckPageWorker
                 CheckStatus = item.Status == ItemStatus.Found ? CheckStatusEnum.Found :
                                          (item.Status == ItemStatus.NotFound ? CheckStatusEnum.NotFound : CheckStatusEnum.Error),
                 DateTime = item.LastModificationTime,
+                Direction = _movement?.Direction ?? Common.Enumerations.MovementDirection.In,
             });
         }
     }
@@ -102,6 +103,7 @@ public class CheckPageWorker
                     CheckStatus = item.Status == ItemStatus.Found ? CheckStatusEnum.Found :
                                          (item.Status == ItemStatus.NotFound ? CheckStatusEnum.NotFound : CheckStatusEnum.Error),
                     DateTime = item.LastModificationTime,
+                    Direction = _movement?.Direction ?? Common.Enumerations.MovementDirection.In,
                 };
                 _viewItems.Add(vItem);
             }
