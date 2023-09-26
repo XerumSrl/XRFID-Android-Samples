@@ -78,6 +78,7 @@ namespace XRFID.Sample.Server.Migrations
                     ReaderId = table.Column<Guid>(type: "TEXT", nullable: false),
                     OrderId = table.Column<Guid>(type: "TEXT", nullable: true),
                     OrderReference = table.Column<string>(type: "TEXT", nullable: true),
+                    Direction = table.Column<int>(type: "INTEGER", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: true),
                     Code = table.Column<string>(type: "TEXT", nullable: true),
                     Reference = table.Column<string>(type: "TEXT", nullable: true),

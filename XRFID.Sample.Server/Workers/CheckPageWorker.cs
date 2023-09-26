@@ -10,11 +10,14 @@ namespace XRFID.Sample.Server.Workers;
 public class CheckPageWorker
 {
     private readonly MovementItemRepository movementItemRepository;
+    private readonly MovementRepository movementRepository;
     private readonly ILogger<CheckPageWorker> logger;
 
 
     private List<CheckItemModel> _viewItems = new List<CheckItemModel>();
     private Guid ActiveId = Guid.Empty;
+
+    private Movement _movement;
 
     public bool Gpi1IsOn = false;
     public bool Gpi2IsOn = false;
@@ -24,6 +27,7 @@ public class CheckPageWorker
     {
         var scope = serviceProvider.CreateScope();
         movementItemRepository = scope.ServiceProvider.GetRequiredService<MovementItemRepository>();
+        movementRepository = scope.ServiceProvider.GetRequiredService<MovementRepository>();
 
         this.logger = logger;
     }
@@ -33,7 +37,12 @@ public class CheckPageWorker
         CheckItemModel? foundItem = _viewItems.Where(w => w.Epc == epc).FirstOrDefault();
         if (foundItem is not null)
         {
-            foundItem.CheckStatus = CheckStatusEnum.Found;
+            if (foundItem.CheckStatus == CheckStatusEnum.NotFound)
+            {
+                foundItem.CheckStatus = CheckStatusEnum.Found;
+            }
+
+            foundItem.Direction = _movement?.Direction ?? Common.Enumerations.MovementDirection.In;
         }
         else
         {
@@ -78,6 +87,8 @@ public class CheckPageWorker
         {
             throw new Exception("No items");
         }
+
+        _movement = await movementRepository.GetAsync(Id);
 
         foreach (var item in itemList)
         {

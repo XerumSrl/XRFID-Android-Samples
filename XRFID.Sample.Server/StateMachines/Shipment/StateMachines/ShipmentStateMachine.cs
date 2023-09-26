@@ -62,10 +62,8 @@ public class ShipmentStateMachine :
             When(InitializeEvent).IfElse(x => x.Message.GpiValue == true,
             start => start
                 .TransitionTo(LoadingData)
-                    .Activity(x => x.OfType<InitializeCreateMovementActivity>())
-                    .Then(ctx => ctx.Saga.DateModified = DateTime.Now)
-                .TransitionTo(Ready)
-                    .Activity(x => x.OfType<InitializeActivity>()),
+                .Activity(x => x.OfType<InitializeActivity>())
+                .TransitionTo(Ready),
             stop => stop
                 .Finalize()));
 
@@ -85,9 +83,10 @@ public class ShipmentStateMachine :
         //***************************** Separa Stati ********************************************************
 
         During(Ready,
-            //Ignore(TagEvent),
             Ignore(InitializeEvent),
-            When(GpiEvent, x => x.Message.GpiId == 2 && x.Message.GpiValue == true)
+            When(GpiEvent, x => x.Message.GpiId >= 2 && x.Message.GpiValue == true)
+                .Activity(x => x.OfType<InitializeCreateMovementActivity>())
+                .Then(ctx => ctx.Saga.DateModified = DateTime.Now)
                 .Activity(x => x.OfType<StartReadingActivity>())
                 .Then(ctx => ctx.Saga.DateModified = DateTime.Now)
                 .TransitionTo(Reading));
@@ -97,7 +96,7 @@ public class ShipmentStateMachine :
         //***************************** Separa Stati ********************************************************
 
         During(Reading,
-            When(GpiEvent, x => x.Message.GpiId == 2 && x.Message.GpiValue == false)
+            When(GpiEvent, x => x.Message.GpiId >= 2 && x.Message.GpiValue == false)
                 .Schedule(ReadingTimeout, context => context.Init<ReadingExpired>(new
                 {
                     CorrelationId = context.Saga.CorrelationId,
@@ -110,8 +109,7 @@ public class ShipmentStateMachine :
 
 
         During(Stopping,
-           When(GpiEvent, x => x.Message.GpiId == 1
-                    && x.Message.GpiValue == true)
+           When(GpiEvent, x => x.Message.GpiId >= 2 && x.Message.GpiValue == true)
                .Unschedule(ReadingTimeout)
                .Then(ctx => ctx.Saga.DateModified = DateTime.Now)
                .TransitionTo(Reading),
