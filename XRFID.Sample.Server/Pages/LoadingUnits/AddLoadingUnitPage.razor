@@ -21,9 +21,9 @@
                 <MudSelectItem Value="@reader">@reader.Name</MudSelectItem>
             }
         </MudSelect>
-        <MudTextField T="string" Variant="Variant.Outlined" Label="Name" For="()=>model.Name" @bind-Value="model.Name" AutoFocus="true" />
-        <MudTextField T="string" Variant="Variant.Outlined" Label="Code" For="()=>model.Code" @bind-Value="model.Code" />
-        <MudTextField T="string" Variant="Variant.Outlined" Label="Reference" For="()=>model.Reference" @bind-Value="model.Reference" />
+        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Name" For="()=>model.Name" @bind-Value="model.Name" AutoFocus="true" />
+        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Code" For="()=>model.Code" @bind-Value="model.Code" />
+        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Reference" For="()=>model.Reference" @bind-Value="model.Reference" />
         <MudTextField T="string" Variant="Variant.Outlined" Label="Description" For="()=>model.Description" @bind-Value="model.Description" Lines="10" />
 
         <MudStack Row="true" Class="my-6 d-flex justify-end">

@@ -22,12 +22,12 @@
                 <MudSelectItem Value="@sku">@sku.Code - @sku.Description</MudSelectItem>
             }
         </MudSelect>
-        <MudTextField T="string" Variant="Variant.Outlined" Label="Name" For="()=>model.Name" @bind-Value="model.Name" AutoFocus="true" />
-        <MudTextField T="string" Variant="Variant.Outlined" Label="Code" For="()=>model.Code" @bind-Value="model.Code" />
-        <MudTextField T="string" Variant="Variant.Outlined" Label="Description" For="()=>model.Description" @bind-Value="model.Description" />
-        <MudTextField T="string" Variant="Variant.Outlined" Label="EPC" HelperText="24 or 32 characther HEX string"
+        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Name" For="()=>model.Name" @bind-Value="model.Name" AutoFocus="true" />
+        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Code" For="()=>model.Code" @bind-Value="model.Code" />
+        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Description" For="()=>model.Description" @bind-Value="model.Description" />
+        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="EPC" HelperText="24 or 32 characther HEX string"
                       For="()=>model.Epc" @bind-Value="model.Epc" />
-        <MudTextField T="string" Variant="Variant.Outlined" Label="Serial Number" For="()=>model.SerialNumber" @bind-Value="model.SerialNumber" />
+        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Serial Number" For="()=>model.SerialNumber" @bind-Value="model.SerialNumber" />
 
         <MudStack Row="true" Class="my-6 d-flex justify-end">
             <MudButton OnClick="@(()=> Back())" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Back</MudButton>

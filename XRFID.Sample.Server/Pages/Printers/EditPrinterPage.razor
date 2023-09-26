@@ -16,10 +16,10 @@
 
 <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
     <MudStack Class="my-3">
-        <MudTextField T="string" Variant="Variant.Outlined" Label="Name" For="()=>model.Name" @bind-Value="model.Name" AutoFocus="true" />
+        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Name" For="()=>model.Name" @bind-Value="model.Name" AutoFocus="true" />
         <MudTextField T="string" Variant="Variant.Outlined" Label="Description" For="()=>model.Description" @bind-Value="model.Description" />
-        <MudTextField T="string" Variant="Variant.Outlined" Label="IP Address" For="()=>model.Ip" @bind-Value="model.Ip" />
-        <MudNumericField T="int" Variant="Variant.Outlined" Label="Port" For="()=>model.Port" @bind-Value="model.Port" />
+        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="IP Address" For="()=>model.Ip" @bind-Value="model.Ip" />
+        <MudNumericField T="int" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Port" For="()=>model.Port" @bind-Value="model.Port" />
         <MudSelect Label="Manufacturer" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-Value="@model.Manufacturer" Required="true">
             @foreach (PrinterManufacturers item in Enum.GetValues(typeof(PrinterManufacturers)))
             {
