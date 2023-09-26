@@ -1,0 +1,52 @@
+﻿@page "/Skus/Add"
+@using System.ComponentModel.DataAnnotations;
+@using XRFID.Demo.Server.Database;
+@using XRFID.Demo.Server.Repositories;
+@using XRFID.Demo.Server.ViewModels;
+@inject NavigationManager Navigation;
+@inject SkuRepository skuRepository;
+@inject UnitOfWork uow;
+
+<h1>Add New Sku</h1>
+
+<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+    <MudStack Class="my-3">
+
+        <DataAnnotationsValidator />
+        <MudTextField T="string" Variant="Variant.Outlined" Label="Name" For="()=>model.Name" @bind-Value="model.Name" AutoFocus="true" />
+        <MudTextField T="string" Variant="Variant.Outlined" Label="Code" For="()=>model.Code" @bind-Value="model.Code" />
+        <MudTextField T="string" Variant="Variant.Outlined" Label="Description" For="()=>model.Description" @bind-Value="model.Description" Lines="10" />
+        <MudDatePicker Variant="Variant.Outlined" Editable="true" Clearable="true" Label="Start Date" For="()=>model.StartDate" @bind-Date="model.StartDate" />
+        <MudDatePicker Variant="Variant.Outlined" Editable="true" Clearable="true" Label="Expiration Date" For="()=>model.ExpirationDate" @bind-Date="model.ExpirationDate" />
+        <MudStack Row="true" Class="my-6 d-flex justify-end">
+            <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Reset</MudButton>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-3">Submit</MudButton>
+        </MudStack>
+    </MudStack>
+</EditForm>
+
+
+
+@code {
+    private AddSkuModel model = new AddSkuModel();
+
+    private async Task OnValidSubmit(EditContext context)
+    {
+        var result = await skuRepository.CreateAsync(new Entities.Sku
+            {
+                Name = model.Name,
+                Code = model.Code,
+                Description = model.Description,
+                EffectivityStart = model.StartDate ?? DateTime.Now,
+                EffectivityEnd = model.ExpirationDate ?? DateTime.Now,
+            });
+        await uow.SaveAsync();
+        //fare comparire un popup che inserimento ok e rimanare alla pagina
+
+        Navigation.NavigateTo($"Skus");
+
+        StateHasChanged();
+    }
+
+
+}

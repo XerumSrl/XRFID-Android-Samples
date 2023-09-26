@@ -1,0 +1,116 @@
+﻿@page "/Settings"
+
+<h1>Settings</h1>
+
+<MudGrid>
+    <MudItem xs="12" sm="6">
+        <MudCard Class="my-3">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Loading Units</MudText>
+                </CardHeaderContent>
+                <CardHeaderActions>
+                    <MudIconButton Icon="@Icons.Material.Filled.List" Color="Color.Default" />
+                </CardHeaderActions>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudText>Loading Units are list of items to process using XRFID Fixed Reader o XRFID Android application.</MudText>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Href="LoadingUnits" Variant="Variant.Text" Color="Color.Primary">GO</MudButton>
+            </MudCardActions>
+        </MudCard>
+
+        <MudCard Class="my-3">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Skus</MudText>
+                </CardHeaderContent>
+                <CardHeaderActions>
+                    <MudIconButton Icon="@Icons.Material.Filled.AddBox" Color="Color.Default" />
+                </CardHeaderActions>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudText>Skus contains valid items and are associated to Products.</MudText>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Href="Skus" Variant="Variant.Text" Color="Color.Primary">GO</MudButton>
+            </MudCardActions>
+        </MudCard>
+
+        <MudCard Class="my-3">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Products</MudText>
+                </CardHeaderContent>
+                <CardHeaderActions>
+                    <MudIconButton Icon="@Icons.Material.Filled.Label" Color="Color.Default" />
+                </CardHeaderActions>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudText>Products are used to store EPC RFID information and can be assigned to different Loading Units.</MudText>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Href="Products" Variant="Variant.Text" Color="Color.Primary">GO</MudButton>
+            </MudCardActions>
+        </MudCard>
+
+    </MudItem>
+    <MudItem xs="12" sm="6">
+        <MudCard Class="my-3">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Readers</MudText>
+                </CardHeaderContent>
+                <CardHeaderActions>
+                    <MudIconButton Icon="@Icons.Material.Filled.ChromeReaderMode" Color="Color.Default" />
+                </CardHeaderActions>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudText>Fixed readers exchanging data with the server and processing workflows.</MudText>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Href="Readers" Variant="Variant.Text" Color="Color.Primary">GO</MudButton>
+            </MudCardActions>
+        </MudCard>
+
+        <MudCard Class="my-3">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Printers</MudText>
+                </CardHeaderContent>
+                <CardHeaderActions>
+                    <MudIconButton Icon="@Icons.Material.Filled.Print" Color="Color.Default" />
+                </CardHeaderActions>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudText>Printers are used in conjuction with Labels and Products to print RFID Tags on smart labels.</MudText>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Href="Printers" Variant="Variant.Text" Color="Color.Primary">GO</MudButton>
+            </MudCardActions>
+        </MudCard>
+
+        <MudCard Class="my-3">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Labels</MudText>
+                </CardHeaderContent>
+                <CardHeaderActions>
+                    <MudIconButton Icon="@Icons.Material.Filled.NewLabel" Color="Color.Default" />
+                </CardHeaderActions>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudText>Labels templates storing machine ZPL or PGL code.</MudText>
+                <MudText>Templates can have special tags that can be used as dynamic variable while printing.</MudText>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Href="Labels" Variant="Variant.Text" Color="Color.Primary">GO</MudButton>
+            </MudCardActions>
+        </MudCard>
+
+    </MudItem>
+</MudGrid>
+@code {
+
+}

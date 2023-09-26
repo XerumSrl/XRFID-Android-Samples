@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<mvvm:TinyView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:mvvm="clr-namespace:TinyMvvm;assembly=TinyMvvm.Maui"
+               x:Class="XRFID.Demo.Client.Mobile.Views.RapidReadView"
+               Title="RAPID READ">
+
+    <Shell.TitleView>
+        <Grid Padding="0,0,5,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0" Padding="0,0,0,0" 
+                   VerticalTextAlignment="Center" 
+                   VerticalOptions="CenterAndExpand" 
+                   HorizontalOptions="StartAndExpand" 
+                   Text="RAPID READ"
+                   TextColor="#e55934"
+                   FontSize="Medium"
+                   FontAttributes="Bold"/>
+
+            <Button Grid.Column="1" ImageSource="settings_gear_orange.svg"                    
+                    BackgroundColor="Transparent" 
+                    Clicked="GoToSettings" 
+                    HeightRequest="50" WidthRequest="65" 
+                    HorizontalOptions="End"/>
+        </Grid>
+    </Shell.TitleView>
+
+    <Grid Padding="10,0,10,5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <VerticalStackLayout Grid.Row="0" Padding="0,0,0,5">
+
+            <BoxView Color="#E3F2FD"              
+                     HeightRequest="1"  
+                     HorizontalOptions="Fill"/>
+            
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Column ="0"
+                   Text="Auto Reset"
+                   TextColor="#33658A"
+                   SemanticProperties.HeadingLevel="Level1"
+                   FontAttributes="Bold"
+                   FontSize="18"
+                   VerticalTextAlignment="Start"
+                   HorizontalOptions="StartAndExpand"
+                   Padding="5,10,0,0"/>
+
+                <Switch Grid.Column="1" 
+                    IsToggled="{Binding AutoReset, Mode=TwoWay}"
+                    OnColor="DarkCyan" ThumbColor="#33658A" 
+                    VerticalOptions="StartAndExpand"
+                    HorizontalOptions="EndAndExpand"/>
+            </Grid>
+
+            <BoxView Color="#E3F2FD"              
+                     HeightRequest="1"  
+                     HorizontalOptions="Fill"/>
+
+        </VerticalStackLayout>
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0"
+                Text="Unique Tags"
+                SemanticProperties.HeadingLevel="Level1"
+                FontSize="15"
+                HorizontalOptions="Center"/>
+            <Label Grid.Row="1"
+                Text="{Binding InventoryStats.ProductFound}"
+                SemanticProperties.HeadingLevel="Level1"
+                FontSize="30"
+                HorizontalOptions="Center" x:Name="lbluniTags" />
+        </Grid>
+
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0"
+                    x:Name="btnRead"
+                    Margin="10,0,5,10"
+                    Text="{Binding ReadButtonText}"
+                    SemanticProperties.Hint="CheckItem"
+                    Command="{Binding ReadCommandAsync}"
+                    HorizontalOptions="FillAndExpand"
+                    VerticalOptions="End"/>
+
+            <Button Grid.Column="2"
+                    x:Name="btnReset"
+                    Margin="5,0,10,10"
+                    Text="Reset"
+                    SemanticProperties.Hint="CheckItem"
+                    Command="{Binding ResetCommandAsync}"
+                    IsEnabled="{Binding ResetButtonEnabled}"
+                    HorizontalOptions="FillAndExpand" 
+                    VerticalOptions="End"/>
+        </Grid>
+
+    </Grid>
+
+
+</mvvm:TinyView>

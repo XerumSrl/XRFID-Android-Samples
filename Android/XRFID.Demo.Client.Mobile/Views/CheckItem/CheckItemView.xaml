@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<mvvm:TinyView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               xmlns:mvvm="clr-namespace:TinyMvvm;assembly=TinyMvvm.Maui"
+               xmlns:core="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+               xmlns:sflv="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
+               xmlns:local="clr-namespace:XRFID.Demo.Client.Mobile.Behavior"
+             x:Class="XRFID.Demo.Client.Mobile.Views.CheckItem.CheckItemView"
+             Title="CHECK ITEMS">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:SelectedItemEventArgsConverter x:Key="SelectedItemEventArgsConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Shell.TitleView>
+        <Grid Padding="0,0,5,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0" Padding="0,0,0,0" 
+                   VerticalTextAlignment="Center" 
+                   VerticalOptions="CenterAndExpand" 
+                   HorizontalOptions="StartAndExpand" 
+                   Text="CHECK ITEM"
+                   TextColor="#e55934"
+                   FontSize="Medium"
+                   FontAttributes="Bold"/>
+
+            <Button Grid.Column="1" ImageSource="info_icon.svg"                    
+                    BackgroundColor="Transparent" 
+                    Clicked="ShowInfoPage" 
+                    HeightRequest="50" WidthRequest="65" 
+                    HorizontalOptions="End"/>
+        </Grid>
+    </Shell.TitleView>
+
+    <Grid Padding="10,0,10,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <VerticalStackLayout Grid.Row="0" Padding="0,0,0,5">
+            <BoxView Color="#E3F2FD"              
+                     HeightRequest="1"  
+                     Margin="0,0,0,5"
+                     HorizontalOptions="Fill"/>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="80"/>
+                </Grid.ColumnDefinitions>
+
+                <Frame BorderColor="Transparent" BackgroundColor="#E3F2FD" Padding="10,0" Margin="0,0,5,0">
+                    <local:BorderlessEntry Text="{Binding Barcode, Mode=TwoWay}"
+                                           Placeholder="Barcode Scanner"
+                                           PlaceholderColor="#9BBEC7"/>
+                </Frame>
+
+                <Button Grid.Column="1"
+                    x:Name="btnRefresh"
+                    Text="Refresh"
+                    Command="{Binding RefreshCommandAsync}"
+                    SemanticProperties.Hint="CheckItem"
+                    Clicked="OnClickSelect"
+                    IsEnabled="{Binding RefreshEntryEnabled}"
+                    HorizontalOptions="FillAndExpand"
+                    VerticalOptions="Center"/>
+            </Grid>
+
+            <BoxView Color="#E3F2FD"                   
+                     HeightRequest="1"
+                     Margin="0,5,0,0"
+                     HorizontalOptions="Fill"/>
+
+        </VerticalStackLayout>
+
+        <sflv:SfListView Grid.Row="1" x:Name="listView"
+                         ItemsSource="{Binding OrderViews}"
+                         SelectedItem="{Binding ItemTapped}"
+                         ItemSize="50">
+            <sflv:SfListView.ItemTemplate>
+                <DataTemplate>
+                    <StackLayout Orientation="Vertical" Margin="5">
+                        <StackLayout Orientation="Horizontal">
+                            <Label Text="I:" Margin="0,0,5,0"/>
+                            <Label Text="{Binding Id}" />
+                        </StackLayout>
+
+                        <StackLayout Orientation="Horizontal">
+                            <Label Text="N:" Margin="0,0,5,0"/>
+                            <Label Text="{Binding Name}" FontAttributes="Bold"/>
+                        </StackLayout>
+                    </StackLayout>
+                </DataTemplate>
+            </sflv:SfListView.ItemTemplate>
+        </sflv:SfListView>
+
+        <core:SfBusyIndicator Grid.Row="1" x:Name="busyindicator"
+                        AbsoluteLayout.LayoutBounds="0.5,0.5,0.5,0.5"
+                        IndicatorColor="Coral"
+                        AbsoluteLayout.LayoutFlags="All"
+                        AnimationType="DoubleCircle"
+                        IsRunning="{Binding IsBusy}"
+                        IsEnabled="{Binding IsBusy}"
+                        IsVisible="{Binding IsBusy}" />
+    </Grid>
+</mvvm:TinyView>

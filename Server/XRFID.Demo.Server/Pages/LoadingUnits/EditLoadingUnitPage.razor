@@ -1,0 +1,262 @@
+﻿@page "/LoadingUnits/Edit/{Id:guid}"
+@using AutoMapper;
+@using XRFID.Demo.Server.Database;
+@using XRFID.Demo.Server.Entities;
+@using XRFID.Demo.Server.Repositories;
+@using XRFID.Demo.Server.ViewModels;
+@using Xerum.XFramework.Common.Enums;
+@inject NavigationManager Navigation;
+@inject IDialogService DialogService;
+@inject ISnackbar snackbar;
+@inject LoadingUnitRepository loadingUnitRepository;
+@inject LoadingUnitItemRepository loadingUnitItemRepository;
+@inject ReaderRepository readerRepository;
+@inject ProductRepository productRepository;
+@inject UnitOfWork uowk;
+@inject IMapper mapper;
+
+<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+    <MudStack Class="my-3">
+
+        <DataAnnotationsValidator />
+        <MudSelect T="Reader" Label="Reader" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-Value="@selectedReader" Required="true">
+            @foreach (var reader in readers.OrderBy(q => q.Name))
+            {
+                <MudSelectItem Value="@reader">@reader.Name</MudSelectItem>
+            }
+        </MudSelect>
+        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Name" For="()=>model.Name" @bind-Value="model.Name" AutoFocus="true" />
+        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Code" For="()=>model.Code" @bind-Value="model.Code" />
+        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Reference" For="()=>model.Reference" @bind-Value="model.Reference" />
+        <MudTextField T="string" Variant="Variant.Outlined" Label="Description" For="()=>model.Description" @bind-Value="model.Description" Lines="10" />
+
+        <MudStack Row="true" Class="my-6 d-flex justify-end">
+            <MudButton OnClick="@(()=> Back())" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Back</MudButton>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-3">Submit</MudButton>
+
+        </MudStack>
+    </MudStack>
+</EditForm>
+
+<MudSpacer />
+
+@if (adding)
+{
+    <MudSelect Label="Product" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter"
+    @bind-Value="selectedProduct">
+        @foreach (var prod in productsList.OrderBy(q => q.Name))
+        {
+            <MudSelectItem Value="@prod">@prod.Name - @prod.Epc</MudSelectItem>
+        }
+    </MudSelect>
+}
+
+<MudSpacer />
+
+<MudDataGrid Items="@ItemList"
+             ReadOnly="true"
+             SortMode="SortMode.Single" Filterable="true" QuickFilter="@_quickFilter" Striped="true">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Items</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        <MudButton Class="ml-3" Variant="@Variant.Filled" Color="@Color.Secondary" SartIcon="@Icons.Material.Filled.Add"
+                   OnClick="@(() => AddItem())">Add</MudButton>
+    </ToolBarContent>
+    <Columns>
+        <TemplateColumn Filterable="false" Sortable="false">
+            <CellTemplate>
+                <MudStack Row>
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" Size="Size.Small" OnClick="@((e) => DeleteItem(@context.Item))" />
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+
+        <PropertyColumn Property="x => x.Name" />
+        <PropertyColumn Property="x => x.Code" />
+        <PropertyColumn Property="x => x.Description" />
+        <PropertyColumn Property="x => x.Epc" />
+        <PropertyColumn Property="x => x.SerialNumber" />
+        <PropertyColumn Property="x => x.CreationTime" Title="Date Creation" />
+
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="LoadingUnitItem" />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+    private LoadingUnit? loadingUnit { get; set; }
+
+    private List<Reader> readers = new();
+    private Reader? selectedReader;
+
+    private AddLoadingUnitModel model = new();
+
+    private List<LoadingUnitItem> ItemList = new List<LoadingUnitItem>();
+    private string _searchString;
+
+    private bool adding = false;
+    private List<ProductModel> productsList = new();
+    private ProductModel? selectedProduct;
+
+    protected override async Task OnInitializedAsync()
+    {
+        loadingUnit = await loadingUnitRepository.GetAsync(Id);
+        if (loadingUnit is null)
+        {
+            return;
+        }
+
+        readers = await readerRepository.GetAsync();
+
+        if (loadingUnit.LoadingUnitItems is not null && loadingUnit.LoadingUnitItems.Any())
+        {
+            ItemList = loadingUnit.LoadingUnitItems;
+        }
+        else if (loadingUnit.LoadingUnitItems is not null && !loadingUnit.LoadingUnitItems.Any())
+        {
+            ItemList = await loadingUnitItemRepository.GetAsync(q => q.LoadingUnitId == loadingUnit.Id);
+        }
+
+        model = new AddLoadingUnitModel
+            {
+                Name = loadingUnit.Name ?? string.Empty,
+                Code = loadingUnit.Code ?? string.Empty,
+                Reference = loadingUnit.Reference ?? string.Empty,
+                Description = loadingUnit.Description,
+            };
+
+        selectedReader = readers.Where(q => q.Id == loadingUnit.ReaderId).FirstOrDefault();
+    }
+
+    private async Task OnValidSubmit(EditContext context)
+    {
+        if (loadingUnit is null)
+        {
+            return;
+        }
+
+        loadingUnit.Name = model.Name;
+        loadingUnit.Code = model.Code;
+        loadingUnit.Reference = model.Reference;
+        loadingUnit.Description = model.Description;
+
+        LoadingUnit? result = await loadingUnitRepository.UpdateAsync(loadingUnit);
+        await uowk.SaveAsync();
+
+        Navigation.NavigateTo($"LoadingUnits");
+
+        StateHasChanged();
+    }
+
+    async Task DeleteItem(LoadingUnitItem item)
+    {
+        var parameters = new DialogParameters<ConfirmDialog>();
+        parameters.Add(x => x.ContentText, "Do you really want to delete these records? This process cannot be undone.");
+        parameters.Add(x => x.ButtonText, "Delete");
+        parameters.Add(x => x.Color, Color.Error);
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, DisableBackdropClick = true, CloseOnEscapeKey = true };
+
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>("Delete", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            var checkItem = await loadingUnitItemRepository.GetAsync(item.Id);
+            if (checkItem is not null)
+            {
+                await loadingUnitItemRepository.DeleteAsync(item.Id);
+                await uowk.SaveAsync();
+                ItemList.Remove(item);
+            }
+            else
+            {
+                //notificare item non esistente
+            }
+
+            snackbar.Add($"Item {item.Name} deleted", MudBlazor.Severity.Success);
+        }
+    }
+
+    async Task AddItem()
+    {
+        if (!adding)
+        {
+            try
+            {
+                productsList = mapper.Map<List<ProductModel>>(await productRepository.GetAsync());
+            }
+            catch (Exception)
+            {
+            }
+
+            adding = true;
+        }
+        else
+        {
+            if (selectedProduct is null)
+            {
+                return;
+            }
+
+            if (ItemList.Exists(e => e.Epc == selectedProduct.Epc))
+            {
+                snackbar.Add($"Product {selectedProduct.Name} with epc {selectedProduct.Epc} already exists in this loadin unit", Severity.Error);
+                return;
+            }
+
+            var result = await loadingUnitItemRepository.CreateAsync(new LoadingUnitItem
+            {
+                    Name = selectedProduct.Name,
+                    Code = selectedProduct.Code,
+
+                    Description = selectedProduct.Description,
+                    SerialNumber = selectedProduct.SerialNumber,
+                    Epc = selectedProduct.Epc,
+
+                    Status = ItemStatus.NotFound,
+
+                    LoadingUnitId = Id,
+            });
+            await uowk.SaveAsync();
+            ItemList.Add(result);
+            snackbar.Add($"Item {result.Name} added", MudBlazor.Severity.Success);
+            selectedProduct = null;
+
+            adding = false;
+        }
+
+
+        StateHasChanged();
+    }
+
+    private void Back()
+    {
+        Navigation.NavigateTo($"LoadingUnits");
+    }
+
+    // quick filter - filter gobally across multiple columns with the same input
+    private Func<LoadingUnitItem, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (!string.IsNullOrEmpty(x.Name) && x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (!string.IsNullOrEmpty(x.Code) && x.Code.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (x.Epc.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (x.SerialNumber.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    };
+}

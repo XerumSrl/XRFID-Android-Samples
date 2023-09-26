@@ -1,0 +1,155 @@
+﻿@page "/Skus"
+@using AutoMapper;
+@using XRFID.Demo.Server.Database;
+@using XRFID.Demo.Server.Entities;
+@using XRFID.Demo.Server.Repositories;
+@using XRFID.Demo.Server.ViewModels;
+@inject NavigationManager Navigation;
+@inject IDialogService DialogService
+@inject SkuRepository skuRepository;
+@inject UnitOfWork uow;
+@inject IMapper mapper;
+@inject ISnackbar snackbar;
+
+<h1>Skus</h1>
+
+<MudDataGrid Items="@SkuList"
+             ReadOnly="true"
+             SortMode="SortMode.Single" Filterable="true" QuickFilter="@_quickFilter" Striped="true">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Skus</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        <MudButton Class="ml-3" Variant="@Variant.Filled" Color="@Color.Secondary" SartIcon="@Icons.Material.Filled.Add"
+                   OnClick="@(() => AddSku())">Add New</MudButton>
+    </ToolBarContent>
+    <Columns>
+        <HierarchyColumn T="SkuModel" />
+        <TemplateColumn Filterable="false" Sortable="false">
+            <CellTemplate>
+                <MudStack Row>
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit" Size="Size.Small" OnClick="@((e) => EditSku(@context.Item))" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" Size="Size.Small" OnClick="@((e) => DeleteSku(@context.Item))" />
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="x => x.Name" />
+        <PropertyColumn Property="x => x.Code" />
+        <PropertyColumn Property="x => x.Description" />
+        <PropertyColumn Property="x => x.CreationTime" Title="Date Creation" />
+
+    </Columns>
+    <ChildRowContent>
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Related products (@context.Item.Products.Count())</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudDataGrid Items="@context.Item.Products"
+                             ReadOnly="true">
+                    <Columns>
+                        <PropertyColumn Property="x => x.Name" />
+                        <PropertyColumn Property="x => x.Code" />
+                        <PropertyColumn Property="x => x.Epc" />
+                        <PropertyColumn Property="x => x.SerialNumber" />
+                    </Columns>
+                </MudDataGrid>
+            </MudCardContent>
+        </MudCard>
+    </ChildRowContent>
+    <PagerContent>
+        <MudDataGridPager T="SkuModel" />
+    </PagerContent>
+</MudDataGrid>
+@code {
+    private List<SkuModel> SkuList = new List<SkuModel>();
+    private List<string> _events = new();
+    private string _searchString;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var skus = await skuRepository.GetAsync();
+        SkuList.AddRange(mapper.Map<List<SkuModel>>(skus));
+    }
+
+    async Task AddSku()
+    {
+        Navigation.NavigateTo($"Skus/Add");
+    }
+
+    async Task EditSku(SkuModel item)
+    {
+        var parameters = new DialogParameters<ConfirmDialog>();
+        parameters.Add(x => x.ContentText, "Do you really want to edit these records?");
+        parameters.Add(x => x.ButtonText, "Edit");
+        parameters.Add(x => x.Color, Color.Primary);
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, DisableBackdropClick = true, CloseOnEscapeKey = true };
+
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>("Edit", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            Navigation.NavigateTo($"Skus/Edit/{item.Id}");
+        }
+    }
+
+    async Task DeleteSku(SkuModel item)
+    {
+        var parameters = new DialogParameters<ConfirmDialog>();
+        parameters.Add(x => x.ContentText, "Do you really want to delete these records? This process cannot be undone.");
+        parameters.Add(x => x.ButtonText, "Delete");
+        parameters.Add(x => x.Color, Color.Error);
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, DisableBackdropClick = true, CloseOnEscapeKey = true };
+
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>("Delete", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            var checkItem = await skuRepository.GetAsync(item.Id, "Products");
+
+            if (checkItem.Products.Any())
+            {
+                snackbar.Add($"Sku {item.Name} has {checkItem.Products.Count()} related product(s). Please remove the product(s) before deleting.", Severity.Warning);
+
+                return;
+
+            }
+
+            if (checkItem is not null)
+            {
+                await skuRepository.DeleteAsync(item.Id);
+                await uow.SaveAsync();
+                SkuList.Remove(item);
+                snackbar.Add($"Sku {item.Name} deleted.", Severity.Success);
+            }
+            else
+            {
+                //notificare item non esistente
+                snackbar.Add("Invalid sku Id.", Severity.Error);
+            }
+        }
+    }
+
+    // quick filter - filter gobally across multiple columns with the same input
+    private Func<SkuModel, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (!string.IsNullOrEmpty(x.Name) && x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (!string.IsNullOrEmpty(x.Code) && x.Code.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (x.Description.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    };
+}

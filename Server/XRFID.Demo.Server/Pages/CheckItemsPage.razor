@@ -1,0 +1,346 @@
+﻿@page "/CheckItems"
+@using XRFID.Demo.Modules.Mqtt.Contracts;
+@using XRFID.Demo.Modules.Mqtt.Payloads;
+@using XRFID.Demo.Modules.Mqtt.Publishers;
+@using XRFID.Demo.Server.Entities;
+@using XRFID.Demo.Server.Repositories;
+@using XRFID.Demo.Server.ViewModels;
+@using XRFID.Demo.Server.ViewModels.Enums;
+@using XRFID.Demo.Server.Workers;
+@using Microsoft.AspNetCore.SignalR.Client;
+@inject NavigationManager Navigation;
+@inject CheckPageWorker Worker;
+@inject ReaderRepository readerRepository;
+@inject IZebraMqttEventPublisher zebraEventPublisher;
+@implements IAsyncDisposable;
+
+<h1>Check RFID</h1>
+
+<MudStack Class="my-3">
+    <MudSelect T="Reader" Label="Reader" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-Value="@selectedReader" Required="true">
+        @foreach (var reader in readers.OrderBy(q => q.Name))
+        {
+            <MudSelectItem Value="@reader">@reader.Name</MudSelectItem>
+        }
+    </MudSelect>
+    <MudStack Row="true" Class="align-content-lg-stretch">
+        <MudStack Row="true" AlignItems="AlignItems.Center">
+            @if (gpi1IsOn)
+            {
+                <MudIcon Icon="@Icons.Material.Filled.PowerSettingsNew" Size="Size.Large" Color="Color.Success" />
+            }
+            else
+            {
+                <MudIcon Icon="@Icons.Material.Filled.PowerSettingsNew" Size="Size.Large" />
+            }
+
+
+            <MudButtonGroup Variant="Variant.Filled" Color="Color.Secondary">
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Secondary"
+                           Disabled="gpi1IsOn" OnClick="@(() => OnClickGpiButton(true))"> | </MudButton>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Secondary"
+                           Disabled="!gpi1IsOn" OnClick="@(() => OnClickGpiButton(false))"> O </MudButton>
+            </MudButtonGroup>
+
+        </MudStack>
+        <MudStack Row="true" AlignItems="AlignItems.Center" Class="mx-3">
+
+
+            @if (gpi2IsOn)
+            {
+                <MudStack Row="true">
+                    <MudIcon Icon="@Icons.Material.Filled.CenterFocusWeak" Size="Size.Large" Color="Color.Success" />
+                    <MudText>1</MudText>
+                </MudStack>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Secondary"
+                           Disabled="triggerEnable" OnClick="@(() => OnClickGpiFirstTrigger(false))">Stop</MudButton>
+            }
+            else
+            {
+                <MudStack Row="true">
+                    <MudIcon Icon="@Icons.Material.Filled.CenterFocusWeak" Size="Size.Large" />
+                    <MudText>1</MudText>
+                </MudStack>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Secondary"
+                           Disabled="triggerEnable" OnClick="@(() => OnClickGpiFirstTrigger(true))">Start</MudButton>
+            }
+        </MudStack>
+        <MudStack Row="true" AlignItems="AlignItems.Center">
+
+
+            @if (gpi3IsOn)
+            {
+                <MudStack Row="true">
+                    <MudIcon Icon="@Icons.Material.Filled.CenterFocusWeak" Size="Size.Large" Color="Color.Success" />
+                    <MudText>2</MudText>
+                </MudStack>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Secondary"
+                           Disabled="triggerEnable" OnClick="@(() => OnClickGpiSecondTrigger(false))">Stop</MudButton>
+            }
+            else
+            {
+                <MudStack Row="true">
+                    <MudIcon Icon="@Icons.Material.Filled.CenterFocusWeak" Size="Size.Large" />
+                    <MudText>2</MudText>
+                </MudStack>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Secondary"
+                           Disabled="triggerEnable" OnClick="@(() => OnClickGpiSecondTrigger(true))">Start</MudButton>
+            }
+        </MudStack>
+    </MudStack>
+</MudStack>
+
+<MudSpacer />
+
+<MudDataGrid Items="@Items">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Real Time RFID Tags</MudText>
+        <MudSpacer />
+    </ToolBarContent>
+    <Columns>
+        <PropertyColumn Property="x => x.DateTime" Title="Date Time" />
+        @* <PropertyColumn Property="x => x.CheckStatus" Title="Status" CellStyleFunc="@_cellStyleFunc" /> *@
+        <TemplateColumn Filterable="false" Sortable="false" Title="Status">
+            <CellTemplate>
+                <MudStack Row>
+                    @if (context.Item.CheckStatus == CheckStatusEnum.NotFound)
+                    {
+                        <MudChip Color="Color.Default">@context.Item.CheckStatus</MudChip>
+                    }
+                    else if (context.Item.CheckStatus == CheckStatusEnum.Found)
+                    {
+                        <MudChip Color="Color.Success">@context.Item.CheckStatus</MudChip>
+
+                    }
+                    else if (context.Item.CheckStatus == CheckStatusEnum.Error)
+                    {
+                        <MudChip Color="Color.Error">@context.Item.CheckStatus</MudChip>
+                    }
+                    else
+                    {
+                        <MudChip Color="Color.Dark">@context.Item.CheckStatus</MudChip>
+                    }
+
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="x => x.Name" />
+        <PropertyColumn Property="x => x.Epc" />
+        <PropertyColumn Property="x => x.Description" />
+        <TemplateColumn Filterable="false" Sortable="false" Title="Direction">
+            <CellTemplate>
+                <MudStack Row>
+                    @if (context.Item.Direction == Common.Enumerations.MovementDirection.In)
+                    {
+                        <MudChip Color="Color.Primary">@context.Item.Direction</MudChip>
+                    }
+                    else
+                    {
+                        <MudChip Color="Color.Secondary">@context.Item.Direction</MudChip>
+                    }
+
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</MudDataGrid>
+
+@code {
+    private IEnumerable<CheckItemModel> Items = new List<CheckItemModel>();
+
+    private HubConnection? hubConnection;
+
+    private List<Reader> readers = new();
+    private Reader? selectedReader;
+
+    private bool gpi1IsOn = false;
+    private bool gpi2IsOn = false;
+    private bool gpi3IsOn = false;
+
+    private bool triggerEnable = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        #region SignalR
+        //Subscribe this blazor page to refreshub signalR topic
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(Navigation.ToAbsoluteUri("/uimessagehub"))
+            .Build();
+
+        //Wait for a message "RefreshTag"
+        //When he receives it, it executes the lambda expression
+        hubConnection.On("RefreshTag", async () =>
+        {
+            Items = await Worker.GetViewItems();
+            await InvokeAsync(StateHasChanged);
+        });
+        await hubConnection.StartAsync();
+        #endregion
+
+        readers = await readerRepository.GetAsync();
+
+        selectedReader = readers.FirstOrDefault();
+
+        gpi1IsOn = Worker.Gpi1IsOn;
+        gpi2IsOn = Worker.Gpi2IsOn;
+        gpi3IsOn = Worker.Gpi3IsOn;
+
+        triggerEnable = !gpi1IsOn;
+
+        if (!Items.Any())
+        {
+            Items = await Worker.GetViewItems();
+        }
+    }
+
+    //signalR connection open
+    public bool IsConnected =>
+        hubConnection?.State == HubConnectionState.Connected;
+
+    private async Task OnClickGpiButton(bool value)
+    {
+        if (selectedReader is null)
+        {
+            return;
+        }
+
+        if (selectedReader.Name is null || selectedReader.Name == string.Empty)
+        {
+            return;
+        }
+
+        string state;
+        if (value)
+        {
+            state = "low";
+        }
+        else
+        {
+            state = "high";
+        }
+
+        await zebraEventPublisher.Publish(new ZebraGpiData
+            {
+                HostName = selectedReader.Name,
+                Pin = 1,
+                State = state,
+                Timestamp = DateTime.Now,
+            });
+        if (value)
+        {
+            gpi1IsOn = await Worker.StartStop(1);
+
+        }
+        else
+        {
+            gpi1IsOn = await Worker.StartStop(0);
+            gpi2IsOn = Worker.Gpi2IsOn;
+            gpi3IsOn = Worker.Gpi3IsOn;
+        }
+        triggerEnable = !gpi1IsOn;
+
+        StateHasChanged();
+    }
+
+    private async Task OnClickGpiFirstTrigger(bool value)
+    {
+        if (selectedReader is null)
+        {
+            return;
+        }
+
+        if (selectedReader.Name is null || selectedReader.Name == string.Empty)
+        {
+            return;
+        }
+
+        string state;
+        if (value)
+        {
+            state = "low";
+        }
+        else
+        {
+            state = "high";
+        }
+
+        await zebraEventPublisher.Publish(new ZebraGpiData
+            {
+                HostName = selectedReader.Name,
+                Pin = 2,
+                State = state,
+                Timestamp = DateTime.Now,
+            });
+        gpi2IsOn = await Worker.StartStop(2);
+        StateHasChanged();
+
+    }
+
+    private async Task OnClickGpiSecondTrigger(bool value)
+    {
+        if (selectedReader is null)
+        {
+            return;
+        }
+
+        if (selectedReader.Name is null || selectedReader.Name == string.Empty)
+        {
+            return;
+        }
+
+        string state;
+        if (value)
+        {
+            state = "low";
+        }
+        else
+        {
+            state = "high";
+        }
+
+        await zebraEventPublisher.Publish(new ZebraGpiData
+            {
+                HostName = selectedReader.Name,
+                Pin = 3,
+                State = state,
+                Timestamp = DateTime.Now,
+            });
+        gpi3IsOn = await Worker.StartStop(3);
+        StateHasChanged();
+
+    }
+
+    private Func<CheckItemModel, string> _cellStyleFunc => x =>
+    {
+        string style = "";
+
+        switch (x.CheckStatus)
+        {
+            case CheckStatusEnum.NotFound:
+                style += "background-color:#B5D6DB";
+                break;
+
+            case CheckStatusEnum.Found:
+                style += "background-color:#66FF33";
+                break;
+
+            case CheckStatusEnum.Error:
+                style += "background-color:#FF0000";
+                break;
+
+            default:
+                style += "background-color:#FFFFFF";
+                break;
+        }
+
+        return style;
+    };
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+}

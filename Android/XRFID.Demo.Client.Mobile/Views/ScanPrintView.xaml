@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<mvvm:TinyView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               xmlns:mvvm="clr-namespace:TinyMvvm;assembly=TinyMvvm.Maui"
+               x:Class="XRFID.Demo.Client.Mobile.Views.ScanPrintView"
+             Title="SCAN PRINT">
+
+    <Shell.TitleView>
+        <Grid Padding="0,0,5,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0" Padding="0,0,0,0" 
+                   VerticalTextAlignment="Center" 
+                   VerticalOptions="CenterAndExpand" 
+                   HorizontalOptions="StartAndExpand" 
+                   Text="SCAN PRINT"
+                   TextColor="#FFF"
+                   FontSize="Medium"
+                   FontAttributes="Bold"/>
+
+            <!--<Button Grid.Column="1" ImageSource="info_icon.svg"                    
+                    BackgroundColor="Transparent" 
+                    Clicked="ShowInfoPage" 
+                    HeightRequest="50" WidthRequest="65" 
+                    HorizontalOptions="End"/>-->
+        </Grid>
+    </Shell.TitleView>
+
+    <VerticalStackLayout Padding="10,0">
+        <Label Text="Select Printer" Padding="5,15,5,5"/>
+        <Frame BorderColor="Transparent" BackgroundColor="#E3F2FD" Padding="10,0">
+            <Picker x:Name="printerPicker"
+                Title="Select a Printer"
+                ItemsSource="{Binding PrinterList}"
+                ItemDisplayBinding="{Binding Name}"
+                SelectedItem="{Binding SelectedPrinter, Mode=TwoWay}"/>
+        </Frame>
+        <Label Text="Select Label" Padding="5,15,5,5"/>
+        <Frame BorderColor="Transparent" BackgroundColor="#E3F2FD" Padding="10,0">
+            <Picker x:Name="labelPicker"
+                Title="Select a label"
+                ItemsSource="{Binding LabelList}"
+                ItemDisplayBinding="{Binding Name}"
+                SelectedItem="{Binding SelectedLabel, Mode=TwoWay}"/>
+        </Frame>
+
+        <Label Text="Label Quantity" Padding="5,15,5,5"/>
+        <Frame BorderColor="Transparent" BackgroundColor="#E3F2FD" Padding="10,0">
+            <Entry x:Name="qty" Text="{Binding LabelQuantity, Mode=TwoWay}" Keyboard="Numeric"/>
+        </Frame>
+
+        <Label Text="Product Code" Padding="5,15,5,5"/>
+        <Frame BorderColor="Transparent" BackgroundColor="#E3F2FD" Padding="10,0">
+            <Entry x:Name="barcode" Text="{Binding Barcode, Mode=TwoWay}"/>
+        </Frame>
+
+        <Frame BorderColor="Transparent" Padding="0, 10">
+            <Button x:Name="send" Text="Submit" Command="{Binding SendCommand}" Padding="10,10"/>
+        </Frame>
+    </VerticalStackLayout>
+
+</mvvm:TinyView>

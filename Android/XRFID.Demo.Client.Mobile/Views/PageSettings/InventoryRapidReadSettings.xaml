@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="XRFID.Demo.Client.Mobile.Views.PageSettings.InventoryRapidReadSettings"
+             xmlns:sliders="clr-namespace:Syncfusion.Maui.Sliders;assembly=Syncfusion.Maui.Sliders"
+             Title="PAGE SETTINGS">
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IconOverride="back_button.svg"/>
+    </Shell.BackButtonBehavior>
+    <VerticalStackLayout Margin="10,0,10,0">
+
+        <BoxView Color="#E3F2FD"  
+                     Margin="0,0,0,5"                   
+                     HeightRequest="1"  
+                     HorizontalOptions="Fill"/>
+        
+        <Label 
+            Text="RFID Sensitivity"
+            VerticalOptions="Center" 
+            HorizontalOptions="Center"/>
+        <sliders:SfSlider x:Name="sens"
+                          Minimum="0"
+                          Maximum="100"
+                          
+                          ShowLabels="True"
+                          Interval="20"
+                          ShowDividers="True"
+                          StepSize="1"
+                          Margin="10,0,10,0">
+            <sliders:SfSlider.TrackStyle>
+                <sliders:SliderTrackStyle ActiveFill="#33658a"
+                                  InactiveFill="#E3F2FD" />
+            </sliders:SfSlider.TrackStyle>
+            <sliders:SfSlider.ThumbStyle>
+                <sliders:SliderThumbStyle Fill="#33658a" />
+            </sliders:SfSlider.ThumbStyle>
+            <sliders:SfSlider.ThumbOverlayStyle>
+                <sliders:SliderThumbOverlayStyle Fill="#E3F2FD"
+                                                 Radius="16"/>
+            </sliders:SfSlider.ThumbOverlayStyle>
+            <sliders:SfSlider.DividerStyle>
+                <sliders:SliderDividerStyle ActiveRadius="3"
+                                        InactiveRadius="5" 
+                                        ActiveFill="#E3F2FD"
+                                        InactiveFill="#33658a"/>
+            </sliders:SfSlider.DividerStyle>
+        </sliders:SfSlider>
+
+        <BoxView Color="#E3F2FD"  
+                     Margin="0,10,0,5"                   
+                     HeightRequest="1"  
+                     HorizontalOptions="Fill"/>
+        
+        <!--<Label 
+            Text="RFID Power"
+            VerticalOptions="Center" 
+            HorizontalOptions="Center"/>
+        <sliders:SfSlider Minimum="0"
+                          Maximum="100"
+                          Value="100"
+                          ShowLabels="True"
+                          Interval="20"
+                          ShowDividers="True"
+                          StepSize="1"
+                          Margin="10,0,10,0">
+            <sliders:SfSlider.TrackStyle>
+                <sliders:SliderTrackStyle ActiveFill="#33658a"
+                                  InactiveFill="#E3F2FD" />
+            </sliders:SfSlider.TrackStyle>
+            <sliders:SfSlider.ThumbStyle>
+                <sliders:SliderThumbStyle Fill="#33658a" />
+            </sliders:SfSlider.ThumbStyle>
+            <sliders:SfSlider.ThumbOverlayStyle>
+                <sliders:SliderThumbOverlayStyle Fill="#E3F2FD"
+                                                 Radius="16"/>
+            </sliders:SfSlider.ThumbOverlayStyle>
+            <sliders:SfSlider.DividerStyle>
+                <sliders:SliderDividerStyle ActiveRadius="3"
+                                        InactiveRadius="5" 
+                                        ActiveFill="#E3F2FD"
+                                        InactiveFill="#33658a"/>
+            </sliders:SfSlider.DividerStyle>
+        </sliders:SfSlider>
+
+        <BoxView Color="#E3F2FD"  
+                     Margin="0,10,0,0"                   
+                     HeightRequest="1"  
+                     HorizontalOptions="Fill"/>-->
+    
+    </VerticalStackLayout>
+</ContentPage>

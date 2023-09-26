@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<mvvm:TinyView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:mvvm="clr-namespace:TinyMvvm;assembly=TinyMvvm.Maui"
+               xmlns:core="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+               xmlns:syncfusion="clr-namespace:Syncfusion.Maui.DataGrid;assembly=Syncfusion.Maui.DataGrid"
+               xmlns:gauge="clr-namespace:Syncfusion.Maui.Gauges;assembly=Syncfusion.Maui.Gauges"
+             x:Class="XRFID.Demo.Client.Mobile.Views.FindItem.FindItemRfidView"
+             Title="FIND ITEM">
+
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IconOverride="back_button.svg"/>
+    </Shell.BackButtonBehavior>
+
+    <Shell.TitleView>
+        <Grid Padding="0,0,5,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0" Padding="0,0,0,0" 
+                   VerticalTextAlignment="Center" 
+                   VerticalOptions="CenterAndExpand" 
+                   HorizontalOptions="StartAndExpand" 
+                   Text="FIND ITEM"
+                   TextColor="#e55934"
+                   FontSize="Medium"
+                   FontAttributes="Bold"/>
+
+            <Button Grid.Column="1" ImageSource="settings_gear_orange.svg"
+                    BackgroundColor="Transparent" 
+                    Clicked="SettingsNavigation" 
+                    HeightRequest="50" WidthRequest="65" 
+                    HorizontalOptions="End"/>
+        </Grid>
+    </Shell.TitleView>
+
+    <Grid Padding="5,0,5,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="5*"/>
+        </Grid.RowDefinitions>
+
+        <VerticalStackLayout Grid.Row="0" Padding="0,0,0,0">
+
+            <BoxView Color="#E3F2FD"              
+                         Margin="0,0,0,5"
+                         HeightRequest="1"  
+                         HorizontalOptions="Fill"/>
+
+        </VerticalStackLayout>
+
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="2*"/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0"
+            Text="Product Name:"
+            FontAttributes="Bold"
+            VerticalOptions="Center" 
+            HorizontalOptions="Start" />
+
+            <ScrollView Grid.Row="1">
+                <Label  x:Name="lblpname"
+                        Text="{Binding Product.Name}"
+                        VerticalOptions="Start" 
+                        HorizontalOptions="FillAndExpand" />
+            </ScrollView>
+
+        </Grid>
+
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0"
+            Text="Product Epc:"
+            FontAttributes="Bold"
+            VerticalOptions="Center" 
+            HorizontalOptions="Start" />
+
+            <Label Grid.Row="1" x:Name="lblpepc"
+            Text="{Binding Product.Epc}"
+            VerticalOptions="Start" 
+            HorizontalOptions="StartAndExpand" />
+        </Grid>
+        <gauge:SfLinearGauge Grid.Row="3" HorizontalOptions="Center" Margin="0,0,0,5" Orientation="Vertical" ShowLabels="False" ShowTicks="False">
+            <gauge:SfLinearGauge.LineStyle>
+                <gauge:LinearLineStyle CornerStyle="BothFlat" Thickness="80">
+                </gauge:LinearLineStyle>
+            </gauge:SfLinearGauge.LineStyle>
+            <gauge:SfLinearGauge.BarPointers>
+                <gauge:BarPointer x:Name="bpoint"
+                                  CornerStyle="BothFlat" Value="{Binding Percent}" 
+                                  PointerSize="80" 
+                                  Fill="{Binding Color, Mode=OneWay}"
+                                  EnableAnimation="True"
+                                  AnimationDuration="100"
+                                  AnimationEasing="{x:Static Easing.CubicInOut}">
+                    <gauge:BarPointer.Child>
+                        <HorizontalStackLayout HorizontalOptions="CenterAndExpand">
+                            <Label x:Name="lbl"
+                               Text="{Binding Source={x:Reference bpoint},
+                                      Path=Value}"
+                               Margin="0,0,0,0"
+                               FontAttributes="Bold"
+                               HorizontalOptions="CenterAndExpand"
+                               TextColor="White" VerticalOptions="Start"/>
+                            <Label Text="%" FontAttributes="Bold" TextColor="White"/>
+                        </HorizontalStackLayout>
+
+                    </gauge:BarPointer.Child>
+                </gauge:BarPointer>
+            </gauge:SfLinearGauge.BarPointers>
+        </gauge:SfLinearGauge>
+    </Grid>
+
+</mvvm:TinyView>
+
+

@@ -1,0 +1,118 @@
+﻿@page "/Printers/Edit/{Id:guid}"
+@using System.Text.RegularExpressions;
+@using System.ComponentModel.DataAnnotations;
+@using XRFID.Demo.Server.Database;
+@using XRFID.Demo.Server.Entities;
+@using XRFID.Demo.Server.Helpers;
+@using XRFID.Demo.Server.Repositories;
+@using XRFID.Demo.Server.ViewModels;
+@using Xerum.XFramework.Common.Enums;
+@inject NavigationManager Navigation;
+@inject PrinterRepository printerRepository;
+@inject UnitOfWork uow;
+@inject ISnackbar snackbar;
+
+<h1>Edit Printer @model.Name?</h1>
+
+<MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+    <MudStack Class="my-3">
+        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Name" For="()=>model.Name" @bind-Value="model.Name" AutoFocus="true" />
+        <MudTextField T="string" Variant="Variant.Outlined" Label="Description" For="()=>model.Description" @bind-Value="model.Description" />
+        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="IP Address" For="()=>model.Ip" @bind-Value="model.Ip" />
+        <MudNumericField T="int" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Port" For="()=>model.Port" @bind-Value="model.Port" />
+        <MudSelect Label="Manufacturer" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-Value="@model.Manufacturer" Required="true">
+            @foreach (PrinterManufacturers item in Enum.GetValues(typeof(PrinterManufacturers)))
+            {
+                <MudSelectItem Value="@item">@EnumHelper.GetDisplayText(item)</MudSelectItem>
+            }
+        </MudSelect>
+        <MudSelect Label="Language" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-Value="@model.Language" Required="true">
+            @foreach (PrinterLanguage item in Enum.GetValues(typeof(PrinterLanguage)))
+            {
+                <MudSelectItem Value="@item">@EnumHelper.GetDisplayText(item)</MudSelectItem>
+            }
+        </MudSelect>
+        <MudStack Row="true" Class="my-6 d-flex justify-end">
+            <MudButton OnClick="@(()=> Back())" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Back</MudButton>
+            <MudButton OnClick="@(async ()=> await Submit())" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-3">Submit</MudButton>
+        </MudStack>
+    </MudStack>
+</MudForm>
+
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+    private Printer? printer;
+
+    bool success;
+    string[] errors = { };
+    MudForm form;
+
+    private AddPrinterModel model = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        printer = await printerRepository.GetAsync(Id);
+        if (printer is null)
+        {
+            return;
+        }
+
+        model = new AddPrinterModel
+            {
+                Name = printer.Name ?? string.Empty,
+                Description = printer.Description,
+                Ip = printer.Ip,
+                Port = printer.Port,
+                Manufacturer = printer.Manufacturer ?? Xerum.XFramework.Common.Enums.PrinterManufacturers.Printronix,
+                Language = printer.Language ?? Xerum.XFramework.Common.Enums.PrinterLanguage.PGL
+            };
+    }
+
+    private async Task Submit()
+    {
+        await form.Validate();
+
+        if (!form.IsValid)
+        {
+            return;
+        }
+
+        if (printer.Name != model.Name && !(await IsNameUniqueAsync(model.Name)))
+        {
+            snackbar.Add($"Printer name {model.Name} already in use.", MudBlazor.Severity.Error);
+            return;
+        }
+
+        var result = await printerRepository.UpdateAsync(new Entities.Printer
+            {
+                Id = printer.Id,
+                Name = model.Name,
+                Ip = model.Ip,
+                Port = model.Port,
+                Description = model.Description,
+                Manufacturer = model.Manufacturer,
+                Language = model.Language
+
+            });
+        await uow.SaveAsync();
+        //fare comparire un popup che inserimento ok e rimanare alla pagina
+
+        snackbar.Add($"Printer {model.Name} updated.", MudBlazor.Severity.Success);
+
+        Navigation.NavigateTo($"Printers");
+
+        StateHasChanged();
+    }
+
+    private void Back()
+    {
+        Navigation.NavigateTo($"Printers");
+    }
+
+    private async Task<bool> IsNameUniqueAsync(string name)
+    {
+        return !(await printerRepository.GetAsync(q => q.Name == name)).Any();
+    }
+}

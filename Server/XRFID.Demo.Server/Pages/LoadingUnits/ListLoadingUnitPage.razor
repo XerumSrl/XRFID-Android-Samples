@@ -1,0 +1,228 @@
+﻿@page "/LoadingUnits"
+@using XRFID.Demo.Server.Database;
+@using XRFID.Demo.Server.Entities;
+@using XRFID.Demo.Server.Repositories;
+@inject NavigationManager Navigation;
+@inject LoadingUnitRepository loadingUnitRepository;
+@inject LoadingUnitItemRepository loadingUnitItemRepository;
+@inject UnitOfWork uowk;
+@inject IDialogService DialogService;
+
+<h1>Loading Units</h1>
+
+<MudDataGrid Items="@LuList"
+             ReadOnly="true"
+             SortMode="SortMode.Single" Filterable="true" QuickFilter="@_quickFilter" Striped="true">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Loading Units</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        <MudButton Class="ml-3" Variant="@Variant.Filled" Color="@Color.Secondary" SartIcon="@Icons.Material.Filled.Add"
+                   OnClick="@(() => AddLoadingUnit())">Add New</MudButton>
+    </ToolBarContent>
+    <Columns>
+        <HierarchyColumn T="LoadingUnit" />
+        <TemplateColumn Filterable="false" Sortable="false">
+            <CellTemplate>
+                <MudStack Row>
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit" Size="Size.Small" OnClick="@((e) => EditLoadingUnit(@context.Item))" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" Size="Size.Small" OnClick="@((e) => DeleteLoadingUnit(@context.Item))" />
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="x => x.Name" />
+        <PropertyColumn Property="x => x.Code" />
+        <PropertyColumn Property="x => x.Description" />
+        <PropertyColumn Property="x => x.CreationTime" Title="Date Creation" />
+        <PropertyColumn Property="x => x.IsActive" Title="Active" />
+        <TemplateColumn Filterable="false" Sortable="false">
+            <CellTemplate>
+                <MudStack Row>
+                    @if (context.Item.IsActive)
+                    {
+                        <MudIconButton Icon="@Icons.Material.Filled.StopCircle" Size="Size.Small" OnClick="@((e) => ActivateLu(@context.Item, false))" />
+                    }
+                    else
+                    {
+                        <MudIconButton Icon="@Icons.Material.Filled.PlayArrow" Size="Size.Small" OnClick="@((e) => ActivateLu(@context.Item, true))" />
+                    }
+
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <ChildRowContent>
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">@context.Item.Name</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudDataGrid Items="@context.Item.LoadingUnitItems"
+                             ReadOnly="true">
+                    <Columns>
+                        <PropertyColumn Property="x => x.Name" />
+                        <PropertyColumn Property="x => x.Code" />
+                        <PropertyColumn Property="x => x.Epc" />
+                        <PropertyColumn Property="x => x.SerialNumber" />
+                    </Columns>
+                </MudDataGrid>
+            </MudCardContent>
+        </MudCard>
+    </ChildRowContent>
+    <PagerContent>
+        <MudDataGridPager T="LoadingUnit" />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    private List<LoadingUnit> LuList = new List<LoadingUnit>();
+
+    private string _searchString = string.Empty;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FillTable();
+    }
+
+    async Task AddLoadingUnit()
+    {
+        Navigation.NavigateTo($"LoadingUnits/Add");
+    }
+
+    async Task EditLoadingUnit(LoadingUnit item)
+    {
+        var parameters = new DialogParameters<ConfirmDialog>();
+        parameters.Add(x => x.ContentText, "Do you really want to edit these records?");
+        parameters.Add(x => x.ButtonText, "Edit");
+        parameters.Add(x => x.Color, Color.Primary);
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, DisableBackdropClick = true, CloseOnEscapeKey = true };
+
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>("Edit", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            Navigation.NavigateTo($"LoadingUnits/Edit/{item.Id}");
+        }
+    }
+
+    async Task DeleteLoadingUnit(LoadingUnit item)
+    {
+        var parameters = new DialogParameters<ConfirmDialog>();
+        parameters.Add(x => x.ContentText, "Do you really want to delete these records? This process cannot be undone.");
+        parameters.Add(x => x.ButtonText, "Delete");
+        parameters.Add(x => x.Color, Color.Error);
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, DisableBackdropClick = true, CloseOnEscapeKey = true };
+
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>("Delete", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            var checkItem = await loadingUnitRepository.GetAsync(item.Id);
+            if (checkItem is not null)
+            {
+                await loadingUnitRepository.DeleteAsync(item.Id);
+                await uowk.SaveAsync();
+            }
+            else
+            {
+
+            }
+        }
+        await FillTable();
+        StateHasChanged();
+    }
+
+    async Task ActivateLu(LoadingUnit item, bool activation)
+    {
+        var parameters = new DialogParameters<ConfirmDialog>();
+
+        if (!activation)
+        {
+            parameters.Add(x => x.ContentText, "Do you really want to deactivate these records?");
+            parameters.Add(x => x.ButtonText, "Deactivation");
+            parameters.Add(x => x.Color, Color.Primary);
+        }
+        else
+        {
+            parameters.Add(x => x.ContentText, "Do you really want to activate these records?");
+            parameters.Add(x => x.ButtonText, "Activation");
+            parameters.Add(x => x.Color, Color.Primary);
+        }
+
+
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, DisableBackdropClick = true, CloseOnEscapeKey = true };
+
+        string btnstring;
+        if (!activation)
+        {
+            btnstring = "Deactivation";
+        }else
+        {
+            btnstring = "Activation";
+        }
+
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>(btnstring, parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            LoadingUnit? editLu = await loadingUnitRepository.GetAsync(item.Id);
+            if (editLu is null)
+            {
+                return;
+            }
+
+            editLu.IsActive = activation;
+            editLu = await loadingUnitRepository.UpdateAsync(editLu);
+            await uowk.SaveAsync();
+
+            if (editLu is not null && editLu.IsActive == activation)
+            {
+                item.IsActive = activation;
+            }
+            StateHasChanged();
+        }
+    }
+
+    private Func<LoadingUnit, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (!string.IsNullOrEmpty(x.Name) && x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (!string.IsNullOrEmpty(x.Code) && x.Code.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (x.Description.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    };
+
+    #region DataMethods
+    private async Task FillTable()
+    {
+        var loadingUnits = await loadingUnitRepository.GetAsync();
+        if (loadingUnits is not null)
+        {
+            foreach (var lu in loadingUnits)
+            {
+                if (lu.LoadingUnitItems is null || !lu.LoadingUnitItems.Any())
+                {
+                    lu.LoadingUnitItems = await loadingUnitItemRepository.GetAsync(q => q.LoadingUnitId == lu.Id);
+                }
+            }
+            LuList = loadingUnits;
+
+        }
+    }
+    #endregion
+}

@@ -1,0 +1,84 @@
+﻿@page "/Skus/Edit/{Id:guid}"
+@using System.ComponentModel.DataAnnotations;
+@using XRFID.Demo.Server.Database;
+@using XRFID.Demo.Server.Entities;
+@using XRFID.Demo.Server.Repositories;
+@using XRFID.Demo.Server.ViewModels;
+@inject NavigationManager Navigation;
+@inject SkuRepository skuRepository;
+@inject UnitOfWork uow;
+
+<h1>Edit Sku @model.Name?</h1>
+
+<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+    <MudStack Class="my-3">
+
+        <DataAnnotationsValidator />
+        <MudTextField T="string" Variant="Variant.Outlined" Label="Name" For="()=>model.Name" @bind-Value="model.Name" AutoFocus="true" />
+        <MudTextField T="string" Variant="Variant.Outlined" Label="Code" For="()=>model.Code" @bind-Value="model.Code" />
+        <MudTextField T="string" Variant="Variant.Outlined" Label="Description" For="()=>model.Description" @bind-Value="model.Description" Lines="10" />
+        <MudDatePicker Variant="Variant.Outlined" Editable="true" Clearable="true" Label="Start Date" For="()=>model.StartDate" @bind-Date="model.StartDate" />
+        <MudDatePicker Variant="Variant.Outlined" Editable="true" Clearable="true" Label="Expiration Date" For="()=>model.ExpirationDate" @bind-Date="model.ExpirationDate" />
+        <MudStack Row="true" Class="my-6 d-flex justify-end">
+            <MudButton OnClick="@(()=> Back())" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Back</MudButton>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-3">Submit</MudButton>
+        </MudStack>
+    </MudStack>
+</EditForm>
+
+
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+    private Sku? sku;
+    private bool isDisabled = false;
+
+    private AddSkuModel model = new AddSkuModel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        sku = await skuRepository.GetAsync(Id);
+        if (sku is null)
+        {
+            return;
+        }
+
+        model = new AddSkuModel
+            {
+                Name = sku.Name ?? string.Empty,
+                Code = sku.Code ?? string.Empty,
+                Description = sku.Description,
+                StartDate = sku.EffectivityStart,
+                ExpirationDate = sku.EffectivityEnd,
+            };
+    }
+
+    private async Task OnValidSubmit(EditContext context)
+    {
+        if (sku is null)
+        {
+            return;
+        }
+
+        sku.Name = model.Name;
+        sku.Code = model.Code;
+        sku.Description = model.Description;
+        sku.EffectivityStart = model.StartDate ?? DateTime.Now;
+        sku.EffectivityEnd = model.ExpirationDate ?? DateTime.Now;
+
+        Sku? result = await skuRepository.UpdateAsync(sku);
+
+        await uow.SaveAsync();
+        //fare comparire un popup che inserimento ok e rimanare alla pagina
+
+        Navigation.NavigateTo($"Skus");
+
+        StateHasChanged();
+    }
+
+    private void Back()
+    {
+        Navigation.NavigateTo($"Skus");
+    }
+}

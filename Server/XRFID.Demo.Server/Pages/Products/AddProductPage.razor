@@ -1,0 +1,105 @@
+﻿@page "/Products/Add"
+@using System.Text.RegularExpressions;
+@using System.ComponentModel.DataAnnotations;
+@using XRFID.Demo.Server.Database;
+@using XRFID.Demo.Server.Repositories;
+@using XRFID.Demo.Server.ViewModels;
+@inject NavigationManager Navigation;
+@inject SkuRepository skuRepository;
+@inject ProductRepository productRepository;
+@inject UnitOfWork uow;
+@inject ISnackbar snackbar;
+
+<h1>Add New Product</h1>
+
+<MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+    <MudStack Class="my-3">
+        <MudSelect Label="Sku" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter"
+        @bind-Value="SelectedSku" Required="true" RequiredError="Please select a Sku before creating a product">
+            @foreach (var sku in SkuList.OrderBy(q => q.Code))
+            {
+                <MudSelectItem Value="@sku">@sku.Code - @sku.Description</MudSelectItem>
+            }
+        </MudSelect>
+        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Name" For="()=>model.Name" @bind-Value="model.Name" AutoFocus="true" />
+        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Code" For="()=>model.Code" @bind-Value="model.Code" />
+        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Description" For="()=>model.Description" @bind-Value="model.Description" />
+        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="EPC" HelperText="24 or 32 characther HEX string"
+                      For="()=>model.Epc" @bind-Value="model.Epc" />
+        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Serial Number" For="()=>model.SerialNumber" @bind-Value="model.SerialNumber" />
+
+        <MudStack Row="true" Class="my-6 d-flex justify-end">
+            <MudButton OnClick="@(()=>form.ResetAsync())" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Reset</MudButton>
+            <MudButton OnClick="@(async ()=> await Submit())" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-3">Submit</MudButton>
+        </MudStack>
+    </MudStack>
+</MudForm>
+
+
+@code {
+    bool success;
+    string[] errors = { };
+    MudForm form;
+    private AddProductModel model = new();
+    private List<SkuModel> SkuList = new();
+    private SkuModel? SelectedSku;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var skus = await skuRepository.GetAsync();
+        foreach (var sku in skus)
+        {
+            SkuList.Add(new SkuModel
+                {
+                    Id = sku.Id,
+                    Name = sku.Name ?? sku.Id.ToString(),
+                    Code = sku.Code ?? sku.Id.ToString(),
+                    Description = sku.Description,
+                });
+        }
+
+    }
+
+    private async Task Submit()
+    {
+        await form.Validate();
+
+        if (!form.IsValid)
+        {
+            return;
+        }
+
+        if (!(await IsEpcUniqueAsync(model.Epc)))
+        {
+            snackbar.Add($"Epc {model.Epc} already in use.", MudBlazor.Severity.Error);
+            return;
+        }
+
+        var result = await productRepository.CreateAsync(new Entities.Product
+            {
+                Name = model.Name,
+                Description = model.Description,
+                Code = model.Code,
+                Note = model.Note,
+                Epc = model.Epc,
+                ContentQuantity = model.ContentQuantity,
+                SerialNumber = model.SerialNumber,
+                SkuId = SelectedSku.Id,
+
+            });
+        await uow.SaveAsync();
+        //fare comparire un popup che inserimento ok e rimanare alla pagina
+
+        snackbar.Add($"Product {model.Name} created.", MudBlazor.Severity.Success);
+
+        Navigation.NavigateTo($"Products");
+
+        StateHasChanged();
+    }
+
+    private async Task<bool> IsEpcUniqueAsync(string epc)
+    {
+        return !(await productRepository.GetAsync(q => q.Epc == epc)).Any();
+    }
+
+}

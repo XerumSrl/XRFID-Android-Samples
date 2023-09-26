@@ -1,0 +1,146 @@
+﻿@page "/Labels"
+@using AutoMapper;
+@using XRFID.Demo.Server.Database;
+@using XRFID.Demo.Server.Entities;
+@using XRFID.Demo.Server.Repositories;
+@using XRFID.Demo.Server.ViewModels;
+@inject NavigationManager Navigation;
+@inject IDialogService DialogService
+@inject LabelRepository labelRepository;
+@inject UnitOfWork uow;
+@inject IMapper mapper;
+@inject ISnackbar snackbar;
+
+<h1>Labels</h1>
+
+<MudDataGrid Items="@LabelList"
+             ReadOnly="true"
+             SortMode="SortMode.Single" Filterable="true" QuickFilter="@_quickFilter" Striped="true">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Labels</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        <MudButton Class="ml-3" Variant="@Variant.Filled" Color="@Color.Secondary" SartIcon="@Icons.Material.Filled.Add"
+                   OnClick="@(() => AddLabel())">Add New</MudButton>
+    </ToolBarContent>
+    <Columns>
+        <HierarchyColumn T="LabelModel" />
+        <TemplateColumn Filterable="false" Sortable="false">
+            <CellTemplate>
+                <MudStack Row>
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit" Size="Size.Small" OnClick="@((e) => EditLabel(@context.Item))" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" Size="Size.Small" OnClick="@((e) => DeleteLabel(@context.Item))" />
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="x => x.Name" />
+        <PropertyColumn Property="x => x.Version" />
+        <PropertyColumn Property="x => x.Description" />
+        <PropertyColumn Property="x => x.Language" />
+        <PropertyColumn Property="x => x.IsActive">
+            <EditTemplate>
+                <MudCheckBox @bind-Checked="context.Item.IsActive" />
+            </EditTemplate>
+        </PropertyColumn>
+    </Columns>
+    <ChildRowContent>
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">@context.Item.Name</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudText>@context.Item.Content</MudText>
+            </MudCardContent>
+        </MudCard>
+    </ChildRowContent>
+    <PagerContent>
+        <MudDataGridPager T="LabelModel" />
+    </PagerContent>
+</MudDataGrid>
+@code {
+    private List<LabelModel> LabelList = new List<LabelModel>();
+    private List<string> _events = new();
+    private string _searchString;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var label = await labelRepository.GetAsync();
+        LabelList.AddRange(mapper.Map<List<LabelModel>>(label));
+    }
+
+    async Task AddLabel()
+    {
+        Navigation.NavigateTo($"Labels/Add");
+    }
+
+    async Task EditLabel(LabelModel item)
+    {
+        var parameters = new DialogParameters<ConfirmDialog>();
+        parameters.Add(x => x.ContentText, "Do you really want to edit these records?");
+        parameters.Add(x => x.ButtonText, "Edit");
+        parameters.Add(x => x.Color, Color.Primary);
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, DisableBackdropClick = true, CloseOnEscapeKey = true };
+
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>("Edit", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            Navigation.NavigateTo($"Labels/Edit/{item.Id}");
+        }
+    }
+
+    async Task DeleteLabel(LabelModel item)
+    {
+        var parameters = new DialogParameters<ConfirmDialog>();
+        parameters.Add(x => x.ContentText, "Do you really want to delete these records? This process cannot be undone.");
+        parameters.Add(x => x.ButtonText, "Delete");
+        parameters.Add(x => x.Color, Color.Error);
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, DisableBackdropClick = true, CloseOnEscapeKey = true };
+
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>("Delete", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            var checkItem = await labelRepository.GetAsync(item.Id);
+            if (checkItem is not null)
+            {
+                await labelRepository.DeleteAsync(item.Id);
+                await uow.SaveAsync();
+                LabelList.Remove(item);
+                snackbar.Add($"Label {item.Name} updated.", Severity.Success);
+
+            }
+            else
+            {
+                snackbar.Add("Invalid label Id.", Severity.Error);
+                //notificare item non esistente
+            }
+        }
+    }
+
+    // quick filter - filter gobally across multiple columns with the same input
+    private Func<LabelModel, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (!string.IsNullOrEmpty(x.Name) && x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (!string.IsNullOrEmpty(x.Description) && x.Description.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (!string.IsNullOrEmpty(x.Content) && x.Content.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (x.Description.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    };
+}

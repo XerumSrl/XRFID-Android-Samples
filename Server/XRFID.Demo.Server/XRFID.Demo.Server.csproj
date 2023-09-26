@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.10" />
+		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.11" />
+		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.10">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.10" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="7.0.1" />
+		<PackageReference Include="MQTTnet.AspNetCore" Version="4.3.1.873" />
+		<PackageReference Include="MudBlazor" Version="6.10.0" />
+		<PackageReference Include="OpenIddict.Core" Version="4.7.0" />
+		<PackageReference Include="OpenIddict.EntityFrameworkCore" Version="4.7.0" />
+		<PackageReference Include="OpenIddict.Server" Version="4.7.0" />
+		<PackageReference Include="OpenIddict.Server.AspNetCore" Version="4.7.0" />
+		<PackageReference Include="OpenIddict.Validation.AspNetCore" Version="4.7.0" />
+		<PackageReference Include="OpenIddict.Validation.ServerIntegration" Version="4.7.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+		<PackageReference Include="Xerum.XFramework.DefaultLogging" Version="7.0.9" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Common\XRFID.Demo.Common\XRFID.Demo.Common.csproj" />
+	  <ProjectReference Include="..\XRFID.Demo.Modules.Mqtt\XRFID.Demo.Modules.Mqtt.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Pages\Movements\" />
+		<Folder Include="Persist\" />
+		<Folder Include="wwwroot\images\" />
+	</ItemGroup>
+
+</Project>

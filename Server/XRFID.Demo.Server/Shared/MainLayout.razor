@@ -1,0 +1,48 @@
+﻿@using MudBlazor.Utilities;
+@inherits LayoutComponentBase
+
+<PageTitle>XRFID Demo Webserver</PageTitle>
+
+<MudThemeProvider Theme="@theme" />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Elevation="1" Dense="true">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <MudSpacer />
+    </MudAppBar>
+    <MudDrawer @bind-Open="_drawerOpen" ClipMode="@DrawerClipMode.Always" Elevation="1" Variant="@DrawerVariant.Mini" OpenMiniOnHover="true">
+        <MudDrawerHeader Class="ml-n2 pl-n4">
+            <MudStack Row AlignItems="AlignItems.Center">
+                 <MudImage Src="images/logo.png" Alt="XRFID Demo Logo" Elevation="0" Class="rounded-lg" Width="32" Height="32" />
+                 <MudText Typo="Typo.h6">XRFID Demo</MudText>
+             </MudStack>
+         </MudDrawerHeader>
+         <NavMenu />
+     </MudDrawer>
+     <MudMainContent>
+         <MudContainer MaxWidth="MaxWidth.Large" Class="my-4">
+             @Body
+         </MudContainer>
+     </MudMainContent>
+ </MudLayout>
+
+ @code {
+    bool _drawerOpen = true;
+
+    MudTheme theme = new MudTheme
+        {
+            Palette = new PaletteLight
+            {
+                AppbarBackground = new MudColor(229, 90, 51, 255),
+                Primary = new MudColor(229, 90, 51, 255),
+                Secondary = new MudColor(53, 102, 139, 255)
+            }
+        };
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+}

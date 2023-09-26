@@ -1,0 +1,159 @@
+﻿@page "/LoadingUnits/Add"
+@using XRFID.Demo.Server.Database;
+@using XRFID.Demo.Server.Entities;
+@using XRFID.Demo.Server.Repositories;
+@using XRFID.Demo.Server.ViewModels;
+@using Xerum.XFramework.Common.Enums;
+@inject NavigationManager Navigation;
+@inject ProductRepository pRepos;
+@inject LoadingUnitRepository loadingUnitRepository;
+@inject ReaderRepository readerRepository;
+@inject UnitOfWork uowk;
+@inject ISnackbar snackbar;
+
+<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+    <MudStack Class="my-3">
+
+        <DataAnnotationsValidator />
+        <MudSelect T="Reader" Label="Reader" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-Value="@selectedReader" Required="true">
+            @foreach (var reader in readers.OrderBy(q => q.Name))
+            {
+                <MudSelectItem Value="@reader">@reader.Name</MudSelectItem>
+            }
+        </MudSelect>
+        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Name" For="()=>model.Name" @bind-Value="model.Name" AutoFocus="true" />
+        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Code" For="()=>model.Code" @bind-Value="model.Code" />
+        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Reference" For="()=>model.Reference" @bind-Value="model.Reference" />
+        <MudTextField T="string" Variant="Variant.Outlined" Label="Description" For="()=>model.Description" @bind-Value="model.Description" Lines="10" />
+
+        <MudStack Row="true" Class="my-6 d-flex justify-end">
+            <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Reset</MudButton>
+
+            @if (selectedProducts.Count > 0)
+            {
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-3">Submit</MudButton>
+            }
+        </MudStack>
+    </MudStack>
+</EditForm>
+
+<MudSpacer />
+
+<MudDataGrid T="Product" MultiSelection="true" Items="@Products" SortMode="SortMode.Multiple" Filterable="true"
+             Hideable="true" RowClick="@RowClicked" SelectedItemsChanged="@SelectedItemsChanged">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Products</MudText>
+        <MudSpacer />
+    </ToolBarContent>
+    <Columns>
+        <SelectColumn T="Product" />
+        <PropertyColumn Property="x => x.CreationTime" Title="Date Time" />
+        <PropertyColumn Property="x => x.Name" />
+        <PropertyColumn Property="x => x.Epc" />
+        <PropertyColumn Property="x => x.Description" />
+        <PropertyColumn Property="x => x.ContentQuantity" Title="Quantity" />
+        <PropertyColumn Property="x => x.SerialNumber" Title="Serial Number" />
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="Product" />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    private AddLoadingUnitModel model = new();
+    private List<Product> Products = new List<Product>();
+    private List<Product> selectedProducts = new();
+    private List<Reader> readers = new();
+    private Reader? selectedReader;
+
+    protected override async Task OnInitializedAsync()
+    {
+        readers = await readerRepository.GetAsync();
+        await FillProductTable();
+    }
+
+    #region Events
+    private async Task OnValidSubmit(EditContext context)
+    {
+        if (selectedReader is null)
+        {
+            return;
+        }
+
+        try
+        {
+            LoadingUnit newLu = new LoadingUnit
+                {
+                    Name = model.Name,
+                    Code = model.Code,
+                    Reference = model.Reference,
+                    Description = model.Description,
+                    ReaderId = selectedReader.Id,
+                    LoadingUnitItems = new List<LoadingUnitItem>(),
+                };
+
+            foreach (var item in selectedProducts)
+            {
+                LoadingUnitItem newItem = new LoadingUnitItem
+                    {
+                        Name = item.Name,
+                        Code = item.Code,
+                        Reference = item.Reference,
+
+                        Description = item.Description,
+                        SerialNumber = item.SerialNumber,
+                        Epc = item.Epc,
+
+                        Status = ItemStatus.NotFound,
+
+                        LoadingUnitId = newLu.Id,
+                    };
+
+                newLu.LoadingUnitItems.Add(newItem);
+            }
+            var result = await loadingUnitRepository.CreateAsync(newLu);
+            await uowk.SaveAsync();
+        }
+        catch (Exception)
+        {
+            snackbar.Add($"Loading Unit {model.Name} error in creation.", Severity.Error);
+            return;
+        }
+
+        snackbar.Add($"Loading Unit {model.Name} created.", Severity.Success);
+
+        Navigation.NavigateTo($"LoadingUnits");
+        StateHasChanged();
+    }
+
+    void RowClicked(DataGridRowClickEventArgs<Product> args)
+    {
+        if (!selectedProducts.Exists(e => e.Id == args.Item.Id))
+        {
+            selectedProducts.Add(args.Item);
+        }
+        else
+        {
+            selectedProducts.Remove(args.Item);
+        }
+    }
+
+    void SelectedItemsChanged(HashSet<Product> items)
+    {
+        selectedProducts = items.ToList();
+    }
+    #endregion
+
+    #region DataMethods
+    private async Task FillProductTable()
+    {
+        List<Product> allProds = await pRepos.GetAsync();
+        if (allProds is null)
+        {
+            Products = new List<Product>();
+            return;
+        }
+        Products = allProds;
+    }
+    #endregion
+}

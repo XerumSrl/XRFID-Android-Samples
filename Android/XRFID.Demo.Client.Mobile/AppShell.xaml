@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="XRFID.Demo.Client.Mobile.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:XRFID.Demo.Client.Mobile"
+    xmlns:views="clr-namespace:XRFID.Demo.Client.Mobile.Views"
+    xmlns:inventory="clr-namespace:XRFID.Demo.Client.Mobile.Views.Inventory"
+    xmlns:checkItem="clr-namespace:XRFID.Demo.Client.Mobile.Views.CheckItem"
+    xmlns:findItem="clr-namespace:XRFID.Demo.Client.Mobile.Views.FindItem"
+    Shell.FlyoutBehavior="Flyout">
+
+    <Page.Resources>
+        <Style TargetType="Tab">
+            <Setter Property="Shell.TabBarBackgroundColor"
+                    Value="#E3F2FD" />
+            <Setter Property="Shell.BackgroundColor"
+                    Value="White"/>
+            <Setter Property="Shell.TitleColor"
+                    Value="#e55934"/>
+            <Setter Property="Shell.BackButtonBehavior">
+                <BackButtonBehavior IconOverride="back_button.svg"/>
+            </Setter>
+        </Style>
+
+        <Style TargetType="Shell" ApplyToDerivedTypes="True">
+            <Setter Property="Shell.FlyoutIcon" Value="menu_icon.svg" />
+        </Style>
+    </Page.Resources>
+
+    <FlyoutItem Title="Home" Icon="home_icon.svg">
+        <Tab Title="Inventory"
+             Icon="inventory.svg">
+            <ShellContent ContentTemplate="{DataTemplate inventory:InventoryView}" Route="inventory"/>
+        </Tab>
+
+        <Tab Title="Check Items"
+             Icon="check_item.svg">
+            <ShellContent ContentTemplate="{DataTemplate checkItem:CheckItemView}" Route="checkitem"/>
+        </Tab>
+
+        <Tab Title="Rapid Read"
+            Icon="rapid_read.svg">
+            <ShellContent ContentTemplate="{DataTemplate views:RapidReadView}" Route="rapidread"/>
+        </Tab>
+
+        <Tab Title="Find Item"
+             Icon="find_item.svg">
+            <ShellContent ContentTemplate="{DataTemplate findItem:FindItemView}" Route="finditem"/>
+        </Tab>
+    </FlyoutItem>
+
+    <FlyoutItem Title="ScanPrint" Icon="settings_gear_blue.svg">
+        <ShellContent ContentTemplate="{DataTemplate views:ScanPrintView}" Route="scanprint"/>
+    </FlyoutItem>
+    
+    <FlyoutItem Title="Settings" Icon="settings_gear_blue.svg">
+        <ShellContent ContentTemplate="{DataTemplate views:SettingsPage}" Route="settings"/>
+    </FlyoutItem>
+    
+    <FlyoutItem Title="About" Icon="info_about.svg">
+        <ShellContent ContentTemplate="{DataTemplate views:AboutView}" Route="about"/>
+    </FlyoutItem>
+</Shell>
+
+

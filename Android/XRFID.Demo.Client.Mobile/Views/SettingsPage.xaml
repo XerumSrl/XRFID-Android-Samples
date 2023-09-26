@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<mvvm:TinyView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               xmlns:mvvm="clr-namespace:TinyMvvm;assembly=TinyMvvm.Maui"
+               xmlns:sliders="clr-namespace:Syncfusion.Maui.Sliders;assembly=Syncfusion.Maui.Sliders"
+               x:Class="XRFID.Demo.Client.Mobile.Views.SettingsPage"
+               Title="SETTINGS PAGE">
+
+    <ContentPage.Resources>
+        <Style x:Key="InvalidEntryStyle" TargetType="Entry">
+            <Setter Property="TextColor" Value="Red" />
+        </Style>
+        <Style x:Key="ValidEntryStyle" TargetType="Entry">
+            <Setter Property="TextColor" Value="Black" />
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid Padding="10,0,10,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="7*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout>
+
+                <Label Text="Device ID" Padding="5,15,5,5"/>
+                <Frame BorderColor="Transparent" BackgroundColor="#E3F2FD" Padding="10,0">
+                    <Entry x:Name="device_id"
+                           IsSpellCheckEnabled="False"
+                           IsReadOnly="True"
+                           Text="{Binding DeviceId, Mode=OneWay}">
+                    </Entry>
+                </Frame>
+
+                <Label Text="Device Name" Padding="5,15,5,5"/>
+                <Frame BorderColor="Transparent" BackgroundColor="#E3F2FD" Padding="10,0">
+                    <Entry x:Name="device_name"
+                       IsSpellCheckEnabled="False"
+                       Keyboard="Plain"
+                       Placeholder="host-name_example"
+                       Text="{Binding DeviceName, Mode=TwoWay}">
+                        <Entry.Behaviors>
+                            <toolkit:TextValidationBehavior 
+                        InvalidStyle="{StaticResource InvalidEntryStyle}"
+                        ValidStyle="{StaticResource ValidEntryStyle}"
+                        Flags="ValidateOnValueChanged"
+                        DecorationFlags="Trim"
+                        RegexOptions="Compiled"
+                        RegexPattern="{Binding HostnameRegex}"/>
+                        </Entry.Behaviors>
+                    </Entry>
+                </Frame>
+
+                <Label Text="API Endpoint" Padding="5,15,5,5"/>
+                <Frame BorderColor="Transparent" BackgroundColor="#E3F2FD" Padding="10,0">
+                    <Entry x:Name="api_endpoint"
+                       IsSpellCheckEnabled="False"
+                       Keyboard="Url"
+                       Placeholder="https://example.com/"
+                       Text="{Binding ApiEndpoint, Mode=TwoWay}">
+                        <Entry.Behaviors>
+                            <toolkit:TextValidationBehavior 
+                        InvalidStyle="{StaticResource InvalidEntryStyle}"
+                        ValidStyle="{StaticResource ValidEntryStyle}"
+                        Flags="ValidateOnValueChanged"
+                        DecorationFlags="Trim"
+                        RegexOptions="Compiled"
+                        RegexPattern="{Binding UriRegex}" />
+                        </Entry.Behaviors>
+                    </Entry>
+                </Frame>
+            </VerticalStackLayout>
+        </ScrollView>
+        <Button x:Name="btnSelect"
+                Grid.Row="1"
+                Text="Validate"
+                Command="{Binding SaveCommand}"
+                SemanticProperties.Hint="Validate"
+                IsEnabled="True"
+                HorizontalOptions="FillAndExpand"
+                VerticalOptions="Center"/>
+    </Grid>
+
+</mvvm:TinyView>

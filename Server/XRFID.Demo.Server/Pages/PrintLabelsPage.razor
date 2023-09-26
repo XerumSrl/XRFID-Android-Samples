@@ -1,0 +1,284 @@
+﻿@page "/PrintLabels"
+@using AutoMapper;
+@using System.Text.Json;
+@using System.ComponentModel.DataAnnotations;
+@using System.Net.NetworkInformation;
+@using System.Net.Sockets;
+@using XRFID.Demo.Server.Repositories;
+@using XRFID.Demo.Server.ViewModels;
+
+@inject PrinterRepository printerRepository;
+@inject LabelRepository labelRepository;
+@inject ISnackbar snackbar;
+@inject IMapper mapper;
+@inject ILogger<PrintLabelsPage> _logger;
+
+<h1>PrintLabels</h1>
+
+<MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+    <MudStack Class="my-3">
+        <MudSelect T="PrinterModel" Label="Printer" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Required="true" @bind-Value="selectedPrinter">
+            @foreach (var printer in printers)
+            {
+                <MudSelectItem Value="@printer">@printer.Name</MudSelectItem>
+            }
+        </MudSelect>
+        <MudSelect T="LabelModel" Label="Label" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Required="true" Value="@selectedLabel" ValueChanged="GetVariables">
+            @foreach (var label in labels)
+            {
+                <MudSelectItem Value="@label">@label.Name [Rev. @label.Version]</MudSelectItem>
+            }
+        </MudSelect>
+
+        <MudNumericField T="int" Variant="Variant.Outlined" Label="Label Quantity" For="()=>labelQuantity" @bind-Value="labelQuantity" />
+
+        <MudTextField T="string" Label="Label Template" Value="@labelContent" ValueChanged="(x) => SetContent(x)" Lines="15" ReadOnly="false" Variant="Variant.Outlined" />
+
+        @if (variables.Any())
+        {
+            <MudCard Elevation="0" Outlined="true" >
+                <MudCardHeader>Variables</MudCardHeader>
+                <MudCardContent>
+                @foreach (var variable in variables)
+                {
+                    if (variable.Name.Equals("epc", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                            <MudTextField T="string" Variant="Variant.Outlined" Label="@variable.Name" @bind-Value="@variable.Value" Required="true" RequiredError="@("The " + variable.Name+ " Field is required")" Validation="@( new RegularExpressionAttribute(@"^([0-9a-fA-F]{32}|[0-9a-fA-F]{24})$"){ErrorMessage= "EPC must be a valix HEX rapresentation of 24 or 32 charachers"})" />
+                    }
+                    else
+                    {
+                            <MudTextField T="string" Variant="Variant.Outlined" Label="@variable.Name" @bind-Value="@variable.Value" />
+                    }
+
+                }
+                </MudCardContent>
+            </MudCard>
+        }
+
+        <MudStack Row="true" Class="my-6 d-flex justify-end">
+            <MudButton OnClick="@(async ()=> await Reset())" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Reset</MudButton>
+            <MudButton OnClick="@(async ()=> await Print())" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-3">Print</MudButton>
+        </MudStack>
+    </MudStack>
+</MudForm>
+
+@code {
+    bool success;
+    string[] errors = { };
+    MudForm form;
+
+    private List<PrinterModel> printers = new List<PrinterModel>();
+    private List<LabelModel> labels = new List<LabelModel>();
+
+    private PrinterModel? selectedPrinter;
+    private LabelModel? selectedLabel;
+
+    private List<LabelVariable> variables = new List<LabelVariable>();
+    private int labelQuantity = 1;
+    private string labelContent = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        printers = mapper.Map<List<PrinterModel>>(await printerRepository.GetAsync());
+        labels = mapper.Map<List<LabelModel>>(await labelRepository.GetAsync());
+    }
+
+    private async Task Print()
+    {
+        await form.Validate();
+
+        if (selectedPrinter is null)
+        {
+            snackbar.Add($"Please select a printer.", MudBlazor.Severity.Warning);
+            return;
+        }
+        if (selectedLabel == null)
+        {
+            snackbar.Add($"Please select a label.", MudBlazor.Severity.Warning);
+            return;
+        }
+
+        if (!success)
+        {
+            snackbar.Add($"Input value error.", MudBlazor.Severity.Warning);
+            return;
+        }
+
+        try
+        {
+            if (!PingHost(selectedPrinter.Ip))
+            {
+                throw new Exception($"Printer {selectedPrinter.Ip} not reachable");
+            }
+            else
+            {
+                _logger.LogDebug("Ping {Ip} Success", selectedPrinter.Ip);
+            }
+
+            if (selectedPrinter.Language != selectedPrinter.Language)
+            {
+                throw new Exception($"Label language: {selectedPrinter.Language} and Printer language: {selectedPrinter.Language} MISMATCH");
+            }
+            else
+            {
+                _logger.LogDebug("Valid label language: {Language}", selectedLabel.Language);
+            }
+
+            using (TcpClient client = new TcpClient(selectedPrinter.Ip, selectedPrinter.Port))
+            {
+                NetworkStream networkStream = client.GetStream();
+                StreamWriter writer = new StreamWriter(networkStream);
+
+                writer.AutoFlush = false;
+
+                string label = labelContent;
+
+                for (int curLabel = 1; curLabel <= labelQuantity; curLabel++)
+                {
+                    foreach (var variable in variables)
+                    {
+                        string oldValue = "{" + variable.Name + "}";
+                        string newValue = variable.Value ?? "";
+                        label = label.Replace(oldValue, newValue);
+                    }
+
+                    // progressivo numerazione
+                    string currentLabel = string.Format($"{curLabel}/{labelQuantity}");
+                    label = label.Replace("{currentLabel}", currentLabel);
+                    label += "\r\n";
+
+                    _logger.LogTrace("[Post] printed label: \n{labelContent}", label);
+
+                    await writer.WriteAsync(label);
+                    await writer.FlushAsync();
+                }
+            }
+
+            snackbar.Add($"Label(s) sent to printer {selectedPrinter.Name}.", MudBlazor.Severity.Success);
+
+        }
+        catch (Exception ex)
+        {
+            snackbar.Add($"{ex.Message}.", MudBlazor.Severity.Error);
+            _logger.LogError("PrintController|{Message}", ex.Message);
+
+        }
+
+    }
+
+    private void GetVariables(LabelModel label)
+    {
+        selectedLabel = label;
+        variables.Clear();
+        if (selectedLabel is null)
+        {
+            return;
+        }
+
+        labelContent = selectedLabel.Content;
+
+        int startIndex = 0;
+        do
+        {
+            int openIndex = selectedLabel.Content.IndexOf("{", startIndex + 1);
+            if (openIndex == -1)
+            {
+                break;
+            }
+
+            int closeIndex = selectedLabel.Content.IndexOf("}", openIndex + 1);
+
+            if (closeIndex == -1 || openIndex + 1 == closeIndex)
+            {
+                throw new Exception("no closing bracket found or variablename is 0 characters long");
+            }
+
+            string variableName = selectedLabel.Content.Substring(openIndex + 1, closeIndex - openIndex - 1);
+
+            variables.Add(new LabelVariable { Name = variableName, OpenBraketIndex = openIndex, CloseBraketIndex = closeIndex });
+
+            startIndex = closeIndex + 1;
+
+        } while (true);
+
+        variables = variables.GroupBy(g => g.Name).Select(s => s.First()).ToList();
+    }
+
+    private void SetContent(string content)
+    {
+        if (selectedLabel is not null)
+        {
+            selectedLabel.Content = content;
+            labelContent = content;
+
+            GetVariables(selectedLabel);
+        }
+    }
+
+    private class LabelVariable
+    {
+        public string Name { get; set; } = string.Empty;
+        public string? Value { get; set; }
+        public int OpenBraketIndex { get; set; }
+        public int CloseBraketIndex { get; set; }
+
+        public override string ToString()
+        {
+            return JsonSerializer.Serialize(this, this.GetType(), new JsonSerializerOptions { WriteIndented = true });
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is null)
+            {
+                return false;
+            }
+            if (obj.GetType() != this.GetType())
+            {
+                return false;
+            }
+            var o = (LabelVariable)obj;
+            return Name == o.Name && Value == o.Value && OpenBraketIndex == o.OpenBraketIndex && CloseBraketIndex == o.CloseBraketIndex;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Name, Value, OpenBraketIndex, CloseBraketIndex);
+        }
+    }
+
+    private bool PingHost(string nameOrAddress)
+    {
+        bool pingable = false;
+        Ping pinger = null;
+
+        try
+        {
+            pinger = new Ping();
+            PingReply reply = pinger.Send(nameOrAddress);
+            pingable = reply.Status == IPStatus.Success;
+        }
+        catch (PingException)
+        {
+            // Discard PingExceptions and return false;
+        }
+        finally
+        {
+            if (pinger != null)
+            {
+                pinger.Dispose();
+            }
+        }
+
+        return pingable;
+    }
+
+    private async Task Reset()
+    {
+        await form.ResetAsync();
+        printers = mapper.Map<List<PrinterModel>>(await printerRepository.GetAsync());
+        labels = mapper.Map<List<LabelModel>>(await labelRepository.GetAsync());
+        labelQuantity = 1;
+        labelContent = string.Empty;
+    }
+}

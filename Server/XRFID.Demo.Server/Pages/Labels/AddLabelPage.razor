@@ -1,0 +1,88 @@
+﻿@page "/Labels/Add"
+@using System.Text.RegularExpressions;
+@using System.ComponentModel.DataAnnotations;
+@using XRFID.Demo.Server.Database;
+@using XRFID.Demo.Server.Helpers;
+@using XRFID.Demo.Server.Repositories;
+@using XRFID.Demo.Server.ViewModels;
+@using Xerum.XFramework.Common.Enums;
+@inject NavigationManager Navigation;
+@inject SkuRepository labelRepository;
+@inject LabelRepository labelRepository;
+@inject UnitOfWork uow;
+
+<h1>Add New Label</h1>
+
+<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+    <MudStack Class="my-3">
+
+        <DataAnnotationsValidator />
+        <MudTextField T="string" Variant="Variant.Outlined" Label="Name" For="()=>model.Name" Value="@labelName" ValueChanged="(x)=>OnTextChanged(x)" AutoFocus="true" />
+        <MudTextField T="string" Variant="Variant.Outlined" Label="Description" For="()=>model.Description" @bind-Value="model.Description" />
+        <MudTextField T="int" Variant="Variant.Outlined" Label="Version" For="()=>model.Version" @bind-Value="model.Version" Disabled="true" />
+        <MudSelect Label="Language" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-Value="@model.Language" Required="true">
+            @foreach (PrinterLanguage item in Enum.GetValues(typeof(PrinterLanguage)))
+            {
+                <MudSelectItem Value="@item">@EnumHelper.GetDisplayText(item)</MudSelectItem>
+            }
+        </MudSelect>
+        <MudCheckBox T="bool" Variant="Variant.Outlined" Label="Is Active" For="()=>model.IsActive" @bind-Checked="model.IsActive" />
+
+        <MudTextField T="string" Variant="Variant.Outlined" Label="Template"
+                      Placeholder="Label template using machine language. Place variable between markers like {myvariable}"
+                      For="()=>model.Content" @bind-Value="model.Content" Lines="10" />
+        <MudText Typo="Typo.body2">Label template using machine language. Place variable between markers like <strong>{myvariable}</strong></MudText>
+        <MudStack Row="true" Class="my-6 d-flex justify-end">
+            <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Reset</MudButton>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-3">Submit</MudButton>
+        </MudStack>
+    </MudStack>
+</EditForm>
+
+
+@code {
+    private AddLabelModel model = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    private async Task OnValidSubmit(EditContext context)
+    {
+        var result = await labelRepository.CreateAsync(new Entities.Label
+            {
+                Name = model.Name,
+                Description = model.Description,
+                Version = model.Version,
+                IsActive = model.IsActive,
+                Language = model.Language,
+                Content = model.Content,
+                Code = $"{model.Name}_{model.Version}",
+                Reference = $"{model.Name}_{model.Version}",
+            });
+        await uow.SaveAsync();
+        //fare comparire un popup che inserimento ok e rimanare alla pagina
+
+        Navigation.NavigateTo($"Labels");
+
+        StateHasChanged();
+    }
+
+    private string labelName = "";
+    private async Task OnTextChanged(string value)
+    {
+        var labels = await labelRepository.GetAsync(q => q.Name == value);
+        if (labels.Any())
+        {
+            var maxVersion = labels.Max(q => q.Version);
+            model.Version = maxVersion + 1;
+        }
+        else
+        {
+            model.Version = 1;
+        }
+        labelName = value;
+        model.Name = value;
+    }
+}

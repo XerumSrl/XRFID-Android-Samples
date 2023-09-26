@@ -1,0 +1,66 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34009.444
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{8B83B17A-1F80-4283-A144-D999B2C89A3F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{77D7AC6B-3865-40BA-BAE6-AA862989FB3B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XRFID.Demo.Modules.Mqtt", "Server\XRFID.Demo.Modules.Mqtt\XRFID.Demo.Modules.Mqtt.csproj", "{603347BC-92AA-4073-943A-DDDAE69B0ED8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XRFID.Demo.Server", "Server\XRFID.Demo.Server\XRFID.Demo.Server.csproj", "{137A3609-38C3-4B31-B3EA-06EE2F4441E1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XRFID.Demo.ServerTests", "Test\XRFID.Demo.ServerTests\XRFID.Demo.ServerTests.csproj", "{B1843E13-2C43-433D-A123-1A01D3435C86}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Android", "Android", "{0C18CC08-930C-4663-9209-5B279B7AB6E9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{12900969-F704-4FEA-9B9B-D4ABE9AF194C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XRFID.Demo.Common", "Common\XRFID.Demo.Common\XRFID.Demo.Common.csproj", "{E4D64D95-EC78-4828-A8EF-4DA59CC3CD43}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XRFID.Demo.Client.Mobile", "Android\XRFID.Demo.Client.Mobile\XRFID.Demo.Client.Mobile.csproj", "{7C8091CB-C182-41B2-B496-095389BD3A31}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{603347BC-92AA-4073-943A-DDDAE69B0ED8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{603347BC-92AA-4073-943A-DDDAE69B0ED8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{603347BC-92AA-4073-943A-DDDAE69B0ED8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{603347BC-92AA-4073-943A-DDDAE69B0ED8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{137A3609-38C3-4B31-B3EA-06EE2F4441E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{137A3609-38C3-4B31-B3EA-06EE2F4441E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{137A3609-38C3-4B31-B3EA-06EE2F4441E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{137A3609-38C3-4B31-B3EA-06EE2F4441E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1843E13-2C43-433D-A123-1A01D3435C86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1843E13-2C43-433D-A123-1A01D3435C86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1843E13-2C43-433D-A123-1A01D3435C86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1843E13-2C43-433D-A123-1A01D3435C86}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4D64D95-EC78-4828-A8EF-4DA59CC3CD43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4D64D95-EC78-4828-A8EF-4DA59CC3CD43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4D64D95-EC78-4828-A8EF-4DA59CC3CD43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4D64D95-EC78-4828-A8EF-4DA59CC3CD43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C8091CB-C182-41B2-B496-095389BD3A31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C8091CB-C182-41B2-B496-095389BD3A31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C8091CB-C182-41B2-B496-095389BD3A31}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{7C8091CB-C182-41B2-B496-095389BD3A31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C8091CB-C182-41B2-B496-095389BD3A31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C8091CB-C182-41B2-B496-095389BD3A31}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{603347BC-92AA-4073-943A-DDDAE69B0ED8} = {8B83B17A-1F80-4283-A144-D999B2C89A3F}
+		{137A3609-38C3-4B31-B3EA-06EE2F4441E1} = {8B83B17A-1F80-4283-A144-D999B2C89A3F}
+		{B1843E13-2C43-433D-A123-1A01D3435C86} = {77D7AC6B-3865-40BA-BAE6-AA862989FB3B}
+		{E4D64D95-EC78-4828-A8EF-4DA59CC3CD43} = {12900969-F704-4FEA-9B9B-D4ABE9AF194C}
+		{7C8091CB-C182-41B2-B496-095389BD3A31} = {0C18CC08-930C-4663-9209-5B279B7AB6E9}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5B467AC4-9FC0-4F11-9782-BA682127A0F7}
+	EndGlobalSection
+EndGlobal

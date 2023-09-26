@@ -1,0 +1,153 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<mvvm:TinyView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:mvvm="clr-namespace:TinyMvvm;assembly=TinyMvvm.Maui"
+               xmlns:syncfusion="clr-namespace:Syncfusion.Maui.DataGrid;assembly=Syncfusion.Maui.DataGrid"
+               xmlns:sflv="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
+               x:Class="XRFID.Demo.Client.Mobile.Views.Inventory.InventoryView"
+               Title="INVENTORY">
+
+    <Shell.TitleView>
+        <Grid Padding="0,0,5,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0" Padding="0,0,0,0" 
+                   VerticalTextAlignment="Center" 
+                   VerticalOptions="CenterAndExpand" 
+                   HorizontalOptions="StartAndExpand" 
+                   Text="INVENTORY"
+                   TextColor="#e55934"
+                   FontSize="Medium"
+                   FontAttributes="Bold"/>
+
+            <Button Grid.Column="1" ImageSource="settings_gear_orange.svg"                    
+                    BackgroundColor="Transparent" 
+                    Clicked="GoToSettings" 
+                    HeightRequest="50" WidthRequest="65" 
+                    HorizontalOptions="End"/>
+        </Grid>
+    </Shell.TitleView>
+
+    <Grid Padding="10,0,10,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="70"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <VerticalStackLayout Grid.Row="0">
+            
+            <BoxView Color="#E3F2FD"  
+                     Margin="0,0,0,5"                   
+                     HeightRequest="1"  
+                     HorizontalOptions="Fill"/>  
+            
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <VerticalStackLayout Grid.Column="0">
+                    <Label
+                Text="ITEMS"
+                FontSize="12"
+                HorizontalOptions="Center"  />
+
+                    <Label  x:Name="lbltagRead" 
+                Text="{Binding InventoryStats.TagRead}"
+                FontSize="24"
+                HorizontalOptions="Center" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Grid.Column="1">
+                    <Label
+                Text="FOUND"
+                FontSize="12"
+                HorizontalOptions="Center" />
+
+                    <Label x:Name="lblproductFound" 
+                Text="{Binding InventoryStats.ProductFound}"
+                FontSize="24"
+                TextColor="#00916e"
+                HorizontalOptions="Center" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Grid.Column="2">
+                    <Label
+                Text="MISSING"
+                FontSize="12"
+                HorizontalOptions="Center" />
+
+                    <Label  x:Name="lblunexpectedTag" 
+                Text="{Binding InventoryStats.UnexpectedTag}"
+                FontSize="24"
+                TextColor="#d9594c"
+                HorizontalOptions="Center" />
+                </VerticalStackLayout>
+
+                <Button Grid.Column="3"
+                x:Name="btnReset"
+                Text="RESET"
+                FontAttributes="Bold"
+                BackgroundColor="#e55934"
+                SemanticProperties.Hint="CheckItem"
+                Command="{Binding ResetCommand}"
+                HorizontalOptions="Center" />
+            </Grid>
+
+            <BoxView Color="#E3F2FD"  
+                     Margin="0,5,0,0"                   
+                     HeightRequest="1"  
+                     HorizontalOptions="Fill"/>
+            
+        </VerticalStackLayout>
+
+
+        <sflv:SfListView Grid.Row="2"
+                         ItemsSource="{Binding ProductsList}" 
+                         ItemSize="50"
+                         AllowSwiping="True"
+                         SwipeEnded="SwipeEnded"
+                         SwipeOffset="90"
+                         SwipeThreshold="80.0">
+            <sflv:SfListView.EndSwipeTemplate>
+                <DataTemplate x:Name="EndSwipeTemplate">
+                    <Grid BackgroundColor="#e55934" HorizontalOptions="Fill" VerticalOptions="Fill">
+                        <Grid >
+                            <Label Grid.Row="0" 
+                                   HorizontalOptions="CenterAndExpand"
+                                   VerticalOptions="CenterAndExpand"
+                                   BackgroundColor="Transparent" 
+                                   TextColor="Purple"
+                                   FontSize="20"
+                                   Text="🔍">
+                                
+                            </Label>
+                        </Grid>
+                    </Grid>
+                </DataTemplate>
+            </sflv:SfListView.EndSwipeTemplate>
+            <sflv:SfListView.ItemTemplate>
+                <DataTemplate>
+                    <StackLayout Orientation="Vertical" Margin="5">
+                        <StackLayout Orientation="Horizontal">
+                            <Label Text="I:" Margin="0,0,5,0"/>
+                            <Label Text="{Binding Epc}" />
+                        </StackLayout>
+
+                        <StackLayout Orientation="Horizontal">
+                            <Label Text="N:" Margin="0,0,5,0"/>
+                            <Label Text="{Binding ProductName}" FontAttributes="Bold"/>
+                        </StackLayout>
+                    </StackLayout>
+                </DataTemplate>
+            </sflv:SfListView.ItemTemplate>
+        </sflv:SfListView>
+    </Grid>
+
+
+
+</mvvm:TinyView>
