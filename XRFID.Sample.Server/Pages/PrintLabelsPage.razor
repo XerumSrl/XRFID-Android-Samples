@@ -13,7 +13,7 @@
 @inject IMapper mapper;
 @inject ILogger<PrintLabelsPage> _logger;
 
-<h3>PrintPage</h3>
+<h1>PrintLabels</h1>
 
 <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
     <MudStack Class="my-3">
@@ -26,28 +26,33 @@
         <MudSelect T="LabelModel" Label="Label" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Required="true" Value="@selectedLabel" ValueChanged="GetVariables">
             @foreach (var label in labels)
             {
-                <MudSelectItem Value="@label">@label.Name Rev. @label.Version</MudSelectItem>
+                <MudSelectItem Value="@label">@label.Name [Rev. @label.Version]</MudSelectItem>
             }
         </MudSelect>
 
         <MudNumericField T="int" Variant="Variant.Outlined" Label="Label Quantity" For="()=>labelQuantity" @bind-Value="labelQuantity" />
 
-        <MudTextField T="string" Label="Label Template" Value="@labelContent" ValueChanged="(x) => SetContent(x)" Lines="5" ReadOnly="false" />
+        <MudTextField T="string" Label="Label Template" Value="@labelContent" ValueChanged="(x) => SetContent(x)" Lines="15" ReadOnly="false" Variant="Variant.Outlined" />
 
         @if (variables.Any())
         {
-            @foreach (var variable in variables)
-            {
-                if (variable.Name.Equals("epc", StringComparison.InvariantCultureIgnoreCase))
+            <MudCard Elevation="0" Outlined="true" >
+                <MudCardHeader>Variables</MudCardHeader>
+                <MudCardContent>
+                @foreach (var variable in variables)
                 {
-                    <MudTextField T="string" Label="@variable.Name" @bind-Value="@variable.Value" Required="true" RequiredError="@(variable.Name+ " is required")" Validation="@( new RegularExpressionAttribute(@"^([0-9a-fA-F]{32}|[0-9a-fA-F]{24})$"))" ErrorText="EPC must be a valix HEX rapresentation of 24 or 32 charachers" />
-                }
-                else
-                {
-                    <MudTextField T="string" Label="@variable.Name" @bind-Value="@variable.Value" />
-                }
+                    if (variable.Name.Equals("epc", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                            <MudTextField T="string" Variant="Variant.Outlined" Label="@variable.Name" @bind-Value="@variable.Value" Required="true" RequiredError="@("The " + variable.Name+ " Field is required")" Validation="@( new RegularExpressionAttribute(@"^([0-9a-fA-F]{32}|[0-9a-fA-F]{24})$"){ErrorMessage= "EPC must be a valix HEX rapresentation of 24 or 32 charachers"})" />
+                    }
+                    else
+                    {
+                            <MudTextField T="string" Variant="Variant.Outlined" Label="@variable.Name" @bind-Value="@variable.Value" />
+                    }
 
-            }
+                }
+                </MudCardContent>
+            </MudCard>
         }
 
         <MudStack Row="true" Class="my-6 d-flex justify-end">
@@ -126,22 +131,25 @@
 
                 writer.AutoFlush = false;
 
+                string label = labelContent;
+
                 for (int curLabel = 1; curLabel <= labelQuantity; curLabel++)
                 {
                     foreach (var variable in variables)
                     {
                         string oldValue = "{" + variable.Name + "}";
                         string newValue = variable.Value ?? "";
-                        labelContent = labelContent.Replace(oldValue, newValue);
+                        label = label.Replace(oldValue, newValue);
                     }
 
                     // progressivo numerazione
                     string currentLabel = string.Format($"{curLabel}/{labelQuantity}");
-                    labelContent = labelContent.Replace("{currentLabel}", currentLabel);
+                    label = label.Replace("{currentLabel}", currentLabel);
+                    label += "\r\n";
 
-                    _logger.LogTrace("[Post] printed label: \n{labelContent}", labelContent);
+                    _logger.LogTrace("[Post] printed label: \n{labelContent}", label);
 
-                    await writer.WriteAsync(labelContent);
+                    await writer.WriteAsync(label);
                     await writer.FlushAsync();
                 }
             }
@@ -192,6 +200,8 @@
             startIndex = closeIndex + 1;
 
         } while (true);
+
+        variables = variables.GroupBy(g => g.Name).Select(s => s.First()).ToList();
     }
 
     private void SetContent(string content)
