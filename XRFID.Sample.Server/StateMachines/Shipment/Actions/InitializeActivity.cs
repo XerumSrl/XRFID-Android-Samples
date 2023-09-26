@@ -42,13 +42,12 @@ public class InitializeActivity :
             throw new InvalidOperationException("Unable to initialize shipment state machine. Reader id is empty");
         }
 
-        if (reader.CorrelationId != context.Saga.CorrelationId || reader.ActiveMovementId != context.Saga.MovementId)
+        if (reader.CorrelationId != context.Saga.CorrelationId)
         {
             logger.LogDebug("StartActivity|Updating reader {Id}: CorrelationId: {CorrelationId} -> {CorrelationId} MovementId: {MovementId} -> {MovementId}",
                 reader.Id, reader.CorrelationId, context.Saga.CorrelationId, reader.ActiveMovementId, context.Saga.MovementId);
 
             reader.CorrelationId = context.Saga.CorrelationId;
-            reader.ActiveMovementId = context.Saga.MovementId;
 
             await readerRepository.UpdateAsync(reader);
             await uowk.SaveAsync();

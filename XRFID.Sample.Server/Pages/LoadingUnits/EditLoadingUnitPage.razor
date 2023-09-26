@@ -179,7 +179,7 @@
                 //notificare item non esistente
             }
 
-            snackbar.Add($"Item {item.Name} dleted", MudBlazor.Severity.Success);
+            snackbar.Add($"Item {item.Name} deleted", MudBlazor.Severity.Success);
         }
     }
 
@@ -210,7 +210,7 @@
                 return;
             }
 
-            await loadingUnitItemRepository.CreateAsync(new LoadingUnitItem
+            var result = await loadingUnitItemRepository.CreateAsync(new LoadingUnitItem
             {
                     Name = selectedProduct.Name,
                     Code = selectedProduct.Code,
@@ -224,7 +224,8 @@
                     LoadingUnitId = Id,
             });
             await uowk.SaveAsync();
-
+            ItemList.Add(result);
+            snackbar.Add($"Item {result.Name} added", MudBlazor.Severity.Success);
             selectedProduct = null;
 
             adding = false;

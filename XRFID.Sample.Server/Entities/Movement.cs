@@ -1,4 +1,6 @@
-﻿namespace XRFID.Sample.Server.Entities;
+﻿using XRFID.Sample.Common.Enumerations;
+
+namespace XRFID.Sample.Server.Entities;
 
 public class Movement : AuditEntity
 {
@@ -27,4 +29,6 @@ public class Movement : AuditEntity
     public Guid? OrderId { get; set; }
 
     public string? OrderReference { get; set; }
+
+    public MovementDirection Direction { get; set; } = MovementDirection.In;
 }

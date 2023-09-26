@@ -1,5 +1,6 @@
 ﻿using Xerum.XFramework.Common.Dto;
 using Xerum.XFramework.Common.Enums;
+using XRFID.Sample.Common.Enumerations;
 
 namespace XRFID.Sample.Common.Dto;
 
@@ -82,4 +83,6 @@ public class MovementDto : RestEntityDto
     public Guid? OrderId { get; set; }
 
     public string? OrderReference { get; set; }
+
+    public MovementDirection Direction { get; set; } = MovementDirection.In;
 }

@@ -11,7 +11,7 @@ using XRFID.Sample.Server.Database;
 namespace XRFID.Sample.Server.Migrations
 {
     [DbContext(typeof(XRFIDSampleContext))]
-    [Migration("20230925100132_Initial")]
+    [Migration("20230926150446_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -205,6 +205,9 @@ namespace XRFID.Sample.Server.Migrations
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("Direction")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("INTEGER");

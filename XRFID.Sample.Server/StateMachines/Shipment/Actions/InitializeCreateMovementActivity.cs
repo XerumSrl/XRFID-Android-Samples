@@ -10,7 +10,7 @@ using XRFID.Sample.Server.StateMachines.Shipment.States;
 
 namespace XRFID.Sample.Server.StateMachines.Shipment.Actions;
 internal class InitializeCreateMovementActivity :
-    IStateMachineActivity<ShipmentState, IInitializeEvent>
+    IStateMachineActivity<ShipmentState, IGpiEvent>
 {
     private readonly IServiceProvider serviceProvider;
     private readonly ReaderRepository readerRepository;
@@ -48,7 +48,7 @@ internal class InitializeCreateMovementActivity :
         visitor.Visit(this);
     }
 
-    public async Task Execute(BehaviorContext<ShipmentState, IInitializeEvent> context, IBehavior<ShipmentState, IInitializeEvent> next)
+    public async Task Execute(BehaviorContext<ShipmentState, IGpiEvent> context, IBehavior<ShipmentState, IGpiEvent> next)
     {
         Reader? reader = (await readerRepository.GetAsync(q => q.Id == context.Saga.ReaderId)).FirstOrDefault();
         if (reader is null || context.Saga.ReaderId == Guid.Empty)
@@ -77,12 +77,18 @@ internal class InitializeCreateMovementActivity :
 
 
             await movementRepository.DeactivateByReaderId(reader.Id);
+            if (context.Message.GpiId == 2)
+            {
 
+            }
             var newMovement = new Movement
             {
                 ReaderId = reader.Id,
                 Name = $"{reader.Name}_{DateTime.Now}",
                 IsActive = true,
+
+                Direction = context.Message.GpiId == 2 ? Common.Enumerations.MovementDirection.In :
+                (context.Message.GpiId == 3 ? Common.Enumerations.MovementDirection.Out : Common.Enumerations.MovementDirection.In),
             };
             await movementRepository.CreateAsync(newMovement);
             await uowk.SaveAsync();
@@ -157,10 +163,23 @@ internal class InitializeCreateMovementActivity :
             ActivMoveId = movement.Id,
         });
 
+        #region Update Reader
+        if (reader.ActiveMovementId != context.Saga.MovementId)
+        {
+            logger.LogDebug("StartActivity|Updating reader {Id}: CorrelationId: {CorrelationId} -> {CorrelationId} MovementId: {MovementId} -> {MovementId}",
+                reader.Id, reader.CorrelationId, context.Saga.CorrelationId, reader.ActiveMovementId, context.Saga.MovementId);
+
+            reader.ActiveMovementId = context.Saga.MovementId;
+
+            await readerRepository.UpdateAsync(reader);
+            await uowk.SaveAsync();
+        }
+        #endregion
+
         await next.Execute(context);
     }
 
-    public Task Faulted<TException>(BehaviorExceptionContext<ShipmentState, IInitializeEvent, TException> context, IBehavior<ShipmentState, IInitializeEvent> next) where TException : Exception
+    public Task Faulted<TException>(BehaviorExceptionContext<ShipmentState, IGpiEvent, TException> context, IBehavior<ShipmentState, IGpiEvent> next) where TException : Exception
     {
         return next.Faulted(context);
     }

@@ -10,16 +10,24 @@ namespace XRFID.Sample.Server.Workers;
 public class CheckPageWorker
 {
     private readonly MovementItemRepository movementItemRepository;
+    private readonly MovementRepository movementRepository;
     private readonly ILogger<CheckPageWorker> logger;
 
 
     private List<CheckItemModel> _viewItems = new List<CheckItemModel>();
     private Guid ActiveId = Guid.Empty;
 
+    private Movement _movement;
+
+    public bool Gpi1IsOn = false;
+    public bool Gpi2IsOn = false;
+    public bool Gpi3IsOn = false;
+
     public CheckPageWorker(IServiceProvider serviceProvider, ILogger<CheckPageWorker> logger)
     {
         var scope = serviceProvider.CreateScope();
         movementItemRepository = scope.ServiceProvider.GetRequiredService<MovementItemRepository>();
+        movementRepository = scope.ServiceProvider.GetRequiredService<MovementRepository>();
 
         this.logger = logger;
     }
@@ -29,7 +37,12 @@ public class CheckPageWorker
         CheckItemModel? foundItem = _viewItems.Where(w => w.Epc == epc).FirstOrDefault();
         if (foundItem is not null)
         {
-            foundItem.CheckStatus = CheckStatusEnum.Found;
+            if (foundItem.CheckStatus == CheckStatusEnum.NotFound)
+            {
+                foundItem.CheckStatus = CheckStatusEnum.Found;
+            }
+
+            foundItem.Direction = _movement?.Direction ?? Common.Enumerations.MovementDirection.In;
         }
         else
         {
@@ -48,49 +61,6 @@ public class CheckPageWorker
                                          (item.Status == ItemStatus.NotFound ? CheckStatusEnum.NotFound : CheckStatusEnum.Error),
                 DateTime = item.LastModificationTime,
             });
-        }
-    }
-
-    public async Task SetViewItems()
-    {
-        _viewItems.Clear();
-
-
-
-        List<MovementItem> dailyItems = new List<MovementItem>();
-
-        try
-        {
-            dailyItems = await movementItemRepository.GetAsync(q => q.CreationTime >= DateTime.Today);
-            if (dailyItems.IsNullOrEmpty())
-            {
-                return;
-            }
-
-            foreach (var dItem in dailyItems)
-            {
-                try
-                {
-                    CheckItemModel vItem = new CheckItemModel
-                    {
-                        Name = dItem.Name ?? string.Empty,
-                        Epc = dItem.Epc,
-                        Description = dItem.Description,
-                        CheckStatus = dItem.Status == ItemStatus.Found ? CheckStatusEnum.Found :
-                                             (dItem.Status == ItemStatus.NotFound ? CheckStatusEnum.NotFound : CheckStatusEnum.Error),
-                        DateTime = dItem.LastModificationTime,
-                    };
-                    _viewItems.Add(vItem);
-                }
-                catch (Exception ex)
-                {
-                    logger.LogWarning(ex, "");
-                }
-            }
-        }
-        catch (Exception)
-        {
-            return;
         }
     }
 
@@ -118,6 +88,8 @@ public class CheckPageWorker
             throw new Exception("No items");
         }
 
+        _movement = await movementRepository.GetAsync(Id);
+
         foreach (var item in itemList)
         {
             try
@@ -140,6 +112,27 @@ public class CheckPageWorker
         }
 
         return false;
+    }
+
+    public async Task<bool> StartStop(int pin)
+    {
+        switch (pin)
+        {
+            case 1:
+                Gpi1IsOn = !Gpi1IsOn;
+                return Gpi1IsOn;
+            case 2:
+                Gpi2IsOn = !Gpi2IsOn;
+                return Gpi2IsOn;
+            case 3:
+                Gpi3IsOn = !Gpi3IsOn;
+                return Gpi3IsOn;
+            default:
+                Gpi1IsOn = false;
+                Gpi2IsOn = false;
+                Gpi3IsOn = false;
+                return false;
+        }
     }
 
     public bool ItemsIsEmpty()
