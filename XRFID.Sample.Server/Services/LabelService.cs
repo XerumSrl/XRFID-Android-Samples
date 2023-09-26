@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.IdentityModel.Tokens;
 using XRFID.Sample.Common.Dto;
-using XRFID.Sample.Common.Dto.Create;
 using XRFID.Sample.Server.Database;
 using XRFID.Sample.Server.Entities;
 using XRFID.Sample.Server.Repositories;
@@ -19,6 +18,18 @@ public class LabelService
         this.repository = repository;
         this.mapper = mapper;
         this.uowk = uowk;
+    }
+
+    public async Task<List<LabelDto>> GetAsync()
+    {
+        List<Label> labels = await repository.GetAsync();
+
+        if (!labels.Any())
+        {
+            throw new KeyNotFoundException("Resource not found");
+        }
+
+        return mapper.Map<List<LabelDto>>(labels);
     }
 
     public async Task<LabelDto> GetByIdAsync(Guid id)
@@ -53,5 +64,4 @@ public class LabelService
 
         return mapper.Map<LabelDto>(result);
     }
-
 }

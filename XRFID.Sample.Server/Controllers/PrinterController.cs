@@ -2,7 +2,6 @@
 using System.Data;
 using Xerum.XFramework.Common;
 using XRFID.Sample.Common.Dto;
-using XRFID.Sample.Common.Dto.Create;
 using XRFID.Sample.Server.Services;
 
 namespace XRFID.Sample.Server.Controllers;
@@ -21,6 +20,39 @@ public class PrinterController : ControllerBase
         _responseDataFactory = responseDataFactory;
         _logger = logger;
         _printerService = printerService;
+    }
+
+    [HttpGet]
+    [ProducesResponseType(typeof(XResponseData<List<PrinterDto>>), 200)]
+    [ProducesResponseType(typeof(XResponseData), 400)]
+    [ProducesResponseType(typeof(XResponseData), 404)]
+    [ProducesResponseType(typeof(XResponseData), 500)]
+    [ProducesResponseType(typeof(XResponseData), 501)]
+    public async Task<IActionResult> GetBynameAsync()
+    {
+        XResponseData response;
+        try
+        {
+            response = _responseDataFactory.Ok<List<PrinterDto>>(await _printerService.GetAsync());
+        }
+        catch (KeyNotFoundException ex)
+        {
+            response = _responseDataFactory.NotFound(ex.Message);
+        }
+        catch (ArgumentException ex)
+        {
+            response = _responseDataFactory.BadRequest(ex.Message);
+        }
+        catch (NotImplementedException ex)
+        {
+            response = _responseDataFactory.NotImplemented(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            response = _responseDataFactory.InternalError(ex.Message);
+        }
+
+        return StatusCode(response.Code, response);
     }
 
     [HttpGet("ByName")]

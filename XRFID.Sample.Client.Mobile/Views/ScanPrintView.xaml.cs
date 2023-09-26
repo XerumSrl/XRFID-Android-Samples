@@ -4,8 +4,7 @@ namespace XRFID.Sample.Client.Mobile.Views;
 
 public partial class ScanPrintView
 {
-    private readonly ScanPrintViewModel viewModel;
-    public ScanPrintView()
+    public ScanPrintView(ScanPrintViewModel viewModel)
     {
         InitializeComponent();
         BindingContext = viewModel;

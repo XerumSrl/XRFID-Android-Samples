@@ -5,8 +5,6 @@ namespace XRFID.Sample.Client.Mobile.Views;
 
 public partial class RapidReadView
 {
-
-
     public RapidReadView(RapidReadViewModel viewModel)
     {
         InitializeComponent();
