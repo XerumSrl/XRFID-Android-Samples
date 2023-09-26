@@ -81,11 +81,41 @@ public class RestApiHelper
 
         return result;
     }
+
     public async Task<ProductDto?> GetProductByEpcAsync(string epc)
     {
         //Request
         var request = new RestRequest("Product/ByEpc");
         request.AddQueryParameter("epc", epc);
+
+        ProductDto? result;
+
+        try
+        {
+            RestResponse response = await _client.GetAsync(request);
+            if ((int)response.StatusCode >= 400)
+            {
+                return null;
+            }
+            if (response.Content is null)
+            {
+                return null;
+            }
+            result = JsonSerializer.Deserialize<XResponseData<ProductDto>>(response.Content)?.Result;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+
+        return result;
+    }
+
+    public async Task<ProductDto?> GetProductByCodeAsync(string code)
+    {
+        //Request
+        var request = new RestRequest("Product/ByCode");
+        request.AddQueryParameter("code", code);
 
         ProductDto? result;
 
@@ -260,6 +290,84 @@ public class RestApiHelper
             return null;
         }
 
+        return result;
+    }
+    #endregion
+
+    #region Label
+    public async Task<List<LabelDto>?> GetLabelsAsync()
+    {
+        var request = new RestRequest("Label");
+        List<LabelDto>? result;
+
+        try
+        {
+            RestResponse response = await _client.GetAsync(request);
+            if ((int)response.StatusCode >= 400)
+            {
+                return null;
+            }
+            if (response.Content is null)
+            {
+                return null;
+            }
+            result = JsonSerializer.Deserialize<XResponseData<List<LabelDto>>>(response.Content)?.Result;
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
+        return result;
+    }
+
+    public async Task<bool> SendPrintAsync(PrintLabelDto labelPrintDto)
+    {
+        var request = new RestRequest("Print");
+        request.AddBody(labelPrintDto);
+
+        try
+        {
+            RestResponse response = await _client.PostAsync(request);
+            if ((int)response.StatusCode >= 400)
+            {
+                return false;
+            }
+            if (response.Content is null)
+            {
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+        return true;
+    }
+    #endregion
+
+    #region Printer
+    public async Task<List<PrinterDto>?> GetPrintersAsync()
+    {
+        var request = new RestRequest("Printer");
+        List<PrinterDto>? result;
+
+        try
+        {
+            RestResponse response = await _client.GetAsync(request);
+            if ((int)response.StatusCode >= 400)
+            {
+                return null;
+            }
+            if (response.Content is null)
+            {
+                return null;
+            }
+            result = JsonSerializer.Deserialize<XResponseData<List<PrinterDto>>>(response.Content)?.Result;
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
         return result;
     }
     #endregion

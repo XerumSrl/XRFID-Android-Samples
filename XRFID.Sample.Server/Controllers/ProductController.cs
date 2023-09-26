@@ -55,6 +55,39 @@ public class ProductController : ControllerBase
         return StatusCode(response.Code, response);
     }
 
+    [HttpGet("ByCode")]
+    [ProducesResponseType(typeof(XResponseData<ProductDto>), 200)]
+    [ProducesResponseType(typeof(XResponseData), 400)]
+    [ProducesResponseType(typeof(XResponseData), 404)]
+    [ProducesResponseType(typeof(XResponseData), 500)]
+    [ProducesResponseType(typeof(XResponseData), 501)]
+    public async Task<IActionResult> GetByCodeAsync(string code)
+    {
+        XResponseData response;
+        try
+        {
+            response = _responseDataFactory.Ok<ProductDto?>(await _productService.GetByCodeAsync(code));
+        }
+        catch (KeyNotFoundException ex)
+        {
+            response = _responseDataFactory.NotFound(ex.Message);
+        }
+        catch (ArgumentException ex)
+        {
+            response = _responseDataFactory.BadRequest(ex.Message);
+        }
+        catch (NotImplementedException ex)
+        {
+            response = _responseDataFactory.NotImplemented(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            response = _responseDataFactory.InternalError(ex.Message);
+        }
+
+        return StatusCode(response.Code, response);
+    }
+
     [HttpGet("ByEpc")]
     [ProducesResponseType(typeof(XResponseData<ProductDto>), 200)]
     [ProducesResponseType(typeof(XResponseData), 400)]

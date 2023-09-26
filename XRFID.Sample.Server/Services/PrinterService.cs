@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.IdentityModel.Tokens;
 using XRFID.Sample.Common.Dto;
-using XRFID.Sample.Common.Dto.Create;
 using XRFID.Sample.Server.Database;
 using XRFID.Sample.Server.Entities;
 using XRFID.Sample.Server.Repositories;
@@ -19,6 +18,18 @@ public class PrinterService
         this.repository = repository;
         this.mapper = mapper;
         this.uowk = uowk;
+    }
+
+    public async Task<List<PrinterDto>> GetAsync()
+    {
+        List<Printer> result = await repository.GetAsync();
+
+        if (!result.Any())
+        {
+            throw new KeyNotFoundException("Resource not found");
+        }
+
+        return mapper.Map<List<PrinterDto>>(result);
     }
 
     public async Task<PrinterDto> GetByNameAsync(string name)

@@ -29,19 +29,37 @@
         </Grid>
     </Shell.TitleView>
 
-    <Picker x:Name="picker"
-        Title="Select a monkey">
-        <Picker.ItemsSource>
-            <x:Array Type="{x:Type x:String}">
-                <x:String>Baboon</x:String>
-                <x:String>Capuchin Monkey</x:String>
-                <x:String>Blue Monkey</x:String>
-                <x:String>Squirrel Monkey</x:String>
-                <x:String>Golden Lion Tamarin</x:String>
-                <x:String>Howler Monkey</x:String>
-                <x:String>Japanese Macaque</x:String>
-            </x:Array>
-        </Picker.ItemsSource>
-    </Picker>
+    <VerticalStackLayout Padding="10,0">
+        <Label Text="Select Printer" Padding="5,15,5,5"/>
+        <Frame BorderColor="Transparent" BackgroundColor="#E3F2FD" Padding="10,0">
+            <Picker x:Name="printerPicker"
+                Title="Select a Printer"
+                ItemsSource="{Binding PrinterList}"
+                ItemDisplayBinding="{Binding Name}"
+                SelectedItem="{Binding SelectedPrinter, Mode=TwoWay}"/>
+        </Frame>
+        <Label Text="Select Label" Padding="5,15,5,5"/>
+        <Frame BorderColor="Transparent" BackgroundColor="#E3F2FD" Padding="10,0">
+            <Picker x:Name="labelPicker"
+                Title="Select a label"
+                ItemsSource="{Binding LabelList}"
+                ItemDisplayBinding="{Binding Name}"
+                SelectedItem="{Binding SelectedLabel, Mode=TwoWay}"/>
+        </Frame>
+
+        <Label Text="Label Quantity" Padding="5,15,5,5"/>
+        <Frame BorderColor="Transparent" BackgroundColor="#E3F2FD" Padding="10,0">
+            <Entry x:Name="qty" Text="{Binding LabelQuantity, Mode=TwoWay}" Keyboard="Numeric"/>
+        </Frame>
+
+        <Label Text="Product Code" Padding="5,15,5,5"/>
+        <Frame BorderColor="Transparent" BackgroundColor="#E3F2FD" Padding="10,0">
+            <Entry x:Name="barcode" Text="{Binding Barcode, Mode=TwoWay}"/>
+        </Frame>
+
+        <Frame BorderColor="Transparent" Padding="0, 10">
+            <Button x:Name="send" Text="Submit" Command="{Binding SendCommand}" Padding="10,10"/>
+        </Frame>
+    </VerticalStackLayout>
 
 </mvvm:TinyView>

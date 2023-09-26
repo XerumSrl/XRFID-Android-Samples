@@ -91,7 +91,7 @@ public class SettingsViewModel : TinyViewModel
         Preferences.Default.Set("device_name", DeviceName);
         Preferences.Default.Set("api_endpoint", ApiEndpoint);
 
-        await Toast.Make("success, reboot application for changes to take effect", ToastDuration.Short).Show(cancellationTokenSource.Token);
+        await Toast.Make("success, reboot application for changes to take effect", ToastDuration.Long).Show(cancellationTokenSource.Token);
     }
 
     public override Task OnAppearing()

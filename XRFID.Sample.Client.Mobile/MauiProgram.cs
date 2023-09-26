@@ -76,6 +76,9 @@ public static class MauiProgram
         builder.Services.AddTransient<SettingsPage>();
         builder.Services.AddTransient<SettingsViewModel>();
 
+        builder.Services.AddTransient<ScanPrintView>();
+        builder.Services.AddTransient<ScanPrintViewModel>();
+
         builder.Services.AddTransient<InventoryRapidReadSettings>();
 
         MauiApp host = builder.Build();

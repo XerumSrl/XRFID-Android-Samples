@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Data;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using Xerum.XFramework.Common;
 using XRFID.Sample.Common.Dto;
-using XRFID.Sample.Common.Dto.Create;
 using XRFID.Sample.Server.Services;
 
 namespace XRFID.Sample.Server.Controllers;
@@ -128,6 +126,8 @@ public class PrintController : ControllerBase
                     labelContent = labelContent.Replace("{currentLabel}", currentLabel);
 
                     _logger.LogTrace("[Post] printed label: \n{labelContent}", labelContent);
+
+                    labelContent += "\r\n";
 
                     await writer.WriteAsync(labelContent);
                     await writer.FlushAsync();

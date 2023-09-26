@@ -50,4 +50,16 @@ public class ProductService
 
         return mapper.Map<ProductDto>(result);
     }
+
+    public async Task<ProductDto?> GetByCodeAsync(string code)
+    {
+        List<Product> resultList = await repository.GetAsync(q => q.Code == code);
+        if (!resultList.Any())
+        {
+            throw new KeyNotFoundException("Resource not found");
+        }
+
+        Product? result = resultList.FirstOrDefault() ?? throw new KeyNotFoundException("Resource not found");
+        return mapper.Map<ProductDto>(result);
+    }
 }
