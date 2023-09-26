@@ -3,12 +3,14 @@
 @using System.ComponentModel.DataAnnotations;
 @using XRFID.Sample.Server.Database;
 @using XRFID.Sample.Server.Entities;
+@using XRFID.Sample.Server.Helpers;
 @using XRFID.Sample.Server.Repositories;
 @using XRFID.Sample.Server.ViewModels;
+@using Xerum.XFramework.Common.Enums;
 @inject NavigationManager Navigation;
 @inject PrinterRepository printerRepository;
 @inject UnitOfWork uow;
-@inject ISnackbar Snackbar;
+@inject ISnackbar snackbar;
 
 <h1>Edit Printer @model.Name?</h1>
 
@@ -18,7 +20,18 @@
         <MudTextField T="string" Variant="Variant.Outlined" Label="Description" For="()=>model.Description" @bind-Value="model.Description" />
         <MudTextField T="string" Variant="Variant.Outlined" Label="IP Address" For="()=>model.Ip" @bind-Value="model.Ip" />
         <MudNumericField T="int" Variant="Variant.Outlined" Label="Port" For="()=>model.Port" @bind-Value="model.Port" />
-
+        <MudSelect Label="Manufacturer" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-Value="@model.Manufacturer" Required="true">
+            @foreach (PrinterManufacturers item in Enum.GetValues(typeof(PrinterManufacturers)))
+            {
+                <MudSelectItem Value="@item">@EnumHelper.GetDisplayText(item)</MudSelectItem>
+            }
+        </MudSelect>
+        <MudSelect Label="Language" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-Value="@model.Language" Required="true">
+            @foreach (PrinterLanguage item in Enum.GetValues(typeof(PrinterLanguage)))
+            {
+                <MudSelectItem Value="@item">@EnumHelper.GetDisplayText(item)</MudSelectItem>
+            }
+        </MudSelect>
         <MudStack Row="true" Class="my-6 d-flex justify-end">
             <MudButton OnClick="@(()=> Back())" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Back</MudButton>
             <MudButton OnClick="@(async ()=> await Submit())" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-3">Submit</MudButton>
@@ -52,6 +65,8 @@
                 Description = printer.Description,
                 Ip = printer.Ip,
                 Port = printer.Port,
+                Manufacturer = printer.Manufacturer ?? Xerum.XFramework.Common.Enums.PrinterManufacturers.Printronix,
+                Language = printer.Language ?? Xerum.XFramework.Common.Enums.PrinterLanguage.PGL
             };
     }
 
@@ -66,7 +81,7 @@
 
         if (printer.Name != model.Name && !(await IsNameUniqueAsync(model.Name)))
         {
-            Snackbar.Add($"Printer name {model.Name} already in use.", MudBlazor.Severity.Error);
+            snackbar.Add($"Printer name {model.Name} already in use.", MudBlazor.Severity.Error);
             return;
         }
 
@@ -77,12 +92,14 @@
                 Ip = model.Ip,
                 Port = model.Port,
                 Description = model.Description,
+                Manufacturer = model.Manufacturer,
+                Language = model.Language
 
             });
         await uow.SaveAsync();
         //fare comparire un popup che inserimento ok e rimanare alla pagina
 
-        Snackbar.Add($"Printer {model.Name} updated.", MudBlazor.Severity.Success);
+        snackbar.Add($"Printer {model.Name} updated.", MudBlazor.Severity.Success);
 
         Navigation.NavigateTo($"Printers");
 

@@ -9,7 +9,7 @@
 @inject LabelRepository labelRepository;
 @inject UnitOfWork uow;
 @inject IMapper mapper;
-@inject ISnackbar Snackbar;
+@inject ISnackbar snackbar;
 
 <h1>Labels</h1>
 
@@ -112,12 +112,12 @@
                 await labelRepository.DeleteAsync(item.Id);
                 await uow.SaveAsync();
                 LabelList.Remove(item);
-                Snackbar.Add($"Label {item.Name} updated.", Severity.Success);
+                snackbar.Add($"Label {item.Name} updated.", Severity.Success);
 
             }
             else
             {
-                Snackbar.Add("Invalid label Id.", Severity.Error);
+                snackbar.Add("Invalid label Id.", Severity.Error);
                 //notificare item non esistente
             }
         }

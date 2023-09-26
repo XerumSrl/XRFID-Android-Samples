@@ -8,7 +8,7 @@
 @inject SkuRepository skuRepository;
 @inject ProductRepository productRepository;
 @inject UnitOfWork uow;
-@inject ISnackbar Snackbar;
+@inject ISnackbar snackbar;
 
 <h1>Add New Product</h1>
 
@@ -71,7 +71,7 @@
 
         if (!(await IsEpcUniqueAsync(model.Epc)))
         {
-            Snackbar.Add($"Epc {model.Epc} already in use.", MudBlazor.Severity.Error);
+            snackbar.Add($"Epc {model.Epc} already in use.", MudBlazor.Severity.Error);
             return;
         }
 
@@ -90,7 +90,7 @@
         await uow.SaveAsync();
         //fare comparire un popup che inserimento ok e rimanare alla pagina
 
-        Snackbar.Add($"Product {model.Name} created.", MudBlazor.Severity.Success);
+        snackbar.Add($"Product {model.Name} created.", MudBlazor.Severity.Success);
 
         Navigation.NavigateTo($"Products");
 

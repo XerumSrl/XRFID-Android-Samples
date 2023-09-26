@@ -8,7 +8,7 @@
 @inject ProductRepository productRepository;
 @inject UnitOfWork uow;
 @inject IMapper mapper;
-@inject ISnackbar Snackbar;
+@inject ISnackbar snackbar;
 
 <h1>Products</h1>
 
@@ -99,12 +99,12 @@
                 await productRepository.DeleteAsync(item.Id);
                 await uow.SaveAsync();
                 ProductList.Remove(item);
-                Snackbar.Add($"Product {item.Name} deleted.", Severity.Success);
+                snackbar.Add($"Product {item.Name} deleted.", Severity.Success);
 
             }
             else
             {
-                Snackbar.Add("Invalid product Id.", Severity.Error);
+                snackbar.Add("Invalid product Id.", Severity.Error);
                 //notificare item non esistente
             }
             
