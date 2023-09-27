@@ -6,7 +6,7 @@ using XRFID.Demo.Server.Workers;
 
 namespace XRFID.Demo.Server.Consumers.Frontend;
 
-public class UpdateUiConsumer : IConsumer<StateMachineUiTagPublish>
+public class UpdateUiConsumer : IConsumer<StateMachineUiTagPublish>, IConsumer<StateMachineStatusPublish>
 {
     private readonly CheckPageWorker worker;
     private readonly IHubContext<UiMessageHub> hubContext;
@@ -43,5 +43,12 @@ public class UpdateUiConsumer : IConsumer<StateMachineUiTagPublish>
 
         //Send signalR messages
         await hubContext.Clients.All.SendAsync("RefreshTag");
+    }
+
+    public async Task Consume(ConsumeContext<StateMachineStatusPublish> context)
+    {
+        await worker.EditSMStatus(context.Message.State);
+
+        await hubContext.Clients.All.SendAsync("RefreshState");
     }
 }

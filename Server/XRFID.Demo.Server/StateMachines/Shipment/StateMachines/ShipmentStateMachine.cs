@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using MassTransit;
+using XRFID.Demo.Common.Enumerations;
+using XRFID.Demo.Server.Contracts;
 using XRFID.Demo.Server.StateMachines.Shipment.Actions;
 using XRFID.Demo.Server.StateMachines.Shipment.Contracts;
 using XRFID.Demo.Server.StateMachines.Shipment.Interfaces;
@@ -16,6 +18,7 @@ public class ShipmentStateMachine :
 
     public ShipmentStateMachine(IConfiguration configuration, IMapper mapper)
     {
+        #region Configuration
         this.configuration = configuration;
         this.mapper = mapper;
 
@@ -55,7 +58,9 @@ public class ShipmentStateMachine :
         Event(() => InitializeEventFaulted, x => x
             .CorrelateById(context => context.Message.Message.CorrelationId)  // Fault<T> includes the original message
             .SelectId(m => m.Message.Message.CorrelationId));
+        #endregion
 
+        #region During States
         //***************************** INITIAL STATE ********************************************************
 
         Initially(
@@ -63,8 +68,22 @@ public class ShipmentStateMachine :
             start => start
                 .TransitionTo(LoadingData)
                 .Activity(x => x.OfType<InitializeActivity>())
-                .TransitionTo(Ready),
+                .TransitionTo(Ready)
+                .PublishAsync(context => context.Init<StateMachineStatusPublish>(new StateMachineStatusPublish
+                {
+                    CorrelationId = context.Saga.CorrelationId,
+                    RederId = context.Saga.ReaderId,
+                    ActiveMovementId = Guid.Empty,
+                    State = StateMachineStateEnum.Ready,
+                })),
             stop => stop
+                .PublishAsync(context => context.Init<StateMachineStatusPublish>(new StateMachineStatusPublish
+                {
+                    CorrelationId = context.Saga.CorrelationId,
+                    RederId = context.Saga.ReaderId,
+                    ActiveMovementId = Guid.Empty,
+                    State = StateMachineStateEnum.Stop,
+                }))
                 .Finalize()));
 
         During(Initial,
@@ -89,7 +108,14 @@ public class ShipmentStateMachine :
                 .Then(ctx => ctx.Saga.DateModified = DateTime.Now)
                 .Activity(x => x.OfType<StartReadingActivity>())
                 .Then(ctx => ctx.Saga.DateModified = DateTime.Now)
-                .TransitionTo(Reading));
+                .TransitionTo(Reading)
+                .PublishAsync(context => context.Init<StateMachineStatusPublish>(new StateMachineStatusPublish
+                {
+                    CorrelationId = context.Saga.CorrelationId,
+                    RederId = context.Saga.ReaderId,
+                    ActiveMovementId = context.Saga.MovementId,
+                    State = StateMachineStateEnum.Reading,
+                })));
 
 
 
@@ -118,7 +144,14 @@ public class ShipmentStateMachine :
            When(ReadingTimeout.Received)
                .Activity(x => x.OfType<StopReadingTimeoutActivity>())
                .Then(ctx => ctx.Saga.DateModified = DateTime.Now)
-               .TransitionTo(Ready));
+               .TransitionTo(Ready)
+               .PublishAsync(context => context.Init<StateMachineStatusPublish>(new StateMachineStatusPublish
+               {
+                   CorrelationId = context.Saga.CorrelationId,
+                   RederId = context.Saga.ReaderId,
+                   ActiveMovementId = context.Saga.MovementId,
+                   State = StateMachineStateEnum.Ready,
+               })));
 
 
 
@@ -154,6 +187,13 @@ public class ShipmentStateMachine :
                 ctx.Saga.DateModified = DateTime.Now;
                 ctx.Saga.DateCompleted = DateTime.Now;
             })
+            .PublishAsync(context => context.Init<StateMachineStatusPublish>(new StateMachineStatusPublish
+            {
+                CorrelationId = context.Saga.CorrelationId,
+                RederId = context.Saga.ReaderId,
+                ActiveMovementId = context.Saga.MovementId,
+                State = StateMachineStateEnum.Stop,
+            }))
             .Finalize());
 
         DuringAny(
@@ -170,22 +210,27 @@ public class ShipmentStateMachine :
             Ignore(GpoBuzzerEvent),
             Ignore(GpoBuzzerTimeout.AnyReceived),
             Ignore(InitializeEvent));
-
+        #endregion
     }
 
+    #region Event
     public Event<IInitializeEvent> InitializeEvent { get; private set; }
     public Event<Fault<IInitializeEvent>> InitializeEventFaulted { get; private set; }
     public Event<IGpiEvent> GpiEvent { get; private set; }
     public Event<IGpoBuzzerEvent> GpoBuzzerEvent { get; private set; }
+    #endregion
 
-
+    #region States
     public State LoadingData { get; private set; }
     public State Ready { get; private set; }
     public State Stopping { get; private set; }
     public State Reading { get; private set; }
     public State Consolidate { get; private set; }
     public State Mismatch { get; private set; }
+    #endregion
 
+    #region Schedulers
     public Schedule<ShipmentState, ReadingExpired> ReadingTimeout { get; private set; }
     public Schedule<ShipmentState, GpoBuzzerExpired> GpoBuzzerTimeout { get; private set; }
+    #endregion
 }

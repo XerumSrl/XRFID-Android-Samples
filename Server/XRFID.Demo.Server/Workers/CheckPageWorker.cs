@@ -1,11 +1,16 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using Xerum.XFramework.Common.Enums;
+using XRFID.Demo.Common.Enumerations;
 using XRFID.Demo.Server.Entities;
 using XRFID.Demo.Server.Repositories;
 using XRFID.Demo.Server.ViewModels;
 using XRFID.Demo.Server.ViewModels.Enums;
 
 namespace XRFID.Demo.Server.Workers;
+
+/*@@ TO DO @@
+ * split for reader ID
+ */
 
 public class CheckPageWorker
 {
@@ -19,10 +24,15 @@ public class CheckPageWorker
 
     private Movement _movement;
 
+    #region GPI
     public bool Gpi1IsOn = false;
     public bool Gpi2IsOn = false;
     public bool Gpi3IsOn = false;
+    #endregion
 
+    #region States
+    private StateMachineStateEnum _stateMachineState = StateMachineStateEnum.Stop;
+    #endregion
     public CheckPageWorker(IServiceProvider serviceProvider, ILogger<CheckPageWorker> logger)
     {
         var scope = serviceProvider.CreateScope();
@@ -75,7 +85,7 @@ public class CheckPageWorker
 
     public async Task<bool> IdIsEqual(Guid Id)
     {
-        if (ActiveId == Id)
+        if (ActiveId == Id && ActiveId != Guid.Empty)
         {
             return true;
         }
@@ -83,13 +93,13 @@ public class CheckPageWorker
         ActiveId = Id;
         _viewItems.Clear();
 
+        _movement = await movementRepository.GetAsync(Id);
+
         List<MovementItem> itemList = await movementItemRepository.GetAsync(q => q.MovementId == Id);
         if (itemList.IsNullOrEmpty())
         {
             throw new Exception("No items");
         }
-
-        _movement = await movementRepository.GetAsync(Id);
 
         foreach (var item in itemList)
         {
@@ -135,6 +145,16 @@ public class CheckPageWorker
                 Gpi3IsOn = false;
                 return false;
         }
+    }
+
+    public async Task EditSMStatus(StateMachineStateEnum status)
+    {
+        _stateMachineState = status;
+    }
+
+    public StateMachineStateEnum GetSMStatus()
+    {
+        return _stateMachineState;
     }
 
     public bool ItemsIsEmpty()

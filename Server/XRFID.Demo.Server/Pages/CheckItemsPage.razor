@@ -1,4 +1,5 @@
 ﻿@page "/CheckItems"
+@using XRFID.Demo.Common.Enumerations;
 @using XRFID.Demo.Modules.Mqtt.Contracts;
 @using XRFID.Demo.Modules.Mqtt.Payloads;
 @using XRFID.Demo.Modules.Mqtt.Publishers;
@@ -87,6 +88,8 @@
                            Disabled="triggerEnable" OnClick="@(() => OnClickGpiSecondTrigger(true))">Start</MudButton>
             }
         </MudStack>
+
+        <MudAlert Severity="@alertSeverity">@alertText</MudAlert>
     </MudStack>
 </MudStack>
 
@@ -159,6 +162,9 @@
 
     private bool triggerEnable = true;
 
+    private Severity alertSeverity = Severity.Error;
+    private string alertText = "RFID Stop";
+
     protected override async Task OnInitializedAsync()
     {
         #region SignalR
@@ -174,12 +180,21 @@
             Items = await Worker.GetViewItems();
             await InvokeAsync(StateHasChanged);
         });
+
+        hubConnection.On("RefreshState", async () =>
+        {
+            SetState();
+
+            await InvokeAsync(StateHasChanged);
+        });
         await hubConnection.StartAsync();
         #endregion
 
         readers = await readerRepository.GetAsync();
 
         selectedReader = readers.FirstOrDefault();
+
+        SetState();
 
         gpi1IsOn = Worker.Gpi1IsOn;
         gpi2IsOn = Worker.Gpi2IsOn;
@@ -195,7 +210,7 @@
 
     //signalR connection open
     public bool IsConnected =>
-        hubConnection?.State == HubConnectionState.Connected;
+    hubConnection?.State == HubConnectionState.Connected;
 
     private async Task OnClickGpiButton(bool value)
     {
@@ -335,6 +350,31 @@
 
         return style;
     };
+
+    private void SetState()
+    {
+        var state = Worker.GetSMStatus();
+
+        switch (state)
+        {
+            case StateMachineStateEnum.Stop:
+                alertSeverity = Severity.Error;
+                alertText = "RFID Stop";
+                break;
+            case StateMachineStateEnum.Ready:
+                alertSeverity = Severity.Info;
+                alertText = "RFID ready to read";
+                break;
+            case StateMachineStateEnum.Reading:
+                alertSeverity = Severity.Success;
+                alertText = "RFID reading...";
+                break;
+            default:
+                alertSeverity = Severity.Error;
+                alertText = "RFID Stop";
+                break;
+        }
+    }
 
     public async ValueTask DisposeAsync()
     {
