@@ -3,7 +3,7 @@
 
 <PageTitle>XRFID Demo Webserver</PageTitle>
 
-<MudThemeProvider Theme="@theme" />
+<MudThemeProvider @bind-IsDarkMode="_darkMode" Theme="@theme" />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
@@ -11,6 +11,7 @@
     <MudAppBar Elevation="1" Dense="true">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudSpacer />
+        <MudSwitch T="bool" @bind-Checked="_darkMode" Label="Dark Mode (Beta)" />
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" ClipMode="@DrawerClipMode.Always" Elevation="1" Variant="@DrawerVariant.Mini" OpenMiniOnHover="true">
         <MudDrawerHeader Class="ml-n2 pl-n4">
@@ -30,10 +31,17 @@
 
  @code {
     bool _drawerOpen = true;
+    bool _darkMode = false;
 
     MudTheme theme = new MudTheme
         {
             Palette = new PaletteLight
+            {
+                AppbarBackground = new MudColor(229, 90, 51, 255),
+                Primary = new MudColor(229, 90, 51, 255),
+                Secondary = new MudColor(53, 102, 139, 255)
+            },
+            PaletteDark = new PaletteDark
             {
                 AppbarBackground = new MudColor(229, 90, 51, 255),
                 Primary = new MudColor(229, 90, 51, 255),

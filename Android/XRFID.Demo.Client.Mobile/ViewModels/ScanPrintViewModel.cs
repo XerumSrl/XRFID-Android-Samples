@@ -17,8 +17,6 @@ public partial class ScanPrintViewModel : TinyViewModel
 
     public ScanPrintViewModel(RestApiHelper restApiHelper, IBarcodeService barcodeService)
     {
-        barcodeService.InitBarcodeReader();
-
         WeakReferenceMessenger.Default.Register<BarcodeMessage>(this, (r, m) =>
         {
             try
@@ -35,6 +33,7 @@ public partial class ScanPrintViewModel : TinyViewModel
         SendCommand = new RelayCommand(Send);
         this.restApiHelper = restApiHelper;
         this.barcodeService = barcodeService;
+        barcodeService.InitBarcodeReader();
     }
 
     private async void Send()

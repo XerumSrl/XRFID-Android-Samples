@@ -36,7 +36,6 @@
 
 	<ItemGroup>
 		<Folder Include="Pages\Movements\" />
-		<Folder Include="Persist\" />
 		<Folder Include="wwwroot\images\" />
 	</ItemGroup>
 

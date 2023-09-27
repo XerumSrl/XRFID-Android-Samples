@@ -16,7 +16,12 @@ public class RestApiHelper
         _baseApiUrl = Preferences.Default.Get<string>("api_endpoint", "https://localhost:5001/api/");
 
         //Client creation
-        _client = new RestClient(_baseApiUrl);
+
+        var options = new RestClientOptions(_baseApiUrl)
+        {
+            RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
+        };
+        _client = new RestClient(options);
     }
 
     #region Requests
