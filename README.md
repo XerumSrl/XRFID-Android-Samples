@@ -61,6 +61,8 @@
 
 This project is designed to provide a sample of the RFID capabilities of Zebra mobile devices
 
+This repository is deprecated and currently unmaintained, see [XRFID-Demo](https://github.com/XerumSrl/XRFID-Demo) for a more up to date version.
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
